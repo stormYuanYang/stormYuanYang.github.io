@@ -1,18 +1,163 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>C语言中的extern,static,auto,register</title><meta name="generator" content="Hexo 5.2.0"></head><body>　　<div class="inner"><h2>C语言中的extern,static,auto,register</h2><p>今晚继续在阅读<a target="_blank" rel="noopener" href="https://github.com/cloudwu/skynet"><strong>Skynet</strong></a>的源代码时，发现了多处<strong>static</strong>关键词和<strong>extern</strong>关键词。读着读着，突然发现自己对static和extern的概念和作用有些模糊，所以索性花点时间重温static、extern以及和其作用类似的auto、register。接下来，将对extern、static、auto、register的概念和作用做一个总结，在此之前，先介绍几个前导概念。 什么是<strong>翻译单元</strong>？翻译单元一般可认为就是编译单元，而编译单元可以粗略地认为就是C编译器预处理之后的单个源文件。 什么是函数或变量声明(declaration)？声明一个函数或变量意味着，编译器知道这里有指定的一个<strong>标识符</strong>，然后编译器可以使用此标识符，但是函数或变量一定要在某处定义，否则虽然编译时不会报错，但是链接时就会找不到函数或变量定义。 什么是函数或变量定义(definition)？定义一个函数或变量意味着，编译器要在定义时为函数或变量分配内存。声明时，并不会分配内存，只是告诉编译器：“喂，我是XXX啦，我可以被你使用了，但是我可能定义在别处。”。 声明和定义有以下规则：函数或变量声明可以有多处，它的作用仅仅是告诉编译器其可以被使用，但是其定义只能有一处，因为同一个函数或变量只会有一个。如果你定义同一个函数或者变量多次，编译器就会报告重复定义的错误信息。 变量按<strong>作用域</strong>划分:</p>
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>C语言中的extern,static,auto,register | 不远,到理塘就回</title><meta name="author" content="天府三街小旋风"><meta name="copyright" content="天府三街小旋风"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="今晚继续在阅读Skynet的源代码时，发现了多处static关键词和extern关键词。读着读着，突然发现自己对static和extern的概念和作用有些模糊，所以索性花点时间重温static、extern以及和其作用类似的auto、register。接下来，将对extern、static、auto、register的概念和作用做一个总结，在此之前，先介绍几个前导概念。 什么是翻译单元？翻译单元一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C语言中的extern,static,auto,register">
+<meta property="og:url" content="https://coderdeepwater.cn/2019/04/12/c%E8%AF%AD%E8%A8%80%E4%B8%AD%E7%9A%84externstaticautoregister/index.html">
+<meta property="og:site_name" content="不远,到理塘就回">
+<meta property="og:description" content="今晚继续在阅读Skynet的源代码时，发现了多处static关键词和extern关键词。读着读着，突然发现自己对static和extern的概念和作用有些模糊，所以索性花点时间重温static、extern以及和其作用类似的auto、register。接下来，将对extern、static、auto、register的概念和作用做一个总结，在此之前，先介绍几个前导概念。 什么是翻译单元？翻译单元一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://coderdeepwater.cn/picture/p1.png">
+<meta property="article:published_time" content="2019-04-12T03:53:25.000Z">
+<meta property="article:modified_time" content="2020-12-01T10:01:24.972Z">
+<meta property="article:author" content="天府三街小旋风">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://coderdeepwater.cn/picture/p1.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://coderdeepwater.cn/2019/04/12/c%E8%AF%AD%E8%A8%80%E4%B8%AD%E7%9A%84externstaticautoregister/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  ClickShowText: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  justifiedGallery: {
+    js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+    css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '20-12-01 18:01:24'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.2.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" data-lazy-src="/picture/touxiang1.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">52</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">39</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">13</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div></div></div></div><div id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/picture/p1.png)"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">不远,到理塘就回</a></span><span id="menus"><div id="search_button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div></div><span class="close" id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></span></span></nav><div id="post-info"><h1 class="post-title">C语言中的extern,static,auto,register</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2019-04-12T03:53:25.000Z" title="发表于 19-04-12 11:53:25">19-04-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2020-12-01T10:01:24.972Z" title="更新于 20-12-01 18:01:24">20-12-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3c%E8%AF%AD%E8%A8%80/">深入理解c语言</a></span></div><div class="meta-secondline"> <span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.2k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>7分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>今晚继续在阅读<a target="_blank" rel="noopener" href="https://github.com/cloudwu/skynet"><strong>Skynet</strong></a>的源代码时，发现了多处<strong>static</strong>关键词和<strong>extern</strong>关键词。读着读着，突然发现自己对static和extern的概念和作用有些模糊，所以索性花点时间重温static、extern以及和其作用类似的auto、register。接下来，将对extern、static、auto、register的概念和作用做一个总结，在此之前，先介绍几个前导概念。 什么是<strong>翻译单元</strong>？翻译单元一般可认为就是编译单元，而编译单元可以粗略地认为就是C编译器预处理之后的单个源文件。 什么是函数或变量声明(declaration)？声明一个函数或变量意味着，编译器知道这里有指定的一个<strong>标识符</strong>，然后编译器可以使用此标识符，但是函数或变量一定要在某处定义，否则虽然编译时不会报错，但是链接时就会找不到函数或变量定义。 什么是函数或变量定义(definition)？定义一个函数或变量意味着，编译器要在定义时为函数或变量分配内存。声明时，并不会分配内存，只是告诉编译器：“喂，我是XXX啦，我可以被你使用了，但是我可能定义在别处。”。 声明和定义有以下规则：函数或变量声明可以有多处，它的作用仅仅是告诉编译器其可以被使用，但是其定义只能有一处，因为同一个函数或变量只会有一个。如果你定义同一个函数或者变量多次，编译器就会报告重复定义的错误信息。 变量按<strong>作用域</strong>划分:</p>
 <ul>
-<li>  <strong>全局变量</strong></li>
-<li>  <strong>局部变量</strong></li>
+<li><strong>全局变量</strong></li>
+<li><strong>局部变量</strong></li>
 </ul>
 <p>一个全局变量意味着，它必须声明在函数之外，它可以被所有其他函数访问。但是当static修饰全局变量时，此时全局变量只能被当前<strong>翻译单元</strong>内的所有函数访问)。 一个局部变量意味着，它必须声明在函数内或者语句块中，它只能在声明的函数或者语句块中被访问。 变量按<strong>生命周期</strong>划分：</p>
 <ul>
-<li>  程序执行期间存活的变量</li>
-<li>  函数执行期间存活的变量</li>
-<li>  语句块执行期间存活变量</li>
+<li>程序执行期间存活的变量</li>
+<li>函数执行期间存活的变量</li>
+<li>语句块执行期间存活变量</li>
 </ul>
 <p>函数按<strong>作用域</strong>划分：</p>
 <ul>
-<li>  外部函数(声明函数的默认策略，程序内都可以访问)</li>
-<li>  内部函数(一个翻译单元内能访问)</li>
+<li>外部函数(声明函数的默认策略，程序内都可以访问)</li>
+<li>内部函数(一个翻译单元内能访问)</li>
 </ul>
 <p>因为标准C并不支持内嵌函数，所以一般不考虑函数的生命周期。只要程序仍然在执行，函数就活着。 extern、static、auto、register是C语言用来表示函数或者变量的存储策略的4个关键词。他们对函数和变量的影响，如下表：</p>
 <p>存储策略</p>
@@ -23,7 +168,9 @@
 <p>整个程序内</p>
 <p><strong>static</strong></p>
 <p>程序执行期间</p>
-<p>函数：翻译单元内<br>全局变量：翻译单元内<br>局部变量：函数或者语句块中</p>
+<p>函数：翻译单元内<br />
+全局变量：翻译单元内<br />
+局部变量：函数或者语句块中</p>
 <p><strong>auto</strong></p>
 <p>函数或语句块执行期间</p>
 <p>只能修饰变量。函数或者语句块中。</p>
@@ -32,38 +179,28 @@
 <p>只能修饰变量。函数或者语句块中。</p>
 <p>接下来我们对其一一说明。 首先看<strong>extern</strong>关键词。extern的使用并不是那么频繁。对于函数来说，默认声明函数时就是外部函数。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span>)</span></span>;</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span>)</span></span>;</span><br></pre></td></tr></table></figure>
-
 <p>上述两个函数声明是等价的。 对于全局变量来说就有些不一样了(在函数外定义)。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">int</span> b;<span class="comment">//仅仅是声明b，并不会为b分配内存</span></span><br></pre></td></tr></table></figure>
-
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> b;<span class="comment">//定义b，为b分配内存，默认值是0</span></span><br></pre></td></tr></table></figure>
-
 <p>执行如下代码：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">int</span> b;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    b = <span class="number">10</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, b);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>编译器会报告类似“/home/yangyuan/training/C/main.c:4：对‘b’未定义的引用”的错误。原因就是，extern关键词仅仅声明b是一个外部变量，它的定义在其他某处。编译器都没有为b分配内存，你又如何能够访问b呢？执行如下代码：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="keyword">int</span> b;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, b);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>当我们去掉extern关键，<code>int b;</code>就由声明变成了定义。所以此代码可正常执行。我们继续看一段代码：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">int</span> b = <span class="number">10</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, b);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>这段代码可以执行，并得到输出结果10。但是编译器会给出警告“warning ‘b’ initialized and declared ‘extern’”，即一个声明为extern的变量却被初始化了，严格来讲这是错误的，但是编译器采用的策略是发出警告。 接下来看<strong>static</strong>关键词。当static修饰函数声明或定义时，其表明被修饰的函数只能在同一翻译单元内被访问。这样做，可以做一定程度上的封装和隐藏(不是完全的封装和隐藏，下文会解释)，避免和其他翻译单元发生名字冲突。当static修饰变量声明或定义时，就得分情况讨论：</p>
 <ul>
-<li>  static global variable(静态全局变量)</li>
-<li>  static local variable(静态局部变量)</li>
+<li>static global variable(静态全局变量)</li>
+<li>static local variable(静态局部变量)</li>
 </ul>
 <p>当static修饰的是全局变量时(定义在函数外)，其表明此变量只能在同一翻译单元内被访问。当static修饰的是局部变量时，其声明周期和全局变量一致(存活于程序执行期间)，但是其作用域仍然和普通的局部变量一样。只能在其声明的函数或语句块内被访问。比如：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, ++a);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    func();</span><br><span class="line">    a++;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>执行上述代码，编译器就会报告错误“‘a’ undeclared (first use in this function)”。 上文说到，static仅仅能做一定程度上的封装和隐藏。我们仍然能够通过指向被static修饰的函数或变量的指针来访问函数或变量。 再看<strong>auto</strong>关键词。这个关键词，很少使用。在C++的新标准中有其新的含义。在C语言中，它表示变量是一个自动变量，自动变量从其定义时生，从离开其作用域时死。可以粗略地认为auto修饰的变量就是局部变量，但是别忘了，局部变量被static修饰时，其作用域不变，但是其生存周期已和程序一致。所以，auto变量的范围小于局部变量。当然了，我们使用的最多的就是auto变量，局部变量默认就是auto变量，auto只是隐藏在幕后。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> <span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, ++a);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a = <span class="number">1</span>;<span class="comment">//auto关键词被省略了</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, ++a);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上述两个函数中定义的变量a是等价的。 最后看<strong>register</strong>关键词。这个关键词，几乎都被快被我们遗忘了，甚至C++在过去的一段时间里都废弃过这个关键词，直到C++17才重新启用这个关键词。一般而言，我们很少会使用到该关键词。在变量声明时修饰变量暗示C编译器将此变量存储在寄存器或者其他能快速存取的地方，而不是放入内存中。但是，C编译器不一定会将你用register修饰的变量存储在寄存器中，而是直接放在内存中，这是C编译器的自由。前文说了，register关键词只是暗示C编译器，到底怎么做仍然是C编译器的自由。当你使用register修饰一个变量的时候，这个变量的地址是无法被访问的，这是C编译器对变量的一种保护，你可以这样理解：存储在寄存器中的变量都不存在于内存中，怎么会有地址呢？如下代码：</p>
+<p>上述两个函数中定义的变量a是等价的。 最后看<strong>register</strong>关键词。这个关键词，几乎都被快被我们遗忘了，甚至C<ins>在过去的一段时间里都废弃过这个关键词，直到C</ins>17才重新启用这个关键词。一般而言，我们很少会使用到该关键词。在变量声明时修饰变量暗示C编译器将此变量存储在寄存器或者其他能快速存取的地方，而不是放入内存中。但是，C编译器不一定会将你用register修饰的变量存储在寄存器中，而是直接放在内存中，这是C编译器的自由。前文说了，register关键词只是暗示C编译器，到底怎么做仍然是C编译器的自由。当你使用register修饰一个变量的时候，这个变量的地址是无法被访问的，这是C编译器对变量的一种保护，你可以这样理解：存储在寄存器中的变量都不存在于内存中，怎么会有地址呢？如下代码：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">register</span> <span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%p\n&quot;</span>, &amp;a);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>运行上述代码，一般会出现类似“error address of register variable ‘a’ requested”这样的报错信息。 我们探究这些语言的细节，并不是为了成为语言律师，而是为了对其作用做到了然于胸。比如你对static的作用不了解，那么你在阅读开源C代码时，就很有可能遇到障碍，会让你感到<strong>confused</strong>。探究语言细节，但也不能咬文嚼字，在语言细节上玩一些文字游戏，这是得不偿失的，因为我们最终的目的是更好地阅读和编写代码，而不能本末倒置。</p>
-<p><span>↶ </span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">天府三街小旋风</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://coderdeepwater.cn/2019/04/12/c%E8%AF%AD%E8%A8%80%E4%B8%AD%E7%9A%84externstaticautoregister/">https://coderdeepwater.cn/2019/04/12/c语言中的externstaticautoregister/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://coderdeepwater.cn" target="_blank">不远,到理塘就回</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="/picture/p1.png" data-sites="wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2019/04/15/volatile/"><img class="prev-cover" data-lazy-src="/picture/p1.png" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">volatile</div></div></a></div><div class="next-post pull-right"><a href="/2019/04/09/lua%E4%B8%AD%E7%9A%84%E5%B0%BE%E8%B0%83%E7%94%A8/"><img class="next-cover" data-lazy-src="/picture/p1.png" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">lua中的尾调用</div></div></a></div></nav></div><div class="aside_content" id="aside_content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><img class="avatar-img" data-lazy-src="/picture/touxiang1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">天府三街小旋风</div><div class="author-info__description"></div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">52</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">39</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">13</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/stormYuanYang"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="mailto:yytqmj@vip.qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div></div><div class="card-widget card-announcement"><div class="card-content"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">欢迎来到我的博客!</div></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="card-content"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2020/03/11/lua-table%E7%9A%84%E6%9C%80%E5%A4%A7%E5%AE%B9%E9%87%8F/" title="lua table的最大容量"><img data-lazy-src="/picture/p1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="lua table的最大容量"/></a><div class="content"><a class="title" href="/2020/03/11/lua-table%E7%9A%84%E6%9C%80%E5%A4%A7%E5%AE%B9%E9%87%8F/" title="lua table的最大容量">lua table的最大容量</a><time datetime="2020-03-11T03:28:18.000Z" title="发表于 20-03-11 11:28:18">20-03-11</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2019/08/08/index2addr/" title="index2addr"><img data-lazy-src="/picture/p1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="index2addr"/></a><div class="content"><a class="title" href="/2019/08/08/index2addr/" title="index2addr">index2addr</a><time datetime="2019-08-08T12:37:17.000Z" title="发表于 19-08-08 20:37:17">19-08-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2019/08/02/%E8%87%AA%E5%AE%9A%E4%B9%89%E4%BD%A0%E8%87%AA%E5%B7%B1%E7%9A%84linux%E5%91%BD%E4%BB%A4/" title="自定义你自己的linux命令"><img data-lazy-src="/picture/p1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="自定义你自己的linux命令"/></a><div class="content"><a class="title" href="/2019/08/02/%E8%87%AA%E5%AE%9A%E4%B9%89%E4%BD%A0%E8%87%AA%E5%B7%B1%E7%9A%84linux%E5%91%BD%E4%BB%A4/" title="自定义你自己的linux命令">自定义你自己的linux命令</a><time datetime="2019-08-02T03:35:35.000Z" title="发表于 19-08-02 11:35:35">19-08-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2019/08/01/make%E6%97%B6%E9%81%87%E5%88%B0%E6%97%A0%E6%89%A7%E8%A1%8C%E6%9D%83%E9%99%90%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3/" title="make时遇到无执行权限如何解决"><img data-lazy-src="/picture/p1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="make时遇到无执行权限如何解决"/></a><div class="content"><a class="title" href="/2019/08/01/make%E6%97%B6%E9%81%87%E5%88%B0%E6%97%A0%E6%89%A7%E8%A1%8C%E6%9D%83%E9%99%90%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3/" title="make时遇到无执行权限如何解决">make时遇到无执行权限如何解决</a><time datetime="2019-08-01T08:00:03.000Z" title="发表于 19-08-01 16:00:03">19-08-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2019/07/11/%E9%AB%98%E6%95%88%E5%8D%B4%E5%AD%A4%E7%8B%AC%E7%9A%84switch/" title="高效却孤独的switch"><img data-lazy-src="/picture/p1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="高效却孤独的switch"/></a><div class="content"><a class="title" href="/2019/07/11/%E9%AB%98%E6%95%88%E5%8D%B4%E5%AD%A4%E7%8B%AC%E7%9A%84switch/" title="高效却孤独的switch">高效却孤独的switch</a><time datetime="2019-07-11T12:40:30.000Z" title="发表于 19-07-11 20:40:30">19-07-11</time></div></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(/picture/p1.png)"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2020 By 天府三街小旋风</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="icp"><a><img class="icp-icon" src="/img/icp.png" alt="ICP"/><span>蜀ICP备19006467号</span></a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div></div><hr/><div id="local-search-results"><div id="local-hits"></div><div id="local-stats"><div class="local-search-stats__hr" id="hr"><span>由</span> <a target="_blank" rel="noopener" href="https://github.com/wzpan/hexo-generator-search" style="color:#49B1F5;">hexo-generator-search</a>
+ <span>提供支持</span></div></div></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></div></body></html>
