@@ -346,9 +346,9 @@
       
       <categories>
           
-          <category> 深入理解lua语言 </category>
-          
           <category> Oops!陷阱 </category>
+          
+          <category> 深入理解lua语言 </category>
           
       </categories>
       
