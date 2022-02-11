@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>abs</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>abs</h2><p>函数<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstdlib/abs/"><strong>abs</strong></a>返回参数的绝对值。 其声明如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">abs</span><span class="params">(<span class="type">int</span> n)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个函数的实现本身非常简单，让我们直接看源代码。abs的实现放在stdlib&#x2F;abs.c中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Copyright (C) 1991, 1997 Free Software Foundation, Inc.</span></span><br><span class="line"><span class="comment">   This file is part of the GNU C Library.</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">undef</span> abs</span></span><br><span class="line"><span class="comment">/* Return the absolute value of I.  */</span></span><br><span class="line"><span class="type">int</span> </span><br><span class="line"><span class="title function_">abs</span> <span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> i &lt; <span class="number">0</span> ? -i : i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>abs的实现就一行代码。简单地判断i和0的大小，如果i小于0，直接返回-i，否则返回i本身。 有一个陷阱需要注意：当参数i是<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/climits/"><strong>INT_MIN</strong></a>时，即int的最小值时，这个函数就无法正确获取i的绝对值了。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;limits.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">1</span> &lt;&lt; <span class="number">31</span>;<span class="comment">//如果int是32位的话，1&lt;&lt;31就是最小值</span></span><br><span class="line">    <span class="type">int</span> b = INT_MIN;</span><br><span class="line">    <span class="type">int</span> c = INT_MIN + <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;abs(a):%d\tabs(b):%d\tabs(c):%d\n&quot;</span>, <span class="built_in">abs</span>(a), <span class="built_in">abs</span>(b), <span class="built_in">abs</span>(c));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行上述代码，在我的计算机上打印结果如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">abs</span>(a):<span class="number">-2147483648</span>   <span class="built_in">abs</span>(b):<span class="number">-2147483648</span>  <span class="built_in">abs</span>(c):<span class="number">2147483647</span></span><br></pre></td></tr></table></figure>
+
+<p>是不是感到很奇怪，怎么a、b的绝对值打印出来还是个负数而且就是其本身。<strong>signed</strong>类型的整数在计算机内存中采用2进制的<strong>补码</strong>表示。其首位是<strong>符号位</strong>：</p>
+<p>符号位值</p>
+<p>整数类型</p>
+<p>0</p>
+<p>正数</p>
+<p>1</p>
+<p>负数</p>
+<p>剩下的位数则表示整数的值。以<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstdint/"><strong>int8_t</strong></a>(一个字节，8位)为例构造几个例子：</p>
+<p>10进制</p>
+<p>2进制补码</p>
+<p>1</p>
+<p>0000,0001</p>
+<p>255(int8_t类型的最大值)</p>
+<p>0111,1111</p>
+<p>0</p>
+<p>0000,0000</p>
+<p>-1</p>
+<p>1111,1111</p>
+<p>-255</p>
+<p>1000,0001</p>
+<p>-256(int8_t类型的最小值)</p>
+<p>1000,0000</p>
+<p>由上表，你大概能推测出，为什么abs(INT_MIN)不能得到正确的绝对值了。因为在同一signed类型中，根本表示不了INT_MIN的绝对值。如果是int8_t，那么int8_t的最小值的绝对值256没有办法在int8_t中表示出来。至于为什么int8_t表示不了256，如果你记不清了，可以复习一下大学里的相关课程，特别是《数字电子技术基础》。 既然表示不了INT_MIN的绝对值，为什么返回值还是INT_MIN本身呢？这就涉及到计算机内部的求相反数的运算规则了(取决于你计算机的具体实现,也有其他的方法)：</p>
+<ul>
+<li>步骤1：首先将变量所有位<strong>取反</strong>(比如对1000,000取反，得到0111,1111)；</li>
+<li>步骤2：然后用1加上取反后的值;</li>
+<li>步骤3：步骤2的结果即是相反数。</li>
+</ul>
+<p>同样的，我构造几个例子:</p>
+<p>步骤&#x2F;整数(二进制表示)</p>
+<p>-255(即1000,0001)</p>
+<p>255(即0111,1111)</p>
+<p>-256(即1000,0000)</p>
+<p>步骤1</p>
+<p>对-255取反得到254(即0111,1110)</p>
+<p>对255取反得到-256(1000,0000)</p>
+<p>对-256取反得255(即0111,1111)</p>
+<p>步骤2</p>
+<p>1+254得255(即0111,1111)</p>
+<p>1+(-256)得-255(即1000,0001)</p>
+<p>1+255得-256(即1000,0000)</p>
+<p>步骤3</p>
+<p>得到结果：255</p>
+<p>得到结果:-255</p>
+<p>得到结果：-256</p>
+<p>由上表可知，传给abs的参数是INT_MIN时，返回的结果必然还是INT_MIN。</p>
+<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>

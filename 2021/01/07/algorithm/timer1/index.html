@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>定时器（一）——优化分析与思考</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>定时器（一）——优化分析与思考</h2><h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>最近新项目在进行底层代码的重构和优化（代码源自老项目D1），分配给我的任务是对原来的玩家定时器进行优化。</p>
+<h2 id="原方案分析"><a href="#原方案分析" class="headerlink" title="原方案分析"></a>原方案分析</h2><p>轮询的方式：</p>
+<ol start="2">
+<li>一个每隔1000毫秒触发一次的定时器负责触发playerManager对象上的tick(),当playerManager的tick()方法被调用时，遍历所有玩家并调用玩家的tick()方法；</li>
+<li>每个玩家对象身上都有一个tick()方法，每1000毫秒执行一次tick()方法——遍历玩家的功能系统，执行功能系统的tick()方法；</li>
+<li>功能系统tick()进行计算和判断。</li>
+</ol>
+<p>大致流程如下图所示：</p>
+<img src="/2021/01/07/algorithm/timer1/tick.png" class="">
+
+<p>按上述的方式，意味着每隔1000毫秒，就需要遍历所有玩家并调用其tick()方法；注意，一个玩家可能拥有多个功能系统，每个功能系统都可能拥有自己的tick()方法。其次很多功能系统的tick()会进行大量计算才能判断是否满足下一步逻辑执行的条件;如果用轮询的方式性能消耗是比较大的(因为绝大多数计算可能都是无效的)。</p>
+<h2 id="新方案探索"><a href="#新方案探索" class="headerlink" title="新方案探索"></a>新方案探索</h2><p>考虑将轮询检测改进为到点触发：到达指定时间点后才执行玩家的定时任务，这样可以减少大量不必要的计算和判断。</p>
+<p>目前定时器实现的主要方式参考(<strong>定性分析</strong>):</p>
+<table>
+<thead>
+<tr>
+<th align="left">实现方式</th>
+<th>get时间复杂度</th>
+<th align="left">add时间复杂度</th>
+<th>delete时间复杂度</th>
+<th>空间复杂度</th>
+<th>使用例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">链表</td>
+<td>O(1)</td>
+<td align="left">O(1)</td>
+<td>O(n)</td>
+<td>O(n)</td>
+<td>比较低效,暂未发现有项目使用</td>
+</tr>
+<tr>
+<td align="left">最小堆</td>
+<td>O(log n)</td>
+<td align="left">O(log n)</td>
+<td>O(log n)</td>
+<td>O(n)</td>
+<td>Java的ScheduledThreadPoolExecutor(使用DelayedQueue)</td>
+</tr>
+<tr>
+<td align="left">时间轮</td>
+<td>O(1)</td>
+<td align="left">O(1)</td>
+<td>O(1)</td>
+<td>O(n)</td>
+<td>netty等</td>
+</tr>
+<tr>
+<td align="left">多层级时间轮</td>
+<td>O(1)</td>
+<td align="left">O(1)</td>
+<td>O(1)</td>
+<td>O(n)</td>
+<td>Linux内核，Kafka等</td>
+</tr>
+</tbody></table>
+<p>注意表格中的时间复杂度都是理论上的表述:</p>
+<ol>
+<li><p><strong>链表实现</strong>:最容易想到的质朴方法,但是效率不高;</p>
+</li>
+<li><p><strong>最小堆</strong>:可以保证add和delete都在对数时间复杂度内;</p>
+<p> 如果用多线程操作堆:改变堆结构时需要对整个堆加锁;如果堆里的task元素太多,需要考虑加锁带来的性能消耗(Java的ScheduledThreadPoolExecutor就是对整个堆加锁);</p>
+</li>
+<li><p><strong>时间轮</strong>:本质上是hash表的变种–&gt;<strong>环状的哈希表</strong>,采用链接法解决hash冲突.使用时间轮可以保证add和delete操作的事件复杂度都在O(1)内完成.</p>
+</li>
+<li><p><strong>多层级时间轮</strong>(自定义时间轮轮盘的单位时长):比如YearTimeWheel、MonthTimeWheel、DayTimeWheel、HourTimeWheel、MinuteTimeWhel等；当Task数量较多时,减少每层时间轮的Task数量，减少hash冲突,并且比较符合现实中的定时器需求(可以想想时钟和手表的指针)。</p>
+</li>
+</ol>
+<p>当然，不论采用何种方法实现定时器，定时器都只负责触发Task。Task的业务逻辑应当由相应业务线程去处理。</p>
+<h2 id="备注"><a href="#备注" class="headerlink" title="备注"></a>备注</h2><p>1.因为保密的原因，上文中涉及的项目均为代号；</p>
+<p>2.上文说的Task指定时任务。</p>
+<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>strcat</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>strcat</h2><p>函数<strong>strcat</strong>的作用是将两个<strong>C字符串</strong>连接起来。其声明如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> * <span class="title function_">strcat</span> <span class="params">(<span class="type">char</span> * dest, <span class="type">const</span> <span class="type">char</span> * src)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>将src指向的C字符串连接到dest指向的C字符串后面,会覆盖掉dest处的C字符串的终止符’\0’。调用strcat需要调用者保证：</p>
+<ul>
+<li>src指向合法的C字符串；</li>
+<li>dest指向的字符数组已经有一个合法C字符串；</li>
+<li>dest指向的字符数组的容量足够容纳两个C字符串（dest指向的字符数组容量必须大于等<code>strlen(dest)+strlen(src)+1</code>）。</li>
+</ul>
+<p>当连接完成后，返回dest。</p>
+<hr>
+<p>分析strcat的实现（string&#x2F;strcat.c）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Copyright (C) 1991, 1997, 2003 Free Software Foundation, Inc.</span></span><br><span class="line"><span class="comment">   This file is part of the GNU C Library.</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="comment">/* Append SRC on the end of DEST.  */</span></span><br><span class="line"><span class="type">char</span>* <span class="title function_">strcat</span> <span class="params">(dest, src)</span></span><br><span class="line">    <span class="type">char</span> *dest;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *src;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> *s1 = dest;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *s2 = src;</span><br><span class="line">    reg_char c;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Find the end of the string.  */</span></span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        c = *s1++;</span><br><span class="line">    &#125; <span class="keyword">while</span> (c != <span class="string">&#x27;\0&#x27;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Make S1 point before the next character, so we can increment</span></span><br><span class="line"><span class="comment">       it while memory is read (wins on pipelined cpus).  */</span></span><br><span class="line">    s1 -= <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        c = *s2++;</span><br><span class="line">        *++s1 = c;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> (c != <span class="string">&#x27;\0&#x27;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> dest;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>strcat实现没什么复杂的地方：</p>
+<ul>
+<li>第一步，遍历dest，将s1移动到原字符串的末尾；</li>
+<li>第二部，遍历src，依次将s2指向的字符拷贝到s1。</li>
+</ul>
+<p>这里需要注意的是<code>s1 -= 2;</code>，这样做的目的，上述代码注释已经解释：是为了在执行流水线方式指令的CPU时获得更好的读取性能。但是具体是如何提升的性能，我就不太清楚了，如果你知道，还请告知:-)。 分析strcat的时间复杂度。根据上文很容易得出，strcat的最坏时间复杂度为: $$ O(n) $$</p>
+<hr>
+<p>一些说明：</p>
+<ul>
+<li><strong>reg_char</strong>：已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strcpy/"><strong>《strcpy》</strong></a>中解释，不再赘述。</li>
+</ul>
+<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>

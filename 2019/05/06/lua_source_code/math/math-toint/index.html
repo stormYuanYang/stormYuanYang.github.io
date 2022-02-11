@@ -1,0 +1,20 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>math_toint</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>math_toint</h2><p><strong>math_toint</strong>是lua函数<strong>math.tointeger</strong>的具体实现，其声明如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_toint</span> <span class="params">(lua_State *L)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>math_toint接受一个参数，将其转换成整数；转换成功，就将转换后的整数压栈；否则，就将nil压入栈中。 math_toint的实现：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_toint</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    <span class="type">int</span> valid;</span><br><span class="line">    lua_Integer n = lua_tointegerx(L, <span class="number">1</span>, &amp;valid);</span><br><span class="line">    <span class="keyword">if</span> (valid)</span><br><span class="line">        lua_pushinteger(L, n);</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        luaL_checkany(L, <span class="number">1</span>);</span><br><span class="line">        lua_pushnil(L);  <span class="comment">/* value is not convertible to integer */</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>math_toint首先调用lua_tointegerx（接受整数、浮点数、字符串）尝试将参数转换成整数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lua_Integer n = lua_tointegerx(L, <span class="number">1</span>, &amp;valid);</span><br></pre></td></tr></table></figure>
+
+<p>转换成功，<strong>valid</strong>为真；否则valid为假。 math_toint随后对valid进行真假判断：</p>
+<ul>
+<li>如果valid为真，则直接将n压入栈中；</li>
+<li>否则，首先检查调用者是否传递了参数；如果调用者传递了参数，将nil压入栈中；否则<code>luaL_checkany(L, 1);</code>就会报错。</li>
+</ul>
+<p>最后返回1，表明math_toint的返回值只有1个。 注意，调用lua函数math.tointeger时（实际调用math_toint），必须由调用者保证传递的参数能正确地表示为整数：</p>
+<ul>
+<li>太大或者太小的整数、浮点数都无法正确转换成整数；</li>
+<li>太长的字符串形式表示的整数或者浮点数无法正确转换成整数。</li>
+</ul>
+<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>

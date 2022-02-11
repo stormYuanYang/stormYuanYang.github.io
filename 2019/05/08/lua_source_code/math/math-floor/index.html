@@ -1,0 +1,14 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>math_floor</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>math_floor</h2><p><strong>math_floor</strong>是lua库函数math.floor的具体实现，其声明为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_floor</span> <span class="params">(lua_State *L)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>math_floor</strong>接受一个参数，这个参数必须是<strong>number</strong>类型（整数或者浮点数）或者字符串。<strong>math_floor</strong>正确接受参数后，获取不大于参数的最大整数值；注意获取整数值不一定是lua内部的<strong>LUA_INTEGER</strong>类型，可能是<strong>LUA_NUMBER</strong>类型。</p>
+<hr>
+<p><strong>math_floor</strong>的实现：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_floor</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (lua_isinteger(L, <span class="number">1</span>))</span><br><span class="line">        lua_settop(L, <span class="number">1</span>);  <span class="comment">/* integer is its own floor */</span></span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        lua_Number d = l_mathop(<span class="built_in">floor</span>)(luaL_checknumber(L, <span class="number">1</span>));</span><br><span class="line">        pushnumint(L, d);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>math_floor</strong>先判断栈上的参数类型：</p>
+<ul>
+<li>如果是LUA_INTEGER类型，直接将参数设置到栈顶；</li>
+<li>否则，调用<strong>luaL_checknumber</strong>尝试将参数转换成一个数；转换成功就将这个数传递给<strong>floor</strong>，由<strong>floor</strong>给出不大于参数的最大整数值，并调用<strong>pushnumint</strong>将结果压栈。</li>
+</ul>
+<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>

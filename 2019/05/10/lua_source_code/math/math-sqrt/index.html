@@ -1,0 +1,10 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>math_sqrt</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>math_sqrt</h2><p><strong>math_sqrt</strong>是lua库函数<strong>math.sqrt</strong>的具体实现。<strong>math_sqrt</strong>的声明如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_sqrt</span> <span class="params">(lua_State *L)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>注意调用<strong>math.sqrt</strong>需要你保证传入的参数是非负数（传入负数，一般会得到<strong>-nan</strong>，即not a number）。</p>
+<hr>
+<p><strong>math_sqrt</strong>的实现：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_sqrt</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    lua_pushnumber(L, l_mathop(<span class="built_in">sqrt</span>)(luaL_checknumber(L, <span class="number">1</span>)));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>math_sqrt</strong>本身并没有什么特殊的处理，直接调用C标准库函数<strong>sqrt</strong>（sqrt函数本身的实现比较复杂，甚至不同平台有不同实现，非常空闲时可以去看看sqrt的实现(-:）求参数的平方根，并将求得的结果入栈。返回1表示，<strong>math_sqrt</strong>返回一个值。</p>
+<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
