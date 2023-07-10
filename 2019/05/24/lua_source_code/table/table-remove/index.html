@@ -1,6 +1,106 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>table.remove</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>table.remove</h2><h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>lua库函数<strong>table.remove</strong>的声明如下：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">table</span>.<span class="built_in">remove</span> (list [, pos])</span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="table.remove" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            table.remove
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="post-toc-text">简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%88%86%E6%9E%90"><span class="post-toc-text">分析</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%BC%95%E7%94%A8"><span class="post-toc-text">引用</span></a></li></ol>
+        
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>lua库函数<strong>table.remove</strong>的声明如下：</p>
+<pre><code class="lua">table.remove (list [, pos])
+</code></pre>
 <p><strong>table.remove</strong>的目的是移除list中位于pos处的元素，并返回这个元素：</p>
 <ul>
 <li>当pos在[1,#list]范围内时，<strong>table.remove</strong>将list[pos+1]，list[pos+2]，…，list[#list]向前移动，并移除list[#list]；</li>
@@ -9,11 +109,39 @@
 <li>除此之外，pos就是非法的。</li>
 </ul>
 <p>使用<strong>table.remove</strong>不传递pos时，默认删除位置#list处的元素，也就是删除最后一个元素。 <strong>table.remove</strong>对应的具体实现是C函数<strong>tremove</strong>，<strong>tremove</strong>的声明如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">tremove</span> <span class="params">(lua_State *L)</span>;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">static int tremove (lua_State *L);
+</code></pre>
 <h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>注解<strong>tremove</strong>：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">tremove</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    <span class="comment">// aux_getn()获取序列当前的长度</span></span><br><span class="line">    lua_Integer size = aux_getn(L, <span class="number">1</span>, TAB_RW);</span><br><span class="line">    <span class="comment">// 获取位置pos，默认设置为size</span></span><br><span class="line">    <span class="comment">// 这意味着默认移除表中的最后一个元素</span></span><br><span class="line">    lua_Integer pos = luaL_optinteger(L, <span class="number">2</span>, size);</span><br><span class="line">    <span class="keyword">if</span> (pos != size) &#123; <span class="comment">/* validate &#x27;pos&#x27; if given */</span></span><br><span class="line">        <span class="comment">// 对位置pos的合法性做一次检查</span></span><br><span class="line">        <span class="comment">// 注意pos可以是size+1 此时不会移除序列中的元素</span></span><br><span class="line">        luaL_argcheck(L, <span class="number">1</span> &lt;= pos &amp;&amp; pos &lt;= size + <span class="number">1</span>, <span class="number">1</span>, <span class="string">&quot;position out of bounds&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 将被移除的元素入栈 这个值就是tremove的返回值</span></span><br><span class="line">    <span class="comment">// 当pos == size+1时，这个值就是nil</span></span><br><span class="line">    lua_geti(L, <span class="number">1</span>, pos);  <span class="comment">/* result = t[pos] */</span></span><br><span class="line">    <span class="comment">// 依次将元素向前移动一个位置</span></span><br><span class="line">    <span class="keyword">for</span> ( ; pos &lt; size; pos++) &#123;</span><br><span class="line">        <span class="comment">// 获取下标[pos+1]对应的元素，将其入栈</span></span><br><span class="line">        lua_geti(L, <span class="number">1</span>, pos + <span class="number">1</span>);</span><br><span class="line">        <span class="comment">// 将通过lua_geti()函数获取的[pos+1]对应的元素，设置到[pos]处</span></span><br><span class="line">        lua_seti(L, <span class="number">1</span>, pos);  <span class="comment">/* t[pos] = t[pos + 1] */</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 将nil入栈</span></span><br><span class="line">    lua_pushnil(L);</span><br><span class="line">    <span class="comment">// 将指定位置pos处的元素，设置为nil</span></span><br><span class="line">    <span class="comment">// 达到最终的移除效果</span></span><br><span class="line">    lua_seti(L, <span class="number">1</span>, pos);  <span class="comment">/* t[pos] = nil */</span></span><br><span class="line">    <span class="comment">// 返回值的数量 1个</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">static int tremove (lua_State *L) &#123;
+    // aux_getn()获取序列当前的长度
+    lua_Integer size = aux_getn(L, 1, TAB_RW);
+    // 获取位置pos，默认设置为size
+    // 这意味着默认移除表中的最后一个元素
+    lua_Integer pos = luaL_optinteger(L, 2, size);
+    if (pos != size) &#123; /* validate &#39;pos&#39; if given */
+        // 对位置pos的合法性做一次检查
+        // 注意pos可以是size+1 此时不会移除序列中的元素
+        luaL_argcheck(L, 1 &lt;= pos &amp;&amp; pos &lt;= size + 1, 1, &quot;position out of bounds&quot;);
+    &#125;
+    // 将被移除的元素入栈 这个值就是tremove的返回值
+    // 当pos == size+1时，这个值就是nil
+    lua_geti(L, 1, pos);  /* result = t[pos] */
+    // 依次将元素向前移动一个位置
+    for ( ; pos &lt; size; pos++) &#123;
+        // 获取下标[pos+1]对应的元素，将其入栈
+        lua_geti(L, 1, pos + 1);
+        // 将通过lua_geti()函数获取的[pos+1]对应的元素，设置到[pos]处
+        lua_seti(L, 1, pos);  /* t[pos] = t[pos + 1] */
+    &#125;
+    // 将nil入栈
+    lua_pushnil(L);
+    // 将指定位置pos处的元素，设置为nil
+    // 达到最终的移除效果
+    lua_seti(L, 1, pos);  /* t[pos] = nil */
+    // 返回值的数量 1个
+    return 1;
+&#125;
+</code></pre>
 <p>由上述源码可知：</p>
 <ul>
 <li>#list等于0时，如果移除t[0]，此时<strong>tremove</strong>的时间复杂度是$O(1)$；</li>
@@ -22,4 +150,92 @@
 </ul>
 <p>注意，在调用<strong>table.remove</strong>时，如果每次都移除序列前面的元素，其效率是非常低下的，例如调用**table.remove(list,1)**将移动#list-1个元素。</p>
 <h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><p><a target="_blank" rel="noopener" href="https://www.lua.org/manual/5.3/manual.html#pdf-table.remove"><strong>lua5.3参考手册之table.remove</strong></a></p>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-05-24</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/remove/'>
+                            remove
+                        </a>
+                    
+                        <a href='/tags/table-remove/'>
+                            table_remove
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/ltablib-c/'>
+                            ltablib-c
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

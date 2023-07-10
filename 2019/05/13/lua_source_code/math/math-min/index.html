@@ -1,8 +1,207 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>math_min</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>math_min</h2><h1 id="math-min简介"><a href="#math-min简介" class="headerlink" title="math_min简介"></a>math_min简介</h1><p><strong>math_min</strong>是lua库函数<strong>math.min</strong>的具体实现。<strong>math_min</strong>的目的是找到传入的参数中，最小的那个参数。<strong>math_min</strong>的声明如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_min</span> <span class="params">(lua_State *L)</span>;</span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="math_min" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            math_min
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-min%E7%AE%80%E4%BB%8B"><span class="post-toc-text">math_min简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-min%E5%AE%9E%E7%8E%B0"><span class="post-toc-text">math_min实现</span></a></li></ol>
+        
+        <h1 id="math-min简介"><a href="#math-min简介" class="headerlink" title="math_min简介"></a>math_min简介</h1><p><strong>math_min</strong>是lua库函数<strong>math.min</strong>的具体实现。<strong>math_min</strong>的目的是找到传入的参数中，最小的那个参数。<strong>math_min</strong>的声明如下：</p>
+<pre><code class="c">static int math_min (lua_State *L);
+</code></pre>
 <h1 id="math-min实现"><a href="#math-min实现" class="headerlink" title="math_min实现"></a>math_min实现</h1><p><strong>math_min</strong>的源码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_min</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    <span class="type">int</span> n = lua_gettop(L);  <span class="comment">/* number of arguments */</span></span><br><span class="line">    <span class="type">int</span> imin = <span class="number">1</span>;  <span class="comment">/* index of current minimum value */</span></span><br><span class="line">    <span class="type">int</span> i;</span><br><span class="line">    luaL_argcheck(L, n &gt;= <span class="number">1</span>, <span class="number">1</span>, <span class="string">&quot;value expected&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">2</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (lua_compare(L, i, imin, LUA_OPLT))</span><br><span class="line">            imin = i;</span><br><span class="line">    &#125;</span><br><span class="line">    lua_pushvalue(L, imin);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">static int math_min (lua_State *L) &#123;
+    int n = lua_gettop(L);  /* number of arguments */
+    int imin = 1;  /* index of current minimum value */
+    int i;
+    luaL_argcheck(L, n &gt;= 1, 1, &quot;value expected&quot;);
+    for (i = 2; i &lt;= n; i++) &#123;
+        if (lua_compare(L, i, imin, LUA_OPLT))
+            imin = i;
+    &#125;
+    lua_pushvalue(L, imin);
+    return 1;
+&#125;
+</code></pre>
 <p><strong>math_min</strong>的实现并不复杂：<strong>math_min</strong>遍历所有的参数，找到其中最小的参数。找到最小参数后直接将其入栈。需要注意的是，调用lua函数<strong>math.min</strong>时需要你保证参数之间的可比较性：一个<strong>数字</strong>如何和一个<strong>table</strong>进行比较呢？ 现在我们分析一下<strong>math_min</strong>的时间复杂度。显而易见地，因为<strong>math_min</strong>除了<strong>for</strong>循环，其他操作都花费常数时间，所以<strong>math_min</strong>的时间复杂度是： $$ O(n) $$</p>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-05-13</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/min/'>
+                            min
+                        </a>
+                    
+                        <a href='/tags/%E6%9C%80%E5%B0%8F%E5%80%BC/'>
+                            最小值
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/lmathlib-c/'>
+                            lmathlib-c
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

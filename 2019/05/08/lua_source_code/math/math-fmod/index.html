@@ -1,19 +1,235 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>math_fmod</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>math_fmod</h2><p><strong>math_fmod</strong>是lua库函数<strong>math.fmod</strong>的具体实现，<strong>math_fmod</strong>的声明如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_fmod</span> <span class="params">(lua_State *L)</span>;</span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="math_fmod" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            math_fmod
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            
+        
+        <p><strong>math_fmod</strong>是lua库函数<strong>math.fmod</strong>的具体实现，<strong>math_fmod</strong>的声明如下：</p>
+<pre><code class="c">static int math_fmod (lua_State *L);
+</code></pre>
 <p><strong>math_fmod</strong>接受两个参数，命名这两个参数为x、y，<strong>math_fmod</strong>求x除以y的余数。</p>
 <hr>
 <p><strong>math_fmod</strong>的实现：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_fmod</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (lua_isinteger(L, <span class="number">1</span>) &amp;&amp; lua_isinteger(L, <span class="number">2</span>)) &#123;</span><br><span class="line">        lua_Integer d = lua_tointeger(L, <span class="number">2</span>);</span><br><span class="line">        <span class="keyword">if</span> ((lua_Unsigned)d + <span class="number">1u</span> &lt;= <span class="number">1u</span>) &#123;  <span class="comment">/* special cases: -1 or 0 */</span></span><br><span class="line">            luaL_argcheck(L, d != <span class="number">0</span>, <span class="number">2</span>, <span class="string">&quot;zero&quot;</span>);</span><br><span class="line">            lua_pushinteger(L, <span class="number">0</span>);  <span class="comment">/* avoid overflow with 0x80000... / -1 */</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            lua_pushinteger(L, lua_tointeger(L, <span class="number">1</span>) % d);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        lua_pushnumber(L, l_mathop(<span class="built_in">fmod</span>)(luaL_checknumber(L, <span class="number">1</span>),</span><br><span class="line">                    luaL_checknumber(L, <span class="number">2</span>)));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">static int math_fmod (lua_State *L) &#123;
+    if (lua_isinteger(L, 1) &amp;&amp; lua_isinteger(L, 2)) &#123;
+        lua_Integer d = lua_tointeger(L, 2);
+        if ((lua_Unsigned)d + 1u &lt;= 1u) &#123;  /* special cases: -1 or 0 */
+            luaL_argcheck(L, d != 0, 2, &quot;zero&quot;);
+            lua_pushinteger(L, 0);  /* avoid overflow with 0x80000... / -1 */
+        &#125;
+        else
+            lua_pushinteger(L, lua_tointeger(L, 1) % d);
+    &#125;
+    else
+        lua_pushnumber(L, l_mathop(fmod)(luaL_checknumber(L, 1),
+                    luaL_checknumber(L, 2)));
+    return 1;
+&#125;
+</code></pre>
 <p><strong>math_fmod</strong>首先判断传入参数的类型。如果两个参数都是整数类型，则单独处理求余；否则调用C语言的库函数fmod对浮点数进行余数求解。 当参数x、y都是整数时，lua对第二个参数即y做了安全判断，避免算术运算的异常。<code>luaL_argcheck(L, d != 0, 2, &quot;zero&quot;);</code>对y等于0做了检查；当y等于-1时，如果x等于<strong>0x8000…<strong>（LUA_MININTEGER），而</strong>0x8000…<strong>除以</strong>-1</strong>的结果是无法用当前的整数表示的（因为这个值实际等于<strong>LUA_MAXINTEGER+1</strong>）；为避免溢出，<code>lua_pushinteger(L, 0);</code>对此情况做了一个简单处理：直接将余数设置为0。 当参数x、y不都是整数时，lua先调用<strong>luaL_checknumber</strong>尝试将其转换成浮点数；转换成功后，调用C标准库方法<strong>fmod</strong>求x除以y的余数。注意，求得的余数结果可能并不是你想要的，因为浮点数是存在误差的。看一个例子：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// test.c</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span>      </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;math.h&gt;</span>       </span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span> <span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>( <span class="string">&quot;%lf\n%lf\n&quot;</span>, <span class="number">0.6</span> / <span class="number">0.2</span>, <span class="built_in">fmod</span>(<span class="number">0.6</span>,<span class="number">0.2</span>));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">// test.c
+#include &lt;stdio.h&gt;      
+#include &lt;math.h&gt;       
+int main ()
+&#123;
+    printf( &quot;%lf\n%lf\n&quot;, 0.6 / 0.2, fmod(0.6,0.2));
+    return 0;
+&#125;
+</code></pre>
 <p>这里顺便提醒一下：如果你是用gcc编译上述代码，记得在编译时加上参数<strong>-lm</strong>，表示链接数学库，否则gcc可能会报告<strong>fmod</strong>是未定义的引用。完整的编译并执行程序命令可参考：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -lm -o <span class="built_in">test</span> test.c &amp;&amp; ./test</span><br></pre></td></tr></table></figure>
-
+<pre><code class="bash">gcc -lm -o test test.c &amp;&amp; ./test
+</code></pre>
 <p>在我的PC上，<strong>fmod(0.6,0.2)<strong>的打印结果是</strong>0.2</strong>，这个结果明显是错误的，因为0.6除以0.2能够整数，其商为3；那为什么**fmod(0.6,0.2)**的结果是0.2呢？根本原因就是浮点数是有精度限制的，0.6除以0.2理应等于3，但是在计算机中的结果可能并不是这样；对test.c代码进行修改：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//test1.c</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span>      </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;math.h&gt;</span>       </span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span> <span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>( <span class="string">&quot;%0.17lf\n%0.17f\n&quot;</span>, <span class="number">0.6</span> / <span class="number">0.2</span>, <span class="built_in">fmod</span>(<span class="number">0.6</span>,<span class="number">0.2</span>));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">//test1.c
+#include &lt;stdio.h&gt;      
+#include &lt;math.h&gt;       
+int main ()
+&#123;
+    printf( &quot;%0.17lf\n%0.17f\n&quot;, 0.6 / 0.2, fmod(0.6,0.2));
+    return 0;
+&#125;
+</code></pre>
 <p>运行此程序，得到打印结果： <strong>2.99999999999999956</strong> <strong>0.19999999999999996</strong> 0.6除以0.2实际等于<strong>2.99999999999999956</strong>（近似于<strong>3</strong>），这就导致了0.6除以0.2的余数是<strong>0.19999999999999996</strong>（近似于<strong>0.2</strong>）。所以求两个浮点数的余数时，要特别小心，实际的结果和你预期的结果可能是南辕北辙的。</p>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-05-08</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/lua/'>
+                            lua
+                        </a>
+                    
+                        <a href='/tags/fmod/'>
+                            fmod
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/lmathlib-c/'>
+                            lmathlib-c
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

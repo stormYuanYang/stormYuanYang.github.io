@@ -1,14 +1,238 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>lua for循环的陷阱</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>lua for循环的陷阱</h2><p>lua和C一样提供<strong>for</strong>循环，但是lua的<strong>for</strong>不同于C的for，有些地方甚至可以称之为陷阱：昨天在用lua编写一个测试demo时就遇到了。 现在来详细说说昨天遇到的奇怪现象。示例如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">local t = &#123;<span class="number">1</span>,<span class="number">0</span>,<span class="number">2</span>,<span class="number">0</span>,<span class="number">3</span>,<span class="number">0</span>,<span class="number">4</span>&#125;</span><br><span class="line"><span class="keyword">for</span> i = <span class="number">1</span>, <span class="meta">#t do</span></span><br><span class="line">    <span class="keyword">while</span> i &lt;= <span class="meta">#t and t[i] == 0 do</span></span><br><span class="line">        i = i + <span class="number">1</span></span><br><span class="line">    end</span><br><span class="line">    <span class="keyword">if</span> i &gt; <span class="meta">#t then</span></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    end</span><br><span class="line">    print(t[i])</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="lua for循环的陷阱" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            lua for循环的陷阱
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            
+        
+        <p>lua和C一样提供<strong>for</strong>循环，但是lua的<strong>for</strong>不同于C的for，有些地方甚至可以称之为陷阱：昨天在用lua编写一个测试demo时就遇到了。 现在来详细说说昨天遇到的奇怪现象。示例如下：</p>
+<pre><code class="c">local t = &#123;1,0,2,0,3,0,4&#125;
+for i = 1, #t do
+    while i &lt;= #t and t[i] == 0 do
+        i = i + 1
+    end
+    if i &gt; #t then
+        break
+    end
+    print(t[i])
+end
+</code></pre>
 <p>打印结果预期的是：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="number">4</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="lua">1
+2
+3
+4
+</code></pre>
 <p>但实际上是：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="number">4</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="lua">1
+2
+2
+3
+3
+4
+4
+</code></pre>
 <p>也就是说，for循环中的while循环跳过0失败了。为什么会这样呢？循环变量i的值不是被while循环修改了吗？这个问题也让我昨天晚上困惑了一段时间，接着去查阅了lua53的参考手册并阅读lua虚拟机实现源码中关于for的部分，才恍然大悟。 lua的for和C中的for是不同的，实际上你不能修改lua的for循环中的循环变量的值，正如上述代码，修改的实际是i的一个副本，而i的值只会被for修改，也就是说<code>for v = e1, e2, e3 do block end</code>等价代码(来自lua53参考手册)：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="keyword">local</span> var, limit, step = <span class="built_in">tonumber</span>(e1), <span class="built_in">tonumber</span>(e2), <span class="built_in">tonumber</span>(<span class="number">3</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> (var <span class="keyword">and</span> limit <span class="keyword">and</span> step) <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">error</span>()</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    var = var - step</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">true</span> <span class="keyword">do</span></span><br><span class="line">        var = var + step</span><br><span class="line">        <span class="keyword">if</span> (step &gt;= <span class="number">0</span> <span class="keyword">and</span> var &gt; limit) <span class="keyword">or</span> (step &lt; <span class="number">0</span> <span class="keyword">and</span> var &lt; limit) <span class="keyword">then</span></span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">        <span class="keyword">local</span> v = var</span><br><span class="line">        block</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span>    </span><br></pre></td></tr></table></figure>
-
+<pre><code class="lua">do
+    local var, limit, step = tonumber(e1), tonumber(e2), tonumber(3)
+    if not (var and limit and step) then
+        error()
+    end
+    var = var - step
+    while true do
+        var = var + step
+        if (step &gt;= 0 and var &gt; limit) or (step &lt; 0 and var &lt; limit) then
+            break
+        end
+        local v = var
+        block
+    end
+end    
+</code></pre>
 <p>此等价代码和lua虚拟机中实现的C代码大致类似。在for循环中去修改循环变量<strong>var</strong>的值，实际上是修改的<strong>var</strong>的副本<strong>v</strong>的值，这就是为什么在<strong>for</strong>循环中<code>while i &lt;= #t and t[i] == 0 then i = i + 1 end</code>不能真正的修改循环变量<strong>i</strong>的值。 记住lua for循环的特点，不要踩中这个陷阱。</p>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-05-20</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/%E9%99%B7%E9%98%B1/'>
+                            陷阱
+                        </a>
+                    
+                        <a href='/tags/for/'>
+                            for
+                        </a>
+                    
+                        <a href='/tags/lua/'>
+                            lua
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3lua%E8%AF%AD%E8%A8%80/'>
+                            深入理解lua语言
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

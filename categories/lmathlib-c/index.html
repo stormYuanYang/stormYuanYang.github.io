@@ -1,1 +1,322 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>不远,到理塘就回</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="outer"><ul class="list-group"><li class="list-group-item title"><div class="date">2019年5月13日</div><br><a href="/2019/05/13/lua_source_code/math/math-type/" target="_self">math_type</a></li><li class="list-group-item title"><div class="date">2019年5月13日</div><br><a href="/2019/05/13/lua_source_code/math/math-random/" target="_self">math_random</a></li><li class="list-group-item title"><div class="date">2019年5月13日</div><br><a href="/2019/05/13/lua_source_code/math/math-randomseed/" target="_self">math_randomseed</a></li><li class="list-group-item title"><div class="date">2019年5月13日</div><br><a href="/2019/05/13/lua_source_code/math/math-max/" target="_self">math_max</a></li><li class="list-group-item title"><div class="date">2019年5月13日</div><br><a href="/2019/05/13/lua_source_code/math/math-min/" target="_self">math_min</a></li><li class="list-group-item title"><div class="date">2019年5月13日</div><br><a href="/2019/05/13/lua_source_code/math/math-rad/" target="_self">math_rad</a></li><li class="list-group-item title"><div class="date">2019年5月13日</div><br><a href="/2019/05/13/lua_source_code/math/math-deg/" target="_self">math_deg</a></li><li class="list-group-item title"><div class="date">2019年5月13日</div><br><a href="/2019/05/13/lua_source_code/math/math-exp/" target="_self">math_exp</a></li><li class="list-group-item title"><div class="date">2019年5月11日</div><br><a href="/2019/05/11/lua_source_code/math/math-log/" target="_self">math_log</a></li><li class="list-group-item title"><div class="date">2019年5月11日</div><br><a href="/2019/05/11/lua_source_code/math/math-ult/" target="_self">math_ult</a></li><li class="list-group-item title"><div class="date">2019年5月10日</div><br><a href="/2019/05/10/lua_source_code/math/math-sqrt/" target="_self">math_sqrt</a></li><li class="list-group-item title"><div class="date">2019年5月9日</div><br><a href="/2019/05/09/lua_source_code/math/math-modf/" target="_self">math_modf</a></li><li class="list-group-item title"><div class="date">2019年5月8日</div><br><a href="/2019/05/08/lua_source_code/math/math-fmod/" target="_self">math_fmod</a></li><li class="list-group-item title"><div class="date">2019年5月8日</div><br><a href="/2019/05/08/lua_source_code/math/math-ceil/" target="_self">math_ceil</a></li><li class="list-group-item title"><div class="date">2019年5月8日</div><br><a href="/2019/05/08/lua_source_code/math/math-floor/" target="_self">math_floor</a></li><li class="list-group-item title"><div class="date">2019年5月7日</div><br><a href="/2019/05/07/lua_source_code/pushnumint/" target="_self">pushnumint</a></li><li class="list-group-item title"><div class="date">2019年5月6日</div><br><a href="/2019/05/06/lua_source_code/math/math-toint/" target="_self">math_toint</a></li><li class="list-group-item title"><div class="date">2019年5月6日</div><br><a href="/2019/05/06/lua_source_code/math/三角函数/" target="_self">三角函数</a></li><li class="list-group-item title"><div class="date">2019年5月6日</div><br><a href="/2019/05/06/lua_source_code/math/math-abs/" target="_self">math_abs</a></li></ul></div><div class="footer"><p class="text-center">©2019 - 2022 by coderdeepwater.cn</p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
+
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><i>
+                    
+                        <a style="color: #4e7dde;" href="/categories/">分类</a>
+                    
+                </i></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                        <div class="archive-list">
+  <ul class="archive">
+
+    
+    <span>🔖<i>lmathlib-c</i></span>
+      
+      
+      
+          
+    
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/13</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/13/lua_source_code/math/math-type/">math_type</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/13</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/13/lua_source_code/math/math-random/">math_random</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/13</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/13/lua_source_code/math/math-randomseed/">math_randomseed</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/13</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/13/lua_source_code/math/math-max/">math_max</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/13</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/13/lua_source_code/math/math-min/">math_min</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/13</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/13/lua_source_code/math/math-rad/">math_rad</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/13</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/13/lua_source_code/math/math-deg/">math_deg</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/13</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/13/lua_source_code/math/math-exp/">math_exp</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/11</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/11/lua_source_code/math/math-log/">math_log</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/11</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/11/lua_source_code/math/math-ult/">math_ult</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/10</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/10/lua_source_code/math/math-sqrt/">math_sqrt</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/09</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/09/lua_source_code/math/math-modf/">math_modf</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/08</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/08/lua_source_code/math/math-fmod/">math_fmod</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/08</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/08/lua_source_code/math/math-ceil/">math_ceil</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/08</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/08/lua_source_code/math/math-floor/">math_floor</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/07</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/07/lua_source_code/math/pushnumint/">pushnumint</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/06</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/06/lua_source_code/math/math-toint/">math_toint</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/06</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/06/lua_source_code/math/%E4%B8%89%E8%A7%92%E5%87%BD%E6%95%B0/">三角函数</a>
+          </div>
+        </li>
+    
+  
+    
+        <li>
+          <span class="archive-date">2019/05/06</span>
+          <div class="archive-main">
+              <a class="archive-title" href="/2019/05/06/lua_source_code/math/math-abs/">math_abs</a>
+          </div>
+        </li>
+    
+  
+  </ul>
+</div>
+
+ 
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

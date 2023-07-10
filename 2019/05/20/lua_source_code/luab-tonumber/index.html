@@ -1,10 +1,140 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>luaB_tonumber</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>luaB_tonumber</h2><h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>C函数<strong>luaB_tonumber</strong>是lua库函数<strong>tonumber</strong>的具体实现。<strong>luaB_tonumber</strong>的目的是将传入的参数转换为一个数字。<strong>luaB_tonumber</strong>的声明如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">luaB_tonumber</span> <span class="params">(lua_State *L)</span>;</span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="luaB_tonumber" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            luaB_tonumber
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="post-toc-text">简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%88%86%E6%9E%90"><span class="post-toc-text">分析</span></a></li></ol>
+        
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>C函数<strong>luaB_tonumber</strong>是lua库函数<strong>tonumber</strong>的具体实现。<strong>luaB_tonumber</strong>的目的是将传入的参数转换为一个数字。<strong>luaB_tonumber</strong>的声明如下：</p>
+<pre><code class="c">static int luaB_tonumber (lua_State *L);
+</code></pre>
 <p><strong>luaB_tonumber</strong>接受两个参数e和base，由<strong>L</strong>的栈携带。</p>
 <h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>先看<strong>luaB_tonumber</strong>源码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">luaB_tonumber</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (lua_isnoneornil(L, <span class="number">2</span>)) &#123;  <span class="comment">/* standard conversion? */</span></span><br><span class="line">        luaL_checkany(L, <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span> (lua_type(L, <span class="number">1</span>) == LUA_TNUMBER) &#123;  <span class="comment">/* already a number? */</span></span><br><span class="line">            lua_settop(L, <span class="number">1</span>);  <span class="comment">/* yes; return it */</span></span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="type">size_t</span> l;</span><br><span class="line">            <span class="type">const</span> <span class="type">char</span> *s = lua_tolstring(L, <span class="number">1</span>, &amp;l);</span><br><span class="line">            <span class="keyword">if</span> (s != <span class="literal">NULL</span> &amp;&amp; lua_stringtonumber(L, s) == l + <span class="number">1</span>)</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1</span>;  <span class="comment">/* successful conversion to number */</span></span><br><span class="line">            <span class="comment">/* else not a number */</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="type">size_t</span> l;</span><br><span class="line">        <span class="type">const</span> <span class="type">char</span> *s;</span><br><span class="line">        lua_Integer n = <span class="number">0</span>;  <span class="comment">/* to avoid warnings */</span></span><br><span class="line">        lua_Integer base = luaL_checkinteger(L, <span class="number">2</span>);</span><br><span class="line">        luaL_checktype(L, <span class="number">1</span>, LUA_TSTRING);  <span class="comment">/* no numbers as strings */</span></span><br><span class="line">        s = lua_tolstring(L, <span class="number">1</span>, &amp;l);</span><br><span class="line">        luaL_argcheck(L, <span class="number">2</span> &lt;= base &amp;&amp; base &lt;= <span class="number">36</span>, <span class="number">2</span>, <span class="string">&quot;base out of range&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (b_str2int(s, (<span class="type">int</span>)base, &amp;n) == s + l) &#123;</span><br><span class="line">            lua_pushinteger(L, n);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;  <span class="comment">/* else not a number */</span></span><br><span class="line">    &#125;  <span class="comment">/* else not a number */</span></span><br><span class="line">    lua_pushnil(L);  <span class="comment">/* not a number */</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">static int luaB_tonumber (lua_State *L) &#123;
+    if (lua_isnoneornil(L, 2)) &#123;  /* standard conversion? */
+        luaL_checkany(L, 1);
+        if (lua_type(L, 1) == LUA_TNUMBER) &#123;  /* already a number? */
+            lua_settop(L, 1);  /* yes; return it */
+            return 1;
+        &#125;
+        else &#123;
+            size_t l;
+            const char *s = lua_tolstring(L, 1, &amp;l);
+            if (s != NULL &amp;&amp; lua_stringtonumber(L, s) == l + 1)
+                return 1;  /* successful conversion to number */
+            /* else not a number */
+        &#125;
+    &#125;
+    else &#123;
+        size_t l;
+        const char *s;
+        lua_Integer n = 0;  /* to avoid warnings */
+        lua_Integer base = luaL_checkinteger(L, 2);
+        luaL_checktype(L, 1, LUA_TSTRING);  /* no numbers as strings */
+        s = lua_tolstring(L, 1, &amp;l);
+        luaL_argcheck(L, 2 &lt;= base &amp;&amp; base &lt;= 36, 2, &quot;base out of range&quot;);
+        if (b_str2int(s, (int)base, &amp;n) == s + l) &#123;
+            lua_pushinteger(L, n);
+            return 1;
+        &#125;  /* else not a number */
+    &#125;  /* else not a number */
+    lua_pushnil(L);  /* not a number */
+    return 1;
+&#125;
+</code></pre>
 <p><strong>luaB_tonumber</strong>首先执行代码<code>if (lua_isnoneornil(L, 2))</code>判断是否传入了转换的基数<strong>base</strong>，如果不传入参数<strong>base</strong>，则是标准转换，即将参数转换成十进制：</p>
 <ul>
 <li>执行<code>luaL_checkany(L, 1);</code>检查第一个参数<strong>e</strong>是否存在；</li>
@@ -19,4 +149,92 @@
 <li>然后执行<code>if (b_str2int(s, (int)base, &amp;n) == s + l)</code>尝试将字符串<strong>s</strong>转换成以<strong>base</strong>为基数的数字；其中<strong>b_str2int</strong>就是<strong>lbaselib.c</strong>中的一个内部方法；如果转换成功就将结果入站。</li>
 </ul>
 <p>最后，如果无法转换，<strong>luaB_tonumber</strong>调用<code>lua_pushnil(L);</code>将<strong>nil</strong>入站，表示无法转换成数字。</p>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-05-20</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/luaB-tonumber/'>
+                            luaB_tonumber
+                        </a>
+                    
+                        <a href='/tags/tonumber/'>
+                            tonumber
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/lbaselib-c/'>
+                            lbaselib-c
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

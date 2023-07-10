@@ -1,6 +1,106 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>strncat</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>strncat</h2><p><strong>strncat</strong>和strcat功能一致，对字符串进行连接。其声明如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> * <span class="title function_">strncat</span> <span class="params">( <span class="type">char</span> * str1, <span class="type">const</span> <span class="type">char</span> * str2, <span class="type">size_t</span> num )</span>;</span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="strncat" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            strncat
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            
+        
+        <p><strong>strncat</strong>和strcat功能一致，对字符串进行连接。其声明如下：</p>
+<pre><code class="c">char * strncat ( char * str1, const char * str2, size_t num );
+</code></pre>
 <p>strncat将str2中不超过num个字符<strong>追加</strong>到str1字符串的后面(str1的’\0’会被覆盖掉，然后在拼接最后添加’\0’)：</p>
 <ul>
 <li>num &lt; strlen(str2),只会拷贝部分str2中的字符到str1的末尾，最后添加上终止符’\0’；</li>
@@ -9,15 +109,155 @@
 <p>总体来说，strncat比strcat功能更强大：可以选择拷贝部分字符，而不是全部字符。和strcat一样，strncat也要保证str1指向的字符数数组的容量要足够大。</p>
 <hr>
 <p>strncat的实现（string&#x2F;strncat.c）：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Copyright (C) 1991, 1997 Free Software Foundation, Inc.</span></span><br><span class="line"><span class="comment">   This file is part of the GNU C Library.</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">char</span> * <span class="title function_">strncat</span> <span class="params">(s1, s2, n)</span></span><br><span class="line">    <span class="type">char</span> *s1;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *s2;</span><br><span class="line">    <span class="type">size_t</span> n;</span><br><span class="line">&#123;</span><br><span class="line">    reg_char c;</span><br><span class="line">    <span class="type">char</span> *s = s1;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Find the end of S1.  */</span></span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">        c = *s1++;</span><br><span class="line">    <span class="keyword">while</span> (c != <span class="string">&#x27;\0&#x27;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Make S1 point before next character, so we can increment</span></span><br><span class="line"><span class="comment">       it while memory is read (wins on pipelined cpus).  */</span></span><br><span class="line">    s1 -= <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (n &gt;= <span class="number">4</span>) &#123;</span><br><span class="line">        <span class="type">size_t</span> n4 = n &gt;&gt; <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">do</span> &#123;</span><br><span class="line">            c = *s2++;</span><br><span class="line">            *++s1 = c;</span><br><span class="line">            <span class="keyword">if</span> (c == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">                <span class="keyword">return</span> s;</span><br><span class="line">            c = *s2++;</span><br><span class="line">            *++s1 = c;</span><br><span class="line">            <span class="keyword">if</span> (c == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">                <span class="keyword">return</span> s;</span><br><span class="line">            c = *s2++;</span><br><span class="line">            *++s1 = c;</span><br><span class="line">            <span class="keyword">if</span> (c == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">                <span class="keyword">return</span> s;</span><br><span class="line">            c = *s2++;</span><br><span class="line">            *++s1 = c;</span><br><span class="line">            <span class="keyword">if</span> (c == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">                <span class="keyword">return</span> s;</span><br><span class="line">        &#125; <span class="keyword">while</span> (--n4 &gt; <span class="number">0</span>);</span><br><span class="line">        n &amp;= <span class="number">3</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (n &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        c = *s2++;</span><br><span class="line">        *++s1 = c;</span><br><span class="line">        <span class="keyword">if</span> (c == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">            <span class="keyword">return</span> s;</span><br><span class="line">        n--;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (c != <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">        *++s1 = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c">/* Copyright (C) 1991, 1997 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+*/
+char * strncat (s1, s2, n)
+    char *s1;
+    const char *s2;
+    size_t n;
+&#123;
+    reg_char c;
+    char *s = s1;
 
+    /* Find the end of S1.  */
+    do
+        c = *s1++;
+    while (c != &#39;\0&#39;);
+
+    /* Make S1 point before next character, so we can increment
+       it while memory is read (wins on pipelined cpus).  */
+    s1 -= 2;
+
+    if (n &gt;= 4) &#123;
+        size_t n4 = n &gt;&gt; 2;
+        do &#123;
+            c = *s2++;
+            *++s1 = c;
+            if (c == &#39;\0&#39;)
+                return s;
+            c = *s2++;
+            *++s1 = c;
+            if (c == &#39;\0&#39;)
+                return s;
+            c = *s2++;
+            *++s1 = c;
+            if (c == &#39;\0&#39;)
+                return s;
+            c = *s2++;
+            *++s1 = c;
+            if (c == &#39;\0&#39;)
+                return s;
+        &#125; while (--n4 &gt; 0);
+        n &amp;= 3;
+    &#125;
+
+    while (n &gt; 0) &#123;
+        c = *s2++;
+        *++s1 = c;
+        if (c == &#39;\0&#39;)
+            return s;
+        n--;
+    &#125;
+
+    if (c != &#39;\0&#39;)
+        *++s1 = &#39;\0&#39;;
+
+    return s;
+&#125;
+</code></pre>
 <p>strncat先遍历s1,找到s1的末尾。接下来是一个优化，以4个字符为一组进行拷贝，这样可以减少3&#x2F;4的<code>--n</code>操作和<code>n&gt;0</code>的判断（其思想已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strncpy/"><strong>《strncpy》</strong></a>中详细分析，不再赘述）。4个字符一组拷贝完后，还剩下字符的话，继续拷贝剩下的字符。最后的if判断：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (c != <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">    *++s1 = <span class="string">&#x27;\0&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">if (c != &#39;\0&#39;)
+    *++s1 = &#39;\0&#39;;
+</code></pre>
 <p>这段代码的目的是：当<code>n &lt;= strlen(s2)</code>时，在s1字符串的最后添加上’\0’，以保证其正确性。</p>
 <hr>
 <p>一些说明：</p>
 <ul>
 <li><strong>reg_char</strong>：已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strcpy/"><strong>《strcpy》</strong></a>中解释，不再赘述。</li>
 </ul>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-04-23</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/string-h/'>
+                            string-h
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3c%E8%AF%AD%E8%A8%80/'>
+                            深入理解c语言
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

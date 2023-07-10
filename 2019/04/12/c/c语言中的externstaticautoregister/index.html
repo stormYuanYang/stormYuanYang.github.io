@@ -1,4 +1,104 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>C语言中的extern,static,auto,register</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>C语言中的extern,static,auto,register</h2><p>今晚继续在阅读<a target="_blank" rel="noopener" href="https://github.com/cloudwu/skynet"><strong>Skynet</strong></a>的源代码时，发现了多处<strong>static</strong>关键词和<strong>extern</strong>关键词。读着读着，突然发现自己对static和extern的概念和作用有些模糊，所以索性花点时间重温static、extern以及和其作用类似的auto、register。接下来，将对extern、static、auto、register的概念和作用做一个总结，在此之前，先介绍几个前导概念。 什么是<strong>翻译单元</strong>？翻译单元一般可认为就是编译单元，而编译单元可以粗略地认为就是C编译器预处理之后的单个源文件。 什么是函数或变量声明(declaration)？声明一个函数或变量意味着，编译器知道这里有指定的一个<strong>标识符</strong>，然后编译器可以使用此标识符，但是函数或变量一定要在某处定义，否则虽然编译时不会报错，但是链接时就会找不到函数或变量定义。 什么是函数或变量定义(definition)？定义一个函数或变量意味着，编译器要在定义时为函数或变量分配内存。声明时，并不会分配内存，只是告诉编译器：“喂，我是XXX啦，我可以被你使用了，但是我可能定义在别处。”。 声明和定义有以下规则：函数或变量声明可以有多处，它的作用仅仅是告诉编译器其可以被使用，但是其定义只能有一处，因为同一个函数或变量只会有一个。如果你定义同一个函数或者变量多次，编译器就会报告重复定义的错误信息。 变量按<strong>作用域</strong>划分:</p>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="C语言中的extern,static,auto,register" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
+
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            C语言中的extern,static,auto,register
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            
+        
+        <p>今晚继续在阅读<a target="_blank" rel="noopener" href="https://github.com/cloudwu/skynet"><strong>Skynet</strong></a>的源代码时，发现了多处<strong>static</strong>关键词和<strong>extern</strong>关键词。读着读着，突然发现自己对static和extern的概念和作用有些模糊，所以索性花点时间重温static、extern以及和其作用类似的auto、register。接下来，将对extern、static、auto、register的概念和作用做一个总结，在此之前，先介绍几个前导概念。 什么是<strong>翻译单元</strong>？翻译单元一般可认为就是编译单元，而编译单元可以粗略地认为就是C编译器预处理之后的单个源文件。 什么是函数或变量声明(declaration)？声明一个函数或变量意味着，编译器知道这里有指定的一个<strong>标识符</strong>，然后编译器可以使用此标识符，但是函数或变量一定要在某处定义，否则虽然编译时不会报错，但是链接时就会找不到函数或变量定义。 什么是函数或变量定义(definition)？定义一个函数或变量意味着，编译器要在定义时为函数或变量分配内存。声明时，并不会分配内存，只是告诉编译器：“喂，我是XXX啦，我可以被你使用了，但是我可能定义在别处。”。 声明和定义有以下规则：函数或变量声明可以有多处，它的作用仅仅是告诉编译器其可以被使用，但是其定义只能有一处，因为同一个函数或变量只会有一个。如果你定义同一个函数或者变量多次，编译器就会报告重复定义的错误信息。 变量按<strong>作用域</strong>划分:</p>
 <ul>
 <li><strong>全局变量</strong></li>
 <li><strong>局部变量</strong></li>
@@ -31,39 +131,152 @@
 <p>函数或语句块执行期间</p>
 <p>只能修饰变量。函数或者语句块中。</p>
 <p>接下来我们对其一一说明。 首先看<strong>extern</strong>关键词。extern的使用并不是那么频繁。对于函数来说，默认声明函数时就是外部函数。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">sum</span><span class="params">(<span class="type">int</span>)</span>;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="type">int</span> <span class="title function_">sum</span><span class="params">(<span class="type">int</span>)</span>;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">int sum(int);
+</code></pre>
+<pre><code class="c">extern int sum(int);
+</code></pre>
 <p>上述两个函数声明是等价的。 对于全局变量来说就有些不一样了(在函数外定义)。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="type">int</span> b;<span class="comment">//仅仅是声明b，并不会为b分配内存</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> b;<span class="comment">//定义b，为b分配内存，默认值是0</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">extern int b;//仅仅是声明b，并不会为b分配内存
+</code></pre>
+<pre><code class="c">int b;//定义b，为b分配内存，默认值是0
+</code></pre>
 <p>执行如下代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">int</span> b;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    b = <span class="number">10</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, b);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">#include &lt;stdio.h&gt;
+extern int b;
+int main() &#123;
+    b = 10;
+    printf(&quot;%d\n&quot;, b);
+    return 0;
+&#125;
+</code></pre>
 <p>编译器会报告类似“&#x2F;home&#x2F;yangyuan&#x2F;training&#x2F;C&#x2F;main.c:4：对‘b’未定义的引用”的错误。原因就是，extern关键词仅仅声明b是一个外部变量，它的定义在其他某处。编译器都没有为b分配内存，你又如何能够访问b呢？执行如下代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> b;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, b);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">#include &lt;stdio.h&gt;
+int b;
+int main() &#123;
+    printf(&quot;%d\n&quot;, b);
+    return 0;
+&#125;
+</code></pre>
 <p>当我们去掉extern关键，<code>int b;</code>就由声明变成了定义。所以此代码可正常执行。我们继续看一段代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">int</span> b = <span class="number">10</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, b);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">#include &lt;stdio.h&gt;
+extern int b = 10;
+int main() &#123;
+    printf(&quot;%d\n&quot;, b);
+    return 0;
+&#125;
+</code></pre>
 <p>这段代码可以执行，并得到输出结果10。但是编译器会给出警告“warning ‘b’ initialized and declared ‘extern’”，即一个声明为extern的变量却被初始化了，严格来讲这是错误的，但是编译器采用的策略是发出警告。 接下来看<strong>static</strong>关键词。当static修饰函数声明或定义时，其表明被修饰的函数只能在同一翻译单元内被访问。这样做，可以做一定程度上的封装和隐藏(不是完全的封装和隐藏，下文会解释)，避免和其他翻译单元发生名字冲突。当static修饰变量声明或定义时，就得分情况讨论：</p>
 <ul>
 <li>static global variable(静态全局变量)</li>
 <li>static local variable(静态局部变量)</li>
 </ul>
 <p>当static修饰的是全局变量时(定义在函数外)，其表明此变量只能在同一翻译单元内被访问。当static修饰的是局部变量时，其声明周期和全局变量一致(存活于程序执行期间)，但是其作用域仍然和普通的局部变量一样。只能在其声明的函数或语句块内被访问。比如：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">func</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">static</span> <span class="type">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, ++a);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    func();</span><br><span class="line">    a++;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c">#include &lt;stdio.h&gt;
 
+void func() &#123;
+    static int a = 1;
+    printf(&quot;%d\n&quot;, ++a);
+&#125;
+
+int main() &#123;
+    func();
+    a++;
+    return 0;
+&#125;
+</code></pre>
 <p>执行上述代码，编译器就会报告错误“‘a’ undeclared (first use in this function)”。 上文说到，static仅仅能做一定程度上的封装和隐藏。我们仍然能够通过指向被static修饰的函数或变量的指针来访问函数或变量。 再看<strong>auto</strong>关键词。这个关键词，很少使用。在C++的新标准中有其新的含义。在C语言中，它表示变量是一个自动变量，自动变量从其定义时生，从离开其作用域时死。可以粗略地认为auto修饰的变量就是局部变量，但是别忘了，局部变量被static修饰时，其作用域不变，但是其生存周期已和程序一致。所以，auto变量的范围小于局部变量。当然了，我们使用的最多的就是auto变量，局部变量默认就是auto变量，auto只是隐藏在幕后。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">func</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">auto</span> <span class="type">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, ++a);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">func</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">1</span>;<span class="comment">//auto关键词被省略了</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, ++a);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">void func() &#123;
+    auto int a = 1;
+    printf(&quot;%d\n&quot;, ++a);
+&#125;
+</code></pre>
+<pre><code class="c">void func() &#123;
+    int a = 1;//auto关键词被省略了
+    printf(&quot;%d\n&quot;, ++a);
+&#125;
+</code></pre>
 <p>上述两个函数中定义的变量a是等价的。 最后看<strong>register</strong>关键词。这个关键词，几乎都被快被我们遗忘了，甚至C++在过去的一段时间里都废弃过这个关键词，直到C++17才重新启用这个关键词。一般而言，我们很少会使用到该关键词。在变量声明时修饰变量暗示C编译器将此变量存储在寄存器或者其他能快速存取的地方，而不是放入内存中。但是，C编译器不一定会将你用register修饰的变量存储在寄存器中，而是直接放在内存中，这是C编译器的自由。前文说了，register关键词只是暗示C编译器，到底怎么做仍然是C编译器的自由。当你使用register修饰一个变量的时候，这个变量的地址是无法被访问的，这是C编译器对变量的一种保护，你可以这样理解：存储在寄存器中的变量都不存在于内存中，怎么会有地址呢？如下代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">register</span> <span class="type">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%p\n&quot;</span>, &amp;a);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">#include &lt;stdio.h&gt;
+int main() &#123;
+    register int a = 1;
+    printf(&quot;%p\n&quot;, &amp;a);
+    return 0;
+&#125;
+</code></pre>
 <p>运行上述代码，一般会出现类似“error address of register variable ‘a’ requested”这样的报错信息。 我们探究这些语言的细节，并不是为了成为语言律师，而是为了对其作用做到了然于胸。比如你对static的作用不了解，那么你在阅读开源C代码时，就很有可能遇到障碍，会让你感到<strong>confused</strong>。探究语言细节，但也不能咬文嚼字，在语言细节上玩一些文字游戏，这是得不偿失的，因为我们最终的目的是更好地阅读和编写代码，而不能本末倒置。</p>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-04-12</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3c%E8%AF%AD%E8%A8%80/'>
+                            深入理解c语言
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

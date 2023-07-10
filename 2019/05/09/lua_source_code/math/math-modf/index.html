@@ -1,23 +1,227 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>math_modf</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>math_modf</h2><p><strong>math_modf</strong>是lua库函数<strong>math.modf</strong>的具体实现，和math_ceil、math_floor不同，math_modf不使用任何的C标准库函数，独立地实现了和C标准库函数modf相同的功能。<strong>math_modf</strong>的声明如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_modf</span> <span class="params">(lua_State *L)</span>;</span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="math_modf" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            math_modf
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            
+        
+        <p><strong>math_modf</strong>是lua库函数<strong>math.modf</strong>的具体实现，和math_ceil、math_floor不同，math_modf不使用任何的C标准库函数，独立地实现了和C标准库函数modf相同的功能。<strong>math_modf</strong>的声明如下：</p>
+<pre><code class="c">static int math_modf (lua_State *L);
+</code></pre>
 <p><strong>math_modf</strong>的目的是获得一个浮点数的整数部分（向0取整）和小数部分。</p>
 <hr>
 <p><strong>math_modf</strong>的实现：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> ** next function does not use &#x27;modf&#x27;, avoiding problems with &#x27;double*&#x27;</span></span><br><span class="line"><span class="comment"> ** (which is not compatible with &#x27;float*&#x27;) when lua_Number is not</span></span><br><span class="line"><span class="comment"> ** &#x27;double&#x27;.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_modf</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (lua_isinteger(L ,<span class="number">1</span>)) &#123;</span><br><span class="line">        lua_settop(L, <span class="number">1</span>);  <span class="comment">/* number is its own integer part */</span></span><br><span class="line">        lua_pushnumber(L, <span class="number">0</span>);  <span class="comment">/* no fractional part */</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        lua_Number n = luaL_checknumber(L, <span class="number">1</span>);</span><br><span class="line">        <span class="comment">/* integer part (rounds toward zero) */</span></span><br><span class="line">        lua_Number ip = (n &lt; <span class="number">0</span>) ? l_mathop(<span class="built_in">ceil</span>)(n) : l_mathop(<span class="built_in">floor</span>)(n);</span><br><span class="line">        pushnumint(L, ip);</span><br><span class="line">        <span class="comment">/* fractional part (test needed for inf/-inf) */</span></span><br><span class="line">        lua_pushnumber(L, (n == ip) ? l_mathop(<span class="number">0.0</span>) : (n - ip));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">/*
+ ** next function does not use &#39;modf&#39;, avoiding problems with &#39;double*&#39;
+ ** (which is not compatible with &#39;float*&#39;) when lua_Number is not
+ ** &#39;double&#39;.
+ */
+static int math_modf (lua_State *L) &#123;
+    if (lua_isinteger(L ,1)) &#123;
+        lua_settop(L, 1);  /* number is its own integer part */
+        lua_pushnumber(L, 0);  /* no fractional part */
+    &#125;
+    else &#123;
+        lua_Number n = luaL_checknumber(L, 1);
+        /* integer part (rounds toward zero) */
+        lua_Number ip = (n &lt; 0) ? l_mathop(ceil)(n) : l_mathop(floor)(n);
+        pushnumint(L, ip);
+        /* fractional part (test needed for inf/-inf) */
+        lua_pushnumber(L, (n == ip) ? l_mathop(0.0) : (n - ip));
+    &#125;
+    return 2;
+&#125;
+</code></pre>
 <p>为什么lua不直接使用C标准库的modf函数获取浮点数的整数副本和小数部分呢？先看modf的声明：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">double</span> <span class="title function_">modf</span> <span class="params">(<span class="type">double</span> x, <span class="type">double</span>* intpart)</span>;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">double modf (double x, double* intpart);
+</code></pre>
 <p>当LUA_NUMBER不是double类型时(LUA_NUMBER可以宏定义为float类型)，double* 和float*并不兼容，这样可能会导致一些问题。 看代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (lua_isinteger(L ,<span class="number">1</span>)) &#123;</span><br><span class="line">    lua_settop(L, <span class="number">1</span>);  <span class="comment">/* number is its own integer part */</span></span><br><span class="line">    lua_pushnumber(L, <span class="number">0</span>);  <span class="comment">/* no fractional part */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">if (lua_isinteger(L ,1)) &#123;
+    lua_settop(L, 1);  /* number is its own integer part */
+    lua_pushnumber(L, 0);  /* no fractional part */
+&#125;
+</code></pre>
 <p>math_modf先判断参数本身是不是整数；如果是的话，直接将其设置到栈顶作为整数部分，再压入0作为小数部分；否则继续执行：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span> &#123;</span><br><span class="line">    lua_Number n = luaL_checknumber(L, <span class="number">1</span>);</span><br><span class="line">    <span class="comment">/* integer part (rounds toward zero) */</span></span><br><span class="line">    lua_Number ip = (n &lt; <span class="number">0</span>) ? l_mathop(<span class="built_in">ceil</span>)(n) : l_mathop(<span class="built_in">floor</span>)(n);</span><br><span class="line">    pushnumint(L, ip);</span><br><span class="line">    <span class="comment">/* fractional part (test needed for inf/-inf) */</span></span><br><span class="line">    lua_pushnumber(L, (n == ip) ? l_mathop(<span class="number">0.0</span>) : (n - ip));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">else &#123;
+    lua_Number n = luaL_checknumber(L, 1);
+    /* integer part (rounds toward zero) */
+    lua_Number ip = (n &lt; 0) ? l_mathop(ceil)(n) : l_mathop(floor)(n);
+    pushnumint(L, ip);
+    /* fractional part (test needed for inf/-inf) */
+    lua_pushnumber(L, (n == ip) ? l_mathop(0.0) : (n - ip));
+&#125;
+</code></pre>
 <p>math_modf取整数部分，采用向0舍入的策略；然后用浮点数减去整数部分得到小数部分。例如：</p>
 <ul>
 <li>math.modf(-2.9) –&gt; 整数部分：-2 小数部分：-0.9</li>
 <li>math.modf(2.9) –&gt; 整数部分：2 小数部分：0.9</li>
 </ul>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-05-09</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/lmathlib-c/'>
+                            lmathlib-c
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

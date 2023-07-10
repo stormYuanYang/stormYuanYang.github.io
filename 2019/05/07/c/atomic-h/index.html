@@ -1,28 +1,220 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>atomic.h</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>atomic.h</h2><p>头文件<strong>atomic.h</strong>定义了系列的原子操作宏定义以保证线程安全，这些原子操作宏定义是对GCC提供的内置原子操作api的一次封装。关于GCC的内置原子操作api已在<a href="https://coderdeepwater.cn/c_cpp/gcc/%E5%86%85%E5%BB%BA%E7%9A%84%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9Capi/">《GCC内建的原子操作api》</a>中详细介绍，不再赘述。 atomic.h的实现：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> SKYNET_ATOMIC_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SKYNET_ATOMIC_H</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_CAS(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_CAS_POINTER(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_INC(ptr) __sync_add_and_fetch(ptr, 1)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_FINC(ptr) __sync_fetch_and_add(ptr, 1)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_DEC(ptr) __sync_sub_and_fetch(ptr, 1)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_FDEC(ptr) __sync_fetch_and_sub(ptr, 1)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_ADD(ptr,n) __sync_add_and_fetch(ptr, n)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_SUB(ptr,n) __sync_sub_and_fetch(ptr, n)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_AND(ptr,n) __sync_and_and_fetch(ptr, n)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="atomic.h" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            atomic.h
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            
+        
+        <p>头文件<strong>atomic.h</strong>定义了系列的原子操作宏定义以保证线程安全，这些原子操作宏定义是对GCC提供的内置原子操作api的一次封装。关于GCC的内置原子操作api已在<a href="https://coderdeepwater.cn/c_cpp/gcc/%E5%86%85%E5%BB%BA%E7%9A%84%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9Capi/">《GCC内建的原子操作api》</a>中详细介绍，不再赘述。 atomic.h的实现：</p>
+<pre><code class="c">#ifndef SKYNET_ATOMIC_H
+#define SKYNET_ATOMIC_H
+
+#define ATOM_CAS(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)
+#define ATOM_CAS_POINTER(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)
+#define ATOM_INC(ptr) __sync_add_and_fetch(ptr, 1)
+#define ATOM_FINC(ptr) __sync_fetch_and_add(ptr, 1)
+#define ATOM_DEC(ptr) __sync_sub_and_fetch(ptr, 1)
+#define ATOM_FDEC(ptr) __sync_fetch_and_sub(ptr, 1)
+#define ATOM_ADD(ptr,n) __sync_add_and_fetch(ptr, n)
+#define ATOM_SUB(ptr,n) __sync_sub_and_fetch(ptr, n)
+#define ATOM_AND(ptr,n) __sync_and_and_fetch(ptr, n)
+
+#endif
+</code></pre>
 <p>现在对atomic.h定义的原子操作宏定义一一说明。 CAS操作：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_CAS(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_CAS_POINTER(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">#define ATOM_CAS(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)
+#define ATOM_CAS_POINTER(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)
+</code></pre>
 <p><strong>ATOM_CAS</strong>和<strong>ATOM_CAS_POINTER</strong>对应的文本是一致的，通过调用<strong>__sync_bool_compare_and_swap</strong>执行CAS操作。 自增操作：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_INC(ptr) __sync_add_and_fetch(ptr, 1)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_FINC(ptr) __sync_fetch_and_add(ptr, 1)</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">#define ATOM_INC(ptr) __sync_add_and_fetch(ptr, 1)
+#define ATOM_FINC(ptr) __sync_fetch_and_add(ptr, 1)
+</code></pre>
 <p>注意<strong>ATOM_INC</strong>和<strong>ATOM_FINC</strong>的不同之处：<strong>ATOM_INC</strong>类似++n，<strong>ATOM_FINC</strong>类似n++。 自减操作：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_DEC(ptr) __sync_sub_and_fetch(ptr, 1)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_FDEC(ptr) __sync_fetch_and_sub(ptr, 1)</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">#define ATOM_DEC(ptr) __sync_sub_and_fetch(ptr, 1)
+#define ATOM_FDEC(ptr) __sync_fetch_and_sub(ptr, 1)
+</code></pre>
 <p>注意<strong>ATOM_DEC</strong>和<strong>ATOM_FDEC</strong>的不同之处：<strong>ATOM_DEC</strong>类似–n，<strong>ATOM_FDEC</strong>类似n–。 加法操作：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_ADD(ptr,n) __sync_add_and_fetch(ptr, n)</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">#define ATOM_ADD(ptr,n) __sync_add_and_fetch(ptr, n)
+</code></pre>
 <p>注意，这里的加法类似<code>&#123;*ptr += n; return *ptr;&#125;</code>；可以仿造<strong>ATOM_FINC</strong>定义一个新的原子操作宏定义<strong>ATOM_FADD</strong>：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 构造的例子（skynet源码中并未有此宏定义）</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_FADD(ptr,n) __sync_fetch_and_add(ptr, n)</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">// 构造的例子（skynet源码中并未有此宏定义）
+#define ATOM_FADD(ptr,n) __sync_fetch_and_add(ptr, n)
+</code></pre>
 <p>ATOM_FADD类似<code>&#123;tmp = *ptr; *ptr += n; return *tmp;&#125;</code>。 减法操作：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_SUB(ptr,n) __sync_sub_and_fetch(ptr, n)</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">#define ATOM_SUB(ptr,n) __sync_sub_and_fetch(ptr, n)
+</code></pre>
 <p><strong>ATOM_SUB</strong>类似<code>&#123;*ptr -= n; return *ptr;&#125;</code>。 与操作：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> ATOM_AND(ptr,n) __sync_and_and_fetch(ptr, n)</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">#define ATOM_AND(ptr,n) __sync_and_and_fetch(ptr, n)
+</code></pre>
 <p><strong>ATOM_AND</strong>类似<code>&#123;*ptr &amp;= n; return *ptr;&#125;</code>。</p>
 <hr>
 <p>atomic.h并未使用到所有的内置原子操作函数，想对内置原子操作函数有更多了解，可以阅读<a href="https://coderdeepwater.cn/c_cpp/gcc/%E5%86%85%E5%BB%BA%E7%9A%84%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9Capi/">《GCC内建的原子操作api》</a>。</p>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-05-07</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/skynet-src/'>
+                            skynet-src
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

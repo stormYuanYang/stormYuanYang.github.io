@@ -1,6 +1,106 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>b_str2int</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>b_str2int</h2><p><strong>b_str2int</strong>是一个内部函数，其声明为：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">char</span> *<span class="title function_">b_str2int</span> <span class="params">(<span class="type">const</span> <span class="type">char</span> *s, <span class="type">int</span> base, lua_Integer *pn)</span>;</span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="b_str2int" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            b_str2int
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            
+        
+        <p><strong>b_str2int</strong>是一个内部函数，其声明为：</p>
+<pre><code class="c">static const char *b_str2int (const char *s, int base, lua_Integer *pn);
+</code></pre>
 <p>你是无法直接使用b_str2int的，b_str2int目前只被<strong>luaB_tonumber</strong>调用。b_str2int的目的是将字符串转换成一个整数。b_str2int接受3个参数：</p>
 <ul>
 <li>需要转换成整数的字符串s；</li>
@@ -10,28 +110,133 @@
 <p>b_str2int返回一个字符指针，这个指针可为调用者提供转换的部分信息。</p>
 <hr>
 <p>让我们看b_str2int的实现：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 空格符的字符集合</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPACECHARS <span class="string">&quot; \f\n\r\t\v&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">char</span> *<span class="title function_">b_str2int</span> <span class="params">(<span class="type">const</span> <span class="type">char</span> *s, <span class="type">int</span> base, lua_Integer *pn)</span> &#123;</span><br><span class="line">    lua_Unsigned n = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> neg = <span class="number">0</span>;</span><br><span class="line">    s += <span class="built_in">strspn</span>(s, SPACECHARS);  <span class="comment">/* skip initial spaces */</span></span><br><span class="line">    <span class="keyword">if</span> (*s == <span class="string">&#x27;-&#x27;</span>) &#123; s++; neg = <span class="number">1</span>; &#125;  <span class="comment">/* handle signal */</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (*s == <span class="string">&#x27;+&#x27;</span>) s++;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">isalnum</span>((<span class="type">unsigned</span> <span class="type">char</span>)*s))  <span class="comment">/* no digit? */</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="type">int</span> digit = (<span class="built_in">isdigit</span>((<span class="type">unsigned</span> <span class="type">char</span>)*s)) ? *s - <span class="string">&#x27;0&#x27;</span></span><br><span class="line">            : (<span class="built_in">toupper</span>((<span class="type">unsigned</span> <span class="type">char</span>)*s) - <span class="string">&#x27;A&#x27;</span>) + <span class="number">10</span>;</span><br><span class="line">        <span class="keyword">if</span> (digit &gt;= base) <span class="keyword">return</span> <span class="literal">NULL</span>;  <span class="comment">/* invalid numeral */</span></span><br><span class="line">        n = n * base + digit;</span><br><span class="line">        s++;</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="built_in">isalnum</span>((<span class="type">unsigned</span> <span class="type">char</span>)*s));</span><br><span class="line">    s += <span class="built_in">strspn</span>(s, SPACECHARS);  <span class="comment">/* skip trailing spaces */</span></span><br><span class="line">    *pn = (lua_Integer)((neg) ? (<span class="number">0u</span> - n) : n);</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c">// 空格符的字符集合
+#define SPACECHARS &quot; \f\n\r\t\v&quot;
 
+static const char *b_str2int (const char *s, int base, lua_Integer *pn) &#123;
+    lua_Unsigned n = 0;
+    int neg = 0;
+    s += strspn(s, SPACECHARS);  /* skip initial spaces */
+    if (*s == &#39;-&#39;) &#123; s++; neg = 1; &#125;  /* handle signal */
+    else if (*s == &#39;+&#39;) s++;
+    if (!isalnum((unsigned char)*s))  /* no digit? */
+        return NULL;
+    do &#123;
+        int digit = (isdigit((unsigned char)*s)) ? *s - &#39;0&#39;
+            : (toupper((unsigned char)*s) - &#39;A&#39;) + 10;
+        if (digit &gt;= base) return NULL;  /* invalid numeral */
+        n = n * base + digit;
+        s++;
+    &#125; while (isalnum((unsigned char)*s));
+    s += strspn(s, SPACECHARS);  /* skip trailing spaces */
+    *pn = (lua_Integer)((neg) ? (0u - n) : n);
+    return s;
+&#125;
+</code></pre>
 <p>首先看变量的声明和定义：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lua_Unsigned n = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> neg = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">lua_Unsigned n = 0;
+int neg = 0;
+</code></pre>
 <p>b_str2int首先定义n和neg，n用于暂存转换结果，neg用于标志结果的正负。 再往下看：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s += <span class="built_in">strspn</span>(s, SPACECHARS);</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">s += strspn(s, SPACECHARS);
+</code></pre>
 <p>这里通过调用C标准库中的<strong>strspn</strong>方法，跳过所有的前置空格符。 继续看：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (*s == <span class="string">&#x27;-&#x27;</span>) &#123; s++; neg = <span class="number">1</span>; &#125;</span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (*s == <span class="string">&#x27;+&#x27;</span>) s++;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">if (*s == &#39;-&#39;) &#123; s++; neg = 1; &#125;
+else if (*s == &#39;+&#39;) s++;
+</code></pre>
 <p>跳过所有空格符后，判断一下第一个字符是否是’-‘或者’+’；如果是’-‘，表明这是一个负数，将标志neg设置为1；如果是’+’，s只需要继续向后就好。 继续看代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="built_in">isalnum</span>((<span class="type">unsigned</span> <span class="type">char</span>)*s))</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">if (!isalnum((unsigned char)*s))
+    return NULL;
+</code></pre>
 <p>如果第一个字符不是字母或者数字，说明字符串s根本无法转换成整数，直接返回NULL。 看接下来的<code>do&#123;&#125;while()</code>循环：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">    <span class="type">int</span> digit = (<span class="built_in">isdigit</span>((<span class="type">unsigned</span> <span class="type">char</span>)*s)) ? *s - <span class="string">&#x27;0&#x27;</span></span><br><span class="line">        : (<span class="built_in">toupper</span>((<span class="type">unsigned</span> <span class="type">char</span>)*s) - <span class="string">&#x27;A&#x27;</span>) + <span class="number">10</span>;</span><br><span class="line">    <span class="keyword">if</span> (digit &gt;= base) <span class="keyword">return</span> <span class="literal">NULL</span>;  <span class="comment">/* invalid numeral */</span></span><br><span class="line">    n = n * base + digit;</span><br><span class="line">    s++;</span><br><span class="line">&#125; <span class="keyword">while</span> (<span class="built_in">isalnum</span>((<span class="type">unsigned</span> <span class="type">char</span>)*s));</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">do &#123;
+    int digit = (isdigit((unsigned char)*s)) ? *s - &#39;0&#39;
+        : (toupper((unsigned char)*s) - &#39;A&#39;) + 10;
+    if (digit &gt;= base) return NULL;  /* invalid numeral */
+    n = n * base + digit;
+    s++;
+&#125; while (isalnum((unsigned char)*s));
+</code></pre>
 <p>计算出_<strong>s</strong>对应的字符对应的数值，如果大于等于指定的base，则说明这是一个无效的数字，直接返回；否则更新n的值，s继续向后移动。一旦_s不是数字和字母，就停止循环。 注意，这里并没有考虑整数溢出的情况：当字符串代表的整数长度太长时，转换得到的整数可能是错误的。 继续看代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s += <span class="built_in">strspn</span>(s, SPACECHARS);</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">s += strspn(s, SPACECHARS);
+</code></pre>
 <p>再次调用strspn，跳过后置的空格。 最后看：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*pn = (lua_Integer)((neg) ? (<span class="number">0u</span> - n) : n);</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">*pn = (lua_Integer)((neg) ? (0u - n) : n);
+</code></pre>
 <p>这里根据标志neg的值，得到最终的整数值*pn。注意，就算在<code>do&#123;&#125;while()</code>中没有溢出，这里同样可能会溢出，因为n是unsigned类型(<strong>unsigned LUA_INTEGER</strong>)，*pn却是signed类型(<strong>LUA_INTEGER</strong>)。 执行完后，返回s。 分析一下b_str2int的时间复杂度。strspn的时间复杂度是平方级的： $$ O(n^{2}) $$ 但是，<strong>SPACECHARS</strong>的长度是固定的，而且也不是很大，一共就6个字符。可以认为在b_str2int中，调用strspn的时间复杂度是线性的： $$ O(n) $$ 调用<code>do&#123;&#125;while()</code>循环花费线性时间。其他的操作都只花费常量时间。综上，b_str2int的时间复杂是线性的: $$ O(n) $$</p>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-04-25</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/lbaselib-c/'>
+                            lbaselib-c
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

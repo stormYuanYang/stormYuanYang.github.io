@@ -1,9 +1,213 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>math_randomseed</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>math_randomseed</h2><h1 id="math-randomseed简介"><a href="#math-randomseed简介" class="headerlink" title="math_randomseed简介"></a>math_randomseed简介</h1><p><strong>math_randomseed</strong>是lua库函数<strong>math.randomseed</strong>的具体实现。<strong>math_randomseed</strong>的目的是设定随机数生成器的“种子”，相同的“种子”会产生相同的伪随机数序列。<strong>math_randomseed</strong>的声明如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_randomseed</span> <span class="params">(lua_State *L)</span>;</span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="math_randomseed" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            math_randomseed
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-randomseed%E7%AE%80%E4%BB%8B"><span class="post-toc-text">math_randomseed简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-randomseed%E5%AE%9E%E7%8E%B0"><span class="post-toc-text">math_randomseed实现</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%80%E4%BA%9B%E8%AF%B4%E6%98%8E"><span class="post-toc-text">一些说明</span></a></li></ol>
+        
+        <h1 id="math-randomseed简介"><a href="#math-randomseed简介" class="headerlink" title="math_randomseed简介"></a>math_randomseed简介</h1><p><strong>math_randomseed</strong>是lua库函数<strong>math.randomseed</strong>的具体实现。<strong>math_randomseed</strong>的目的是设定随机数生成器的“种子”，相同的“种子”会产生相同的伪随机数序列。<strong>math_randomseed</strong>的声明如下：</p>
+<pre><code class="c">static int math_randomseed (lua_State *L);
+</code></pre>
 <h1 id="math-randomseed实现"><a href="#math-randomseed实现" class="headerlink" title="math_randomseed实现"></a>math_randomseed实现</h1><p><strong>math_randomseed</strong>的实现源码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_randomseed</span> <span class="params">(lua_State *L)</span> &#123;                                           </span><br><span class="line">    l_srand((<span class="type">unsigned</span> <span class="type">int</span>)(lua_Integer)luaL_checknumber(L, <span class="number">1</span>));</span><br><span class="line">    (<span class="type">void</span>)l_rand(); <span class="comment">/* discard first value to avoid undesirable correlations */</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">static int math_randomseed (lua_State *L) &#123;                                           
+    l_srand((unsigned int)(lua_Integer)luaL_checknumber(L, 1));
+    (void)l_rand(); /* discard first value to avoid undesirable correlations */
+    return 0;
+&#125;
+</code></pre>
 <p><strong>math_randomseed</strong>通过调用<strong>l_srand</strong>将传入的参数设为随机数生成器的“种子”。注意接下来的<code>(void)l_rand();</code>，执行一次随机数函数的调用的目的是丢弃当前“种子”产生的第一个随机数，避免产生不好的随机数关联，以便提高伪随机性。</p>
 <h1 id="一些说明"><a href="#一些说明" class="headerlink" title="一些说明"></a>一些说明</h1><p><strong>l_srand</strong>和<strong>l_rand</strong>均是宏定义(都定义在<strong>lmathlib.c</strong>中)：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">if</span> !defined(l_rand)        <span class="comment">/* &#123; */</span>                                                   </span></span><br><span class="line">    <span class="meta">#<span class="keyword">if</span> defined(LUA_USE_POSIX)</span></span><br><span class="line">        <span class="meta">#<span class="keyword">define</span> l_rand()    random()</span></span><br><span class="line">        <span class="meta">#<span class="keyword">define</span> l_srand(x)  srandom(x)</span></span><br><span class="line">        <span class="meta">#<span class="keyword">define</span> L_RANDMAX   2147483647  <span class="comment">/* (2^31 - 1), following POSIX */</span></span></span><br><span class="line">    <span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">        <span class="meta">#<span class="keyword">define</span> l_rand()    rand()</span></span><br><span class="line">        <span class="meta">#<span class="keyword">define</span> l_srand(x)  srand(x)</span></span><br><span class="line">        <span class="meta">#<span class="keyword">define</span> L_RANDMAX   RAND_MAX</span></span><br><span class="line">    <span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span>                      <span class="comment">/* &#125; */</span></span></span><br></pre></td></tr></table></figure><p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+<pre><code class="c">#if !defined(l_rand)        /* &#123; */                                                   
+    #if defined(LUA_USE_POSIX)
+        #define l_rand()    random()
+        #define l_srand(x)  srandom(x)
+        #define L_RANDMAX   2147483647  /* (2^31 - 1), following POSIX */
+    #else
+        #define l_rand()    rand()
+        #define l_srand(x)  srand(x)
+        #define L_RANDMAX   RAND_MAX
+    #endif
+#endif                      /* &#125; */
+</code></pre>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-05-13</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/randomseed/'>
+                            randomseed
+                        </a>
+                    
+                        <a href='/tags/%E9%9A%8F%E6%9C%BA%E6%95%B0%E7%A7%8D%E5%AD%90/'>
+                            随机数种子
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/lmathlib-c/'>
+                            lmathlib-c
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

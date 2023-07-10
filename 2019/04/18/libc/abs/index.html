@@ -1,15 +1,134 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>abs</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>abs</h2><p>函数<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstdlib/abs/"><strong>abs</strong></a>返回参数的绝对值。 其声明如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">abs</span><span class="params">(<span class="type">int</span> n)</span>;</span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="abs" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            abs
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            
+        
+        <p>函数<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstdlib/abs/"><strong>abs</strong></a>返回参数的绝对值。 其声明如下：</p>
+<pre><code class="c">int abs(int n);
+</code></pre>
 <p>这个函数的实现本身非常简单，让我们直接看源代码。abs的实现放在stdlib&#x2F;abs.c中：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Copyright (C) 1991, 1997 Free Software Foundation, Inc.</span></span><br><span class="line"><span class="comment">   This file is part of the GNU C Library.</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">undef</span> abs</span></span><br><span class="line"><span class="comment">/* Return the absolute value of I.  */</span></span><br><span class="line"><span class="type">int</span> </span><br><span class="line"><span class="title function_">abs</span> <span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> i &lt; <span class="number">0</span> ? -i : i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">/* Copyright (C) 1991, 1997 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+*/
+#include &lt;stdlib.h&gt;
+#undef abs
+/* Return the absolute value of I.  */
+int 
+abs (int i) &#123;
+    return i &lt; 0 ? -i : i;
+&#125;
+</code></pre>
 <p>abs的实现就一行代码。简单地判断i和0的大小，如果i小于0，直接返回-i，否则返回i本身。 有一个陷阱需要注意：当参数i是<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/climits/"><strong>INT_MIN</strong></a>时，即int的最小值时，这个函数就无法正确获取i的绝对值了。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;limits.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">1</span> &lt;&lt; <span class="number">31</span>;<span class="comment">//如果int是32位的话，1&lt;&lt;31就是最小值</span></span><br><span class="line">    <span class="type">int</span> b = INT_MIN;</span><br><span class="line">    <span class="type">int</span> c = INT_MIN + <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;abs(a):%d\tabs(b):%d\tabs(c):%d\n&quot;</span>, <span class="built_in">abs</span>(a), <span class="built_in">abs</span>(b), <span class="built_in">abs</span>(c));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c">#include &lt;stdio.h&gt;
+#include &lt;limits.h&gt;
+#include &lt;stdlib.h&gt;
 
+int main() &#123;
+    int a = 1 &lt;&lt; 31;//如果int是32位的话，1&lt;&lt;31就是最小值
+    int b = INT_MIN;
+    int c = INT_MIN + 1;
+    printf(&quot;abs(a):%d\tabs(b):%d\tabs(c):%d\n&quot;, abs(a), abs(b), abs(c));
+    return 0;
+&#125;
+</code></pre>
 <p>执行上述代码，在我的计算机上打印结果如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">abs</span>(a):<span class="number">-2147483648</span>   <span class="built_in">abs</span>(b):<span class="number">-2147483648</span>  <span class="built_in">abs</span>(c):<span class="number">2147483647</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">abs(a):-2147483648   abs(b):-2147483648  abs(c):2147483647
+</code></pre>
 <p>是不是感到很奇怪，怎么a、b的绝对值打印出来还是个负数而且就是其本身。<strong>signed</strong>类型的整数在计算机内存中采用2进制的<strong>补码</strong>表示。其首位是<strong>符号位</strong>：</p>
 <p>符号位值</p>
 <p>整数类型</p>
@@ -56,4 +175,88 @@
 <p>得到结果:-255</p>
 <p>得到结果：-256</p>
 <p>由上表可知，传给abs的参数是INT_MIN时，返回的结果必然还是INT_MIN。</p>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-04-18</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/string-h/'>
+                            string-h
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3c%E8%AF%AD%E8%A8%80/'>
+                            深入理解c语言
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

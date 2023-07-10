@@ -1,28 +1,265 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>深入理解System.currentTimeMillis()</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>深入理解System.currentTimeMillis()</h2><h2 id="currentTimeMillis"><a href="#currentTimeMillis" class="headerlink" title="currentTimeMillis"></a>currentTimeMillis</h2><p>当我们在Java需要获取当系统当前时间时,想到的第一个函数肯定是System.currentTimeMills(),这个函数返回从1970年1月1日凌晨0点(准确地说是1970-01-01 00:00:00 UTC)到当前时刻所走过的时间,正如其名字所表示,这个函数返回的时间以毫秒为单位.</p>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="深入理解System.currentTimeMillis()" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
+
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            深入理解System.currentTimeMillis()
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#currentTimeMillis"><span class="post-toc-text">currentTimeMillis</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Linux"><span class="post-toc-text">Linux</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Windows"><span class="post-toc-text">Windows</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%A4%87%E6%B3%A8"><span class="post-toc-text">备注</span></a></li></ol>
+        
+        <h2 id="currentTimeMillis"><a href="#currentTimeMillis" class="headerlink" title="currentTimeMillis"></a>currentTimeMillis</h2><p>当我们在Java需要获取当系统当前时间时,想到的第一个函数肯定是System.currentTimeMills(),这个函数返回从1970年1月1日凌晨0点(准确地说是1970-01-01 00:00:00 UTC)到当前时刻所走过的时间,正如其名字所表示,这个函数返回的时间以毫秒为单位.</p>
 <p><strong>System.currentTimeMills()的返回值取决于Java运行时系统的本地时区!千万不要忘记这一点!</strong><br>同一时刻,在英国和中国的两个人同时用System.currentTimeMills()获取当前系统时间,其返回值不是一样的,除非手动将操作系统的时区设置成同一个时区(英国使用UTC+0,而中国使用UTC+8,中国比英国快8个小时).</p>
 <p>System.currentTimeMills()依赖于OS的实现,所以这个函数并不是由java代码实现,正如其声明:</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Returns the current time in milliseconds.  Note that</span></span><br><span class="line"><span class="comment">     * while the unit of time of the return value is a millisecond,</span></span><br><span class="line"><span class="comment">     * the granularity of the value depends on the underlying</span></span><br><span class="line"><span class="comment">     * operating system and may be larger.  For example, many</span></span><br><span class="line"><span class="comment">     * operating systems measure time in units of tens of</span></span><br><span class="line"><span class="comment">     * milliseconds.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * &lt;p&gt; See the description of the class &#123;<span class="doctag">@code</span> Date&#125; for</span></span><br><span class="line"><span class="comment">     * a discussion of slight discrepancies that may arise between</span></span><br><span class="line"><span class="comment">     * &quot;computer time&quot; and coordinated universal time (UTC).</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span>  the difference, measured in milliseconds, between</span></span><br><span class="line"><span class="comment">     *          the current time and midnight, January 1, 1970 UTC.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@see</span>     java.util.Date</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@HotSpotIntrinsicCandidate</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">native</span> <span class="type">long</span> <span class="title function_">currentTimeMillis</span><span class="params">()</span>;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="java">/**
+     * Returns the current time in milliseconds.  Note that
+     * while the unit of time of the return value is a millisecond,
+     * the granularity of the value depends on the underlying
+     * operating system and may be larger.  For example, many
+     * operating systems measure time in units of tens of
+     * milliseconds.
+     *
+     * &lt;p&gt; See the description of the class &#123;@code Date&#125; for
+     * a discussion of slight discrepancies that may arise between
+     * &quot;computer time&quot; and coordinated universal time (UTC).
+     *
+     * @return  the difference, measured in milliseconds, between
+     *          the current time and midnight, January 1, 1970 UTC.
+     * @see     java.util.Date
+     */
+    @HotSpotIntrinsicCandidate
+    public static native long currentTimeMillis();
+</code></pre>
 <p>Java用native关键词表示这个函数由本地函数实现.那就让我们看看System.currentTimeMills到底是如何实现的.接下来查看Windows和Linux平台实现(OS类别实在太多,你有兴趣可以查看其他OS平台下的实现).</p>
 <p>首先,Java中的System类里的native方法,对应到Java的实现源码就在System.c中:</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Only register the performance-critical methods */</span><span class="type">static</span> JNINativeMethod methods[] = &#123;</span><br><span class="line">    &#123;<span class="string">&quot;currentTimeMillis&quot;</span>, <span class="string">&quot;()J&quot;</span>,              (<span class="type">void</span> *)&amp;JVM_CurrentTimeMillis&#125;,</span><br><span class="line">    &#123;<span class="string">&quot;nanoTime&quot;</span>,          <span class="string">&quot;()J&quot;</span>,              (<span class="type">void</span> *)&amp;JVM_NanoTime&#125;,</span><br><span class="line">    &#123;<span class="string">&quot;arraycopy&quot;</span>,     <span class="string">&quot;(&quot;</span> OBJ <span class="string">&quot;I&quot;</span> OBJ <span class="string">&quot;II)V&quot;</span>, (<span class="type">void</span> *)&amp;JVM_ArrayCopy&#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">/* Only register the performance-critical methods */static JNINativeMethod methods[] = &#123;
+    &#123;&quot;currentTimeMillis&quot;, &quot;()J&quot;,              (void *)&amp;JVM_CurrentTimeMillis&#125;,
+    &#123;&quot;nanoTime&quot;,          &quot;()J&quot;,              (void *)&amp;JVM_NanoTime&#125;,
+    &#123;&quot;arraycopy&quot;,     &quot;(&quot; OBJ &quot;I&quot; OBJ &quot;II)V&quot;, (void *)&amp;JVM_ArrayCopy&#125;,
+&#125;;
+</code></pre>
 <p>这里给出了java中的函数名字,和对应的c函数指针,通过c函数指针JVM_CurrentTimeMillis,找到对应实现:</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">JVM_LEAF</span>(jlong, <span class="built_in">JVM_CurrentTimeMillis</span>(JNIEnv *env, jclass ignored))</span><br><span class="line">  <span class="built_in">JVMWrapper</span>(<span class="string">&quot;JVM_CurrentTimeMillis&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> os::<span class="built_in">javaTimeMillis</span>();</span><br><span class="line">JVM_END</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c++">JVM_LEAF(jlong, JVM_CurrentTimeMillis(JNIEnv *env, jclass ignored))
+  JVMWrapper(&quot;JVM_CurrentTimeMillis&quot;);
+  return os::javaTimeMillis();
+JVM_END
+</code></pre>
 <p>由上述源码可知,调用各个OS的<code>os::javaTimeMillis()</code>来获取当前时间.</p>
 <h3 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h3><p>Linux的javaTimeMillis()实现:</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">jlong <span class="title">os::javaTimeMillis</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  timeval time;</span><br><span class="line">  <span class="type">int</span> status = <span class="built_in">gettimeofday</span>(&amp;time, <span class="literal">NULL</span>);</span><br><span class="line">  <span class="built_in">assert</span>(status != <span class="number">-1</span>, <span class="string">&quot;linux error&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">jlong</span>(time.tv_sec) * <span class="number">1000</span>  +  <span class="built_in">jlong</span>(time.tv_usec / <span class="number">1000</span>);</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
-
+<pre><code class="c++">jlong os::javaTimeMillis() &#123;
+  timeval time;
+  int status = gettimeofday(&amp;time, NULL);
+  assert(status != -1, &quot;linux error&quot;);
+  return jlong(time.tv_sec) * 1000  +  jlong(time.tv_usec / 1000);
+&#125; 
+</code></pre>
 <p>由第3行代码可知,在Linux平台下Java获取系统当前时间实际调用的就是函数<code>gettimeofday()</code>,返回的结果放入<code>time</code>中.第5行代码通过单位的换算,返回以毫秒为单位的时间.</p>
 <p>gettimeofday返回的时间以秒和微秒为单位,但是这并不意味着其时间的准确度就是1个微秒,其准确度取决于你使用的机器(关于gettimeofday详细介绍可以戳<a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/gettimeofday.2.html">这里</a>,这里就不再过多说明).</p>
 <h3 id="Windows"><a href="#Windows" class="headerlink" title="Windows"></a>Windows</h3><p>Windows的javaTimeMillis()实现:</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">jlong <span class="title">os::javaTimeMillis</span><span class="params">()</span> </span>&#123;           </span><br><span class="line">  <span class="keyword">if</span> (UseFakeTimers) &#123;</span><br><span class="line">    <span class="keyword">return</span> fake_time++;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    FILETIME wt;</span><br><span class="line">    <span class="built_in">GetSystemTimeAsFileTime</span>(&amp;wt);<span class="comment">// Windows平台提供的获取当前时间的函数</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">windows_to_java_time</span>(wt);<span class="comment">// 转换成毫秒,并返回</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">jlong <span class="title">windows_to_java_time</span><span class="params">(FILETIME wt)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 根据wt存放的时间信息转换成jlong类型.</span></span><br><span class="line">  jlong a = <span class="built_in">jlong_from</span>(wt.dwHighDateTime, wt.dwLowDateTime);</span><br><span class="line">  <span class="comment">// 这里有两个疑问:</span></span><br><span class="line">  <span class="comment">// 1.为什么要减去一个偏移量offset()?</span></span><br><span class="line">  <span class="comment">// 答:因为FILETIME结构的wt代表从1601年1月1日开始到当前的时间的一个数字(时间以100纳秒为间隔得到:总时间(以纳秒为单位)除以100就得到这个数字),而Java需要的是计算从1970年1月1日开始到现在的毫秒数;那么就需要减去这个差值.</span></span><br><span class="line">  <span class="comment">// 2.减去偏移量之后,为什么还要除以10000(一万)?</span></span><br><span class="line">  <span class="comment">// 答:因为a-offset()的结果是以100纳秒为基本单位的一个数字,需要转换成毫秒,就需要除以10000.</span></span><br><span class="line">  <span class="comment">// 1秒=1000毫秒;</span></span><br><span class="line">  <span class="comment">// 1毫秒=1000微秒;</span></span><br><span class="line">  <span class="comment">// 1微秒=1000纳秒.</span></span><br><span class="line">  <span class="keyword">return</span> (a - <span class="built_in">offset</span>()) / <span class="number">10000</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="c++">jlong os::javaTimeMillis() &#123;           
+  if (UseFakeTimers) &#123;
+    return fake_time++;
+  &#125; else &#123;
+    FILETIME wt;
+    GetSystemTimeAsFileTime(&amp;wt);// Windows平台提供的获取当前时间的函数
+    return windows_to_java_time(wt);// 转换成毫秒,并返回
+  &#125;
+&#125;
 
+jlong windows_to_java_time(FILETIME wt) &#123;
+  // 根据wt存放的时间信息转换成jlong类型.
+  jlong a = jlong_from(wt.dwHighDateTime, wt.dwLowDateTime);
+  // 这里有两个疑问:
+  // 1.为什么要减去一个偏移量offset()?
+  // 答:因为FILETIME结构的wt代表从1601年1月1日开始到当前的时间的一个数字(时间以100纳秒为间隔得到:
+  // 总时间(以纳秒为单位)除以100就得到这个数字),而Java需要的是计算从1970年1月1日开始到现在的毫秒数;
+  // 那么就需要减去这个差值.
+  // 2.减去偏移量之后,为什么还要除以10000(一万)?
+  // 答:因为a-offset()的结果是以100纳秒为基本单位的一个数字,需要转换成毫秒,就需要除以10000.
+  // 1秒=1000毫秒;
+  // 1毫秒=1000微秒;
+  // 1微秒=1000纳秒.
+  return (a - offset()) / 10000;
+&#125;
+</code></pre>
 <p>第2行到第3行的代码可以先忽略,这部分逻辑是debug用的;关键在于第6行的<code>GetSystemTimeAsFileTime()</code>和第7行的<code>windows_to_java_time()</code>函数调用.同样的要注意,<code>GetSystemTimeAsFileTime()</code>返回的时间信息虽然以100个纳秒为间隔,但是这并不意味着其准确度就是100纳秒,这取决于你的Windows系统.</p>
 <h2 id="备注"><a href="#备注" class="headerlink" title="备注"></a>备注</h2><p>1.以上所说java的版本均为java11,实现java本身的源码来自OpenJdk 11.</p>
 <p>2.OS是operater system,即操作系统的缩写.</p>
 <p>3.UTC是Universal Time Coordinated的缩写,即协调世界时.比如北京时间和UTC +0的时差为+8,也就是UTC+8,俗称东八区;但是因为祖国幅员辽阔,横跨多个时区,为了保证时间的准确统一,祖国其他地方统一使用北京时间授时.</p>
 <p>4.System.c位于Java源码目录下的java.base&#x2F;share&#x2F;native&#x2F;libjava&#x2F;System.c.</p>
 <p>5.探究java方法的实现,目的是理解其原理做到知其然知其所以然,但并不会陷入过多的实现细节,比如c&#x2F;C++里的宏定义等.</p>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2020-12-29</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/%E6%97%B6%E9%97%B4/'>
+                            时间
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E6%BA%90%E7%A0%81/'>
+                            深入理解Java源码
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

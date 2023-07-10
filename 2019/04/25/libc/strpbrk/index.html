@@ -1,10 +1,209 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>strpbrk</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>strpbrk</h2><p><strong>strpbrk</strong>是一个字符串查找函数，其声明如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> * <span class="title function_">strpbrk</span> <span class="params">( <span class="type">const</span> <span class="type">char</span> * s, <span class="type">const</span> <span class="type">char</span> * accept)</span>; </span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="strpbrk" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            strpbrk
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            
+        
+        <p><strong>strpbrk</strong>是一个字符串查找函数，其声明如下：</p>
+<pre><code class="c">char * strpbrk ( const char * s, const char * accept); 
+</code></pre>
 <p>strpbrk接受两个合法的C字符串。strpbrk的目的是找到accept的任意一个字符在s中首次出现的位置。</p>
 <hr>
 <p>strpbrk的实现还是挺简单的（string&#x2F;strpbrk.c）：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Copyright (C) 1991, 1994, 1996, 1997, 2003 Free Software Foundation, Inc.</span></span><br><span class="line"><span class="comment">   This file is part of the GNU C Library.*/</span></span><br><span class="line"><span class="comment">/* Find the first occurrence in S of any character in ACCEPT.  */</span></span><br><span class="line"><span class="type">char</span> * <span class="title function_">strpbrk</span> <span class="params">(s, accept)</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *s;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *accept;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span> (*s != <span class="string">&#x27;\0&#x27;</span>) &#123;</span><br><span class="line">        <span class="type">const</span> <span class="type">char</span> *a = accept;</span><br><span class="line">        <span class="keyword">while</span> (*a != <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">            <span class="keyword">if</span> (*a++ == *s)</span><br><span class="line">                <span class="keyword">return</span> (<span class="type">char</span> *) s;</span><br><span class="line">        ++s;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">/* Copyright (C) 1991, 1994, 1996, 1997, 2003 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.*/
+/* Find the first occurrence in S of any character in ACCEPT.  */
+char * strpbrk (s, accept)
+    const char *s;
+    const char *accept;
+&#123;
+    while (*s != &#39;\0&#39;) &#123;
+        const char *a = accept;
+        while (*a != &#39;\0&#39;)
+            if (*a++ == *s)
+                return (char *) s;
+        ++s;
+    &#125;
+    return NULL;
+&#125;
+</code></pre>
 <p>strpbrk的代码非常直观，就只有两层嵌套循环：外层循环遍历s中的每一个字符，内循环遍历accept中的字符，如果能在accept中找到当前字符*<strong>s</strong>，则返回s；否则继续检查s中的下一个字符。如果遍历完s都找不到一个字符是accept中的字符，则返回NULL。 显而易见，strpbrk的时间复杂度是平方级的： $$ O(n^{2}) $$ 当然啦，一般使用这个函数的时候accept中的字符都只有常数个（多数情况下只有1个）。从实际的运用来看，其时间复杂度可以认为是线性的： $$ O(n) $$</p>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-04-25</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/string-h/'>
+                            string-h
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3c%E8%AF%AD%E8%A8%80/'>
+                            深入理解c语言
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="pushnumint" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
+
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            pushnumint
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            
+        
+        <p><strong>pushnumint</strong>是lmathlib.c中的一个辅助函数，其作用是向栈中压入一个整数或者整数：</p>
+<ul>
+<li>如果传入的浮点数参数能转换成整数就向栈中压入转换后的整数；</li>
+<li>否则将浮点数直接压入栈中。</li>
+</ul>
+<p>pushnumint的声明如下：</p>
+<pre><code class="c">static void pushnumint (lua_State* L, lua_Number d);
+</code></pre>
+<hr>
+<p>现在来看看pushnumint的实现：</p>
+<pre><code class="c">static void pushnumint (lua_State *L, lua_Number d) &#123;
+    lua_Integer n;
+    if (lua_numbertointeger(d, &amp;n))  /* does &#39;d&#39; fit in an integer? */
+        lua_pushinteger(L, n);  /* result is integer */
+    else
+        lua_pushnumber(L, d);  /* result is float */
+&#125;
+</code></pre>
+<p>pushnumint的结构一目了然。调用<strong>lua_numbertointeger</strong>尝试将浮点数d转换成整数；如果d能转换成整数，则将其整数值n压入栈中；否则，直接将d压入栈中。 那这里的<strong>lua_numbertointeger</strong>又是如何判断d能否转换成一个整数的呢？ <strong>lua_numbertointeger</strong>并不是一个函数，而是一个宏定义（定义在luaconf.h中），其定义为：</p>
+<pre><code class="c">/*
+@@ lua_numbertointeger converts a float number to an integer, or
+** returns 0 if float is not within the range of a lua_Integer.
+** (The range comparisons are tricky because of rounding. The tests
+** here assume a two-complement representation, where MININTEGER always
+** has an exact representation as a float; MAXINTEGER may not have one,
+** and therefore its conversion to float may have an ill-defined value.)
+*/
+#define lua_numbertointeger(n,p) \
+  ((n) &gt;= (LUA_NUMBER)(LUA_MININTEGER) &amp;&amp; \
+   (n) &lt; -(LUA_NUMBER)(LUA_MININTEGER) &amp;&amp; \
+      (*(p) = (LUA_INTEGER)(n), 1))
+</code></pre>
+<p><strong>lua_numbertointeger</strong>对传入的浮点数n做两次条件判断，n必须要落在能被<strong>LUA_INTEGER</strong>表示的范围内，即n满足： $$ LUA_MININTEGER &lt;&#x3D; n &lt;&#x3D; LUA_MAXINTEGER $$ 当n满足条件时，直接将n强制转换成<strong>LUA_INTEGER</strong>类型并复制给*p，并返回真；否则返回假。 注意，这里并不是直接判断n是否小于等于**(LUA_NUMBER)LUA_MAXINTEGER<strong>，而是选择判断n是否小于</strong>-(LUA_NUMBER)LUA_MININTEGER<strong>；这样做的目的，注释中已经给出了解释，但是并未说明为什么</strong>LUA_MAXINTEGER<strong>可能无法用</strong>LUA_NUMBER<strong>类型表示： LUA_NUMBER实际上是double(也可能是float、long double)的别名。LUA_INTEGER实际上是long int(也可能是int、long long int)的别名。而double在内存中存储结构导致，double表示的浮点数是拥有精度限制的，可能无法向long int一样准确地表示一个整数。 double可以用公式表示为： $$ 精度 a\times 2^{指数e} $$ 对于double来说，大于等于$2^{53}$的无符号整数就</strong>可能<strong>无法被精确表示了；因为double用53个bit表示精度，在指数确定时，最多只能表示$2^{53}$个不同的数。特别地，当指数e为0时： $$ [0, 2^{53}-1] $$ 对于有符号整数来说这个范围就是: $$ [-2^{52},2^{52}-1] $$ 当超过double能精确表示的整数范围后，就只有2的整数幂一定能被double精确表示，其他的数字则</strong>可能<strong>无法精确被表示；所lua在这里用</strong>-(LUA_NUMBER)LUA_MININTEGER**(即$2^{63}​$)来做判断。 举个例子：</p>
+<pre><code class="c">#include &lt;stdio.h&gt;
+#include &lt;limits.h&gt;
+
+int main() &#123;
+    printf(&quot;%u %u\n&quot;, sizeof(long long int), sizeof(double));
+    printf(&quot;%ld\n&quot;, LLONG_MAX);
+    double a = (double)LLONG_MAX;
+    printf(&quot;%lf\n&quot;, a);
+    printf(&quot;将a转换成整数:%ld\n&quot;, (long long int)a);
+    printf(&quot;%ld\n&quot;, LLONG_MIN);
+    a = (double)LLONG_MIN;
+    printf(&quot;%lf\n&quot;, a);
+    return 0;
+&#125;
+</code></pre>
+<p>在我的PC上，打印结果：</p>
+<pre><code class="c">8 8
+9223372036854775807
+9223372036854775808.000000
+将a转换成整数:-9223372036854775808
+-9223372036854775808
+-9223372036854775808.000000
+</code></pre>
+<p><strong>LLONG_MAX</strong>被强制转换成double类型后，其结果并不等于<strong>LLONG_MAX</strong>了，已经有大小为1的误差了；再将a强转回<strong>long long int</strong>，其结果已经变成<strong>LLONG_MIN</strong>，这就是真正的天差地别。<strong>LLONG_MIN</strong>被强制转换成double类型后，其结果仍然正确地等于<strong>LLONG_MIN</strong>。</p>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-05-07</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/lmathlib-c/'>
+                            lmathlib-c
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

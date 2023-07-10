@@ -1,26 +1,221 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>三角函数</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>三角函数</h2><h1 id="序言"><a href="#序言" class="headerlink" title="序言"></a>序言</h1><p>此文并未按照一个函数一篇blog的方式进行写作；原因很简单，接下来要介绍到的几个函数都是三角函数，并且都只是对C标准库中的三角函数的一次调用，并未有其他任何处理，十分清晰明了。</p>
-<h1 id="math-sin"><a href="#math-sin" class="headerlink" title="math_sin"></a>math_sin</h1><p>math_sin是lua函数math.sin的具体实现，其目的是返回正弦值。 math_sin的实现：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_sin</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    lua_pushnumber(L, l_mathop(<span class="built_in">sin</span>)(luaL_checknumber(L, <span class="number">1</span>)));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;            </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="三角函数" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            三角函数
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%BA%8F%E8%A8%80"><span class="post-toc-text">序言</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-sin"><span class="post-toc-text">math_sin</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-cos"><span class="post-toc-text">math_cos</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-tan"><span class="post-toc-text">math_tan</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-asin"><span class="post-toc-text">math_asin</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-acos"><span class="post-toc-text">math_acos</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-atan"><span class="post-toc-text">math_atan</span></a></li></ol>
+        
+        <h1 id="序言"><a href="#序言" class="headerlink" title="序言"></a>序言</h1><p>此文并未按照一个函数一篇blog的方式进行写作；原因很简单，接下来要介绍到的几个函数都是三角函数，并且都只是对C标准库中的三角函数的一次调用，并未有其他任何处理，十分清晰明了。</p>
+<h1 id="math-sin"><a href="#math-sin" class="headerlink" title="math_sin"></a>math_sin</h1><p>math_sin是lua函数math.sin的具体实现，其目的是返回正弦值。 math_sin的实现：</p>
+<pre><code class="c">static int math_sin (lua_State *L) &#123;
+    lua_pushnumber(L, l_mathop(sin)(luaL_checknumber(L, 1)));
+    return 1;            
+&#125;
+</code></pre>
 <p>math_sin直接调用sin求正弦值，并将结果压栈。</p>
 <h1 id="math-cos"><a href="#math-cos" class="headerlink" title="math_cos"></a>math_cos</h1><p>math_cos是lua函数math.cos的具体实现，其目的是返回余弦值。 math_cos的实现：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_cos</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    lua_pushnumber(L, l_mathop(<span class="built_in">cos</span>)(luaL_checknumber(L, <span class="number">1</span>)));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">static int math_cos (lua_State *L) &#123;
+    lua_pushnumber(L, l_mathop(cos)(luaL_checknumber(L, 1)));
+    return 1;
+&#125;
+</code></pre>
 <p>math_cos直接调用cos求余弦值，将结果压栈。</p>
 <h1 id="math-tan"><a href="#math-tan" class="headerlink" title="math_tan"></a>math_tan</h1><p>math_tan是lua函数math.tan的具体实现，其目的是返回正切值。 math_tan的实现：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_tan</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    lua_pushnumber(L, l_mathop(<span class="built_in">tan</span>)(luaL_checknumber(L, <span class="number">1</span>)));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">static int math_tan (lua_State *L) &#123;
+    lua_pushnumber(L, l_mathop(tan)(luaL_checknumber(L, 1)));
+    return 1;
+&#125;
+</code></pre>
 <p>math_tan直接调用tan求正切值，将结果压栈。</p>
 <h1 id="math-asin"><a href="#math-asin" class="headerlink" title="math_asin"></a>math_asin</h1><p>math_asin是lua函数math.asin的具体实现，其目的是返回反正弦值。 math_asin的实现：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_asin</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    lua_pushnumber(L, l_mathop(<span class="built_in">asin</span>)(luaL_checknumber(L, <span class="number">1</span>)));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">static int math_asin (lua_State *L) &#123;
+    lua_pushnumber(L, l_mathop(asin)(luaL_checknumber(L, 1)));
+    return 1;
+&#125;
+</code></pre>
 <p>math_asin直接调用asin求反正弦值，将结果压栈。</p>
 <h1 id="math-acos"><a href="#math-acos" class="headerlink" title="math_acos"></a>math_acos</h1><p>math_acos是lua函数math.acos的具体实现，其目的是返回反余弦值。 math_acos的实现：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_acos</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    lua_pushnumber(L, l_mathop(<span class="built_in">acos</span>)(luaL_checknumber(L, <span class="number">1</span>)));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">static int math_acos (lua_State *L) &#123;
+    lua_pushnumber(L, l_mathop(acos)(luaL_checknumber(L, 1)));
+    return 1;
+&#125;
+</code></pre>
 <p>math_acos直接调用acos求反余弦值，将结果压栈。</p>
 <h1 id="math-atan"><a href="#math-atan" class="headerlink" title="math_atan"></a>math_atan</h1><p>math_atan是lua函数math.atan的具体实现，其目的是返回反正切值。 math_atan的实现：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">math_atan</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    lua_Number y = luaL_checknumber(L, <span class="number">1</span>);</span><br><span class="line">    lua_Number x = luaL_optnumber(L, <span class="number">2</span>, <span class="number">1</span>);</span><br><span class="line">    lua_pushnumber(L, l_mathop(<span class="built_in">atan2</span>)(y, x));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">static int math_atan (lua_State *L) &#123;
+    lua_Number y = luaL_checknumber(L, 1);
+    lua_Number x = luaL_optnumber(L, 2, 1);
+    lua_pushnumber(L, l_mathop(atan2)(y, x));
+    return 1;
+&#125;
+</code></pre>
 <p>math_atan使用两个参数y，x来找到结果落在哪个象限。当只有一个参数y时，默认赋值1给x。math_atan通过atan2求反正切值，将结果压栈。</p>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-05-06</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/lmathlib-c/'>
+                            lmathlib-c
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

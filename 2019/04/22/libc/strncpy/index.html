@@ -1,6 +1,106 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>strncpy</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>strncpy</h2><p>上回说到<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstring/strcpy/"><strong>strcpy</strong></a>：对C字符串进行拷贝。今天介绍的<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstring/strncpy/"><strong>strncpy</strong></a>和strcpy功能一致，同样是对C字符串进行拷贝。你可以将strncpy视作strcpy的升级版，一般而言，strncpy本身比strcpy更快、更安全。strncpy的声明如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> * <span class="title function_">strncpy</span><span class="params">(<span class="type">char</span> * dest, <span class="type">const</span> <span class="type">char</span> * src, <span class="type">size_t</span> num)</span>;</span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="strncpy" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            strncpy
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            
+        
+        <p>上回说到<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstring/strcpy/"><strong>strcpy</strong></a>：对C字符串进行拷贝。今天介绍的<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstring/strncpy/"><strong>strncpy</strong></a>和strcpy功能一致，同样是对C字符串进行拷贝。你可以将strncpy视作strcpy的升级版，一般而言，strncpy本身比strcpy更快、更安全。strncpy的声明如下：</p>
+<pre><code class="c">char * strncpy(char * dest, const char * src, size_t num);
+</code></pre>
 <p>参数num限制了strncpy从src拷贝到dest的字符数量上限，即最多拷贝num个字符。有了num参数，strncpy比起strcpy就更加安全，但是strncpy和strcpy一样没有判断dest指向的字符数组的容量是否能容纳拷贝内容，这个需要调用者去负责。但是strncpy有一个问题却是strcpy没有的，strcpy能完整地拷贝C字符串，而当指定的字符串长度num小于字符串本身的长度（包括字符’\0’）时，拷贝的字符串就不是一个完整的C字符串了，这个时候就要小心了：dest指向的字符串可能并没有终止符’\0’。 简单地总结strncpy的作用：</p>
 <ul>
 <li>当<code>num &lt; strlen(src) + 1</code>（即num小于整个字符串长度(包括’\0’)）时：strncpy只会拷贝num个字符，未拷贝终止符’\0’；</li>
@@ -9,11 +109,98 @@
 </ul>
 <hr>
 <p>直接分析源码(string&#x2F;strncpy.c)：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Copyright (C) 1991, 1997, 2003 Free Software Foundation, Inc.</span></span><br><span class="line"><span class="comment">   This file is part of the GNU C Library.</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">char</span>* <span class="title function_">strncpy</span> <span class="params">(s1, s2, n)</span></span><br><span class="line">    <span class="type">char</span> *s1;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *s2;</span><br><span class="line">    <span class="type">size_t</span> n;</span><br><span class="line">&#123;</span><br><span class="line">    reg_char c;</span><br><span class="line">    <span class="type">char</span> *s = s1;</span><br><span class="line">    --s1;</span><br><span class="line">    <span class="keyword">if</span> (n &gt;= <span class="number">4</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 如果以四个字符为单位,这个单位叫做a,则n4表示有多少个a</span></span><br><span class="line">        <span class="type">size_t</span> n4 = n &gt;&gt; <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">for</span> (;;)</span><br><span class="line">        &#123;</span><br><span class="line">            c = *s2++;</span><br><span class="line">            *++s1 = c;</span><br><span class="line">            <span class="keyword">if</span> (c == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            c = *s2++;</span><br><span class="line">            *++s1 = c;</span><br><span class="line">            <span class="keyword">if</span> (c == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            c = *s2++;</span><br><span class="line">            *++s1 = c;</span><br><span class="line">            <span class="keyword">if</span> (c == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            c = *s2++;</span><br><span class="line">            *++s1 = c;</span><br><span class="line">            <span class="keyword">if</span> (c == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">if</span> (--n4 == <span class="number">0</span>)</span><br><span class="line">                <span class="keyword">goto</span> last_chars;</span><br><span class="line">        &#125;</span><br><span class="line">        n = n - (s1 - s) - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (n == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> s;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">goto</span> zero_fill;</span><br><span class="line">    &#125;</span><br><span class="line">last_chars:</span><br><span class="line">    n &amp;= <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> s;</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">    &#123;</span><br><span class="line">        c = *s2++;</span><br><span class="line">        *++s1 = c;</span><br><span class="line">        <span class="keyword">if</span> (--n == <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> s;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> (c != <span class="string">&#x27;\0&#x27;</span>);</span><br><span class="line">zero_fill:</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        *++s1 = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">    &#125; <span class="keyword">while</span> (--n &gt; <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">/* Copyright (C) 1991, 1997, 2003 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+*/
+char* strncpy (s1, s2, n)
+    char *s1;
+    const char *s2;
+    size_t n;
+&#123;
+    reg_char c;
+    char *s = s1;
+    --s1;
+    if (n &gt;= 4)
+    &#123;
+        // 如果以四个字符为单位,这个单位叫做a,则n4表示有多少个a
+        size_t n4 = n &gt;&gt; 2;
+        for (;;)
+        &#123;
+            c = *s2++;
+            *++s1 = c;
+            if (c == &#39;\0&#39;)
+                break;
+            c = *s2++;
+            *++s1 = c;
+            if (c == &#39;\0&#39;)
+                break;
+            c = *s2++;
+            *++s1 = c;
+            if (c == &#39;\0&#39;)
+                break;
+            c = *s2++;
+            *++s1 = c;
+            if (c == &#39;\0&#39;)
+                break;
+            if (--n4 == 0)
+                goto last_chars;
+        &#125;
+        n = n - (s1 - s) - 1;
+        if (n == 0) &#123;
+            return s;
+        &#125;
+        goto zero_fill;
+    &#125;
+last_chars:
+    n &amp;= 3;
+    if (n == 0)
+        return s;
+    do
+    &#123;
+        c = *s2++;
+        *++s1 = c;
+        if (--n == 0)
+            return s;
+    &#125;
+    while (c != &#39;\0&#39;);
+zero_fill:
+    do &#123;
+        *++s1 = &#39;\0&#39;;
+    &#125; while (--n &gt; 0);
+    return s;
+&#125;
+</code></pre>
 <p>我们先分析<code>if (n &gt;= 4)&#123;&#125;</code>语句：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (n &gt;= <span class="number">4</span>) &#123;</span><br><span class="line">    <span class="comment">// 如果以四个字符为单位,这个单位叫做a,则n4表示有多少个a</span></span><br><span class="line">    <span class="type">size_t</span> n4 = n &gt;&gt; <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        c = *s2++;</span><br><span class="line">        *++s1 = c;</span><br><span class="line">        <span class="keyword">if</span> (c == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        c = *s2++;</span><br><span class="line">        *++s1 = c;</span><br><span class="line">        <span class="keyword">if</span> (c == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        c = *s2++;</span><br><span class="line">        *++s1 = c;</span><br><span class="line">        <span class="keyword">if</span> (c == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        c = *s2++;</span><br><span class="line">        *++s1 = c;</span><br><span class="line">        <span class="keyword">if</span> (c == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">if</span> (--n4 == <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">goto</span> last_chars;</span><br><span class="line">    &#125;</span><br><span class="line">    n = n - (s1 - s) - <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> s;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">goto</span> zero_fill;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">if (n &gt;= 4) &#123;
+    // 如果以四个字符为单位,这个单位叫做a,则n4表示有多少个a
+    size_t n4 = n &gt;&gt; 2;
+    for (;;) &#123;
+        c = *s2++;
+        *++s1 = c;
+        if (c == &#39;\0&#39;)
+            break;
+        c = *s2++;
+        *++s1 = c;
+        if (c == &#39;\0&#39;)
+            break;
+        c = *s2++;
+        *++s1 = c;
+        if (c == &#39;\0&#39;)
+            break;
+        c = *s2++;
+        *++s1 = c;
+        if (c == &#39;\0&#39;)
+            break;
+        if (--n4 == 0)
+            goto last_chars;
+    &#125;
+    n = n - (s1 - s) - 1;
+    if (n == 0) &#123;
+        return s;
+    &#125;
+    goto zero_fill;
+&#125;
+</code></pre>
 <p>strcpy在拷贝字符串时，是一个一个字符拷贝的。strncpy虽然同样是一个一个字符地拷贝，但strncpy做了优化(正是因为有了参数n才能做此优化)：以4个字符为一组进行拷贝。注意，这句话并不意味着strncpy会一次拷贝4个字符，仍然是一个一个字符拷贝。以4个字符为一组的目的是减少参数n的判断次数：原本在最坏情况下，需要做n次<code>--n</code>操作和n次<code>n &gt; 0</code>的判断；以4个字符一组进行拷贝，只在第四个字符拷贝时进行<code>--n4</code>操作和<code>n4 &gt; 0</code>的判断，这样可以减少3&#x2F;4的上述操作和判断。当拷贝的字符串较长时，上述优化提升的效率还是很可观的。这里的<code>for(;;)&#123;&#125;</code>虽然写得比较冗余，但是考虑到性能上的提升，则是利大于弊的。 这里为什么要单独执行<code>--s1</code>？是为了使用<code>++s1</code>而不是<code>s1++</code>去移动指针。这样做，是为了进一步提升执行效率，因为执行<code>++s1</code>的效率高于<code>s1++</code>。为什么<code>++s1</code>的效率又要高于<code>s1++</code>呢？简单来说，<code>++s1</code>比起<code>s1++</code>少做做一次旧的s1存储，直接得到s1加1的结果。 读完<code>for(;;)&#123;&#125;</code>，你可能会有这样的疑问：为什么不以8个字符甚至16个字符一组进行拷贝呢，这样的话可以减少7&#x2F;8甚至15&#x2F;16的上述操作和判断？是的，以8个字符甚至16个字符一组进行拷贝，执行效率肯定会更加高效，但是提升又有多少呢？看下表：</p>
 <p>分组字符数</p>
 <p>减少的–n和n&gt;0执行次数百分比(以n为总数)</p>
@@ -29,15 +216,114 @@
 <li><code>n4 == 0</code>即n4个字符组被拷贝完，则退出循环。</li>
 </ol>
 <p>先看**1.**：此时，指定的n个字符可能还未被拷贝完就遇到了终止符’\0’，通过<code>n = n - (s1 - s) - 1;</code>获取还需拷贝的字符数量，如果<code>n == 0</code>，说明字符恰好拷贝完毕，则直接返回；如果<code>n &gt; 0</code>，则代码跳转至<code>zero_fill</code>，继续拷贝n个’\0’到s1：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">zero_fill:</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        *++s1 = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">    &#125; <span class="keyword">while</span> (--n &gt; <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">return</span> s;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">zero_fill:
+    do &#123;
+        *++s1 = &#39;\0&#39;;
+    &#125; while (--n &gt; 0);
+    return s;
+</code></pre>
 <p>再看**2.**：此时，可能还有剩余的字符（一定不会超过4个字符），需要对剩余字符进行拷贝，所以代码跳转至<code>last_chars</code>：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">last_chars:</span><br><span class="line">    n &amp;= <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> s;</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">    &#123;</span><br><span class="line">        c = *s2++;</span><br><span class="line">        *++s1 = c;</span><br><span class="line">        <span class="keyword">if</span> (--n == <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> s;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> (c != <span class="string">&#x27;\0&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">last_chars:
+    n &amp;= 3;
+    if (n == 0)
+        return s;
+    do
+    &#123;
+        c = *s2++;
+        *++s1 = c;
+        if (--n == 0)
+            return s;
+    &#125;
+    while (c != &#39;\0&#39;);
+</code></pre>
 <p>在这里，<code>n &amp;= 3;</code>等价于<code>n %= 4;</code>(注意，并不是说<code>n &amp;= a</code>都等价与<code>n %= a</code>，这里a是一个整数；因为4是2的正整数幂，所以才能等价)，目的是通过求余运算，求得剩余的字符数量。至于为什么不写成容易理解的求余运算<code>n %= 4;</code>而是写成与运算<code>n &amp;= 3;</code>？是出于效率上的考量，毕竟<strong>与运算</strong>比<strong>求余运算</strong>快很多。 如果剩余字符数量为0，则直接返回。如果剩余字符不为0，对剩余的字符进行拷贝：如果尚未拷贝完就遇到’\0’，在拷贝完’\0’后，仍然需要对剩余字符进行<code>zero_fill</code>；如果将剩余字符拷贝完都没有遇到’\0’，则直接返回。</p>
 <hr>
 <p>一些说明：</p>
 <ul>
 <li><strong>reg_char</strong>：已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strcpy/"><strong>《strcpy》</strong></a>中解释，不再赘叙。</li>
 </ul>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-04-22</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/string-h/'>
+                            string-h
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3c%E8%AF%AD%E8%A8%80/'>
+                            深入理解c语言
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

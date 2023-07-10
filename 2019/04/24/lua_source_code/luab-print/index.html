@@ -1,41 +1,239 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>luaB_print</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>luaB_print</h2><p>print应该是你学习lua语言学会使用的第一个函数，因为你用lua写下的第一句代码一般就是:</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Hello World!&quot;</span>)</span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="luaB_print" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
 
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            luaB_print
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            
+        
+        <p>print应该是你学习lua语言学会使用的第一个函数，因为你用lua写下的第一句代码一般就是:</p>
+<pre><code class="lua">print(&quot;Hello World!&quot;)
+</code></pre>
 <p>现在我们就来看看lua中的print函数到底是如何实现的。当我们调用lua函数print时，实际调用的是C函数luaB_print，其定义如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">luaB_print</span> <span class="params">(lua_State *L)</span> &#123;</span><br><span class="line">    <span class="type">int</span> n = lua_gettop(L);  <span class="comment">/* number of arguments */</span></span><br><span class="line">    <span class="type">int</span> i;</span><br><span class="line">    lua_getglobal(L, <span class="string">&quot;tostring&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span> (i=<span class="number">1</span>; i&lt;=n; i++) &#123;</span><br><span class="line">        <span class="type">const</span> <span class="type">char</span> *s;</span><br><span class="line">        <span class="type">size_t</span> l;</span><br><span class="line">        lua_pushvalue(L, <span class="number">-1</span>);  <span class="comment">/* function to be called */</span></span><br><span class="line">        lua_pushvalue(L, i);   <span class="comment">/* value to print */</span></span><br><span class="line">        lua_call(L, <span class="number">1</span>, <span class="number">1</span>);</span><br><span class="line">        s = lua_tolstring(L, <span class="number">-1</span>, &amp;l);  <span class="comment">/* get result */</span></span><br><span class="line">        <span class="keyword">if</span> (s == <span class="literal">NULL</span>)</span><br><span class="line">            <span class="keyword">return</span> luaL_error(L, <span class="string">&quot;&#x27;tostring&#x27; must return a string to &#x27;print&#x27;&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (i&gt;<span class="number">1</span>) lua_writestring(<span class="string">&quot;\t&quot;</span>, <span class="number">1</span>);</span><br><span class="line">        lua_writestring(s, l);</span><br><span class="line">        lua_pop(L, <span class="number">1</span>);  <span class="comment">/* pop result */</span></span><br><span class="line">    &#125;</span><br><span class="line">    lua_writeline();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">static int luaB_print (lua_State *L) &#123;
+    int n = lua_gettop(L);  /* number of arguments */
+    int i;
+    lua_getglobal(L, &quot;tostring&quot;);
+    for (i=1; i&lt;=n; i++) &#123;
+        const char *s;
+        size_t l;
+        lua_pushvalue(L, -1);  /* function to be called */
+        lua_pushvalue(L, i);   /* value to print */
+        lua_call(L, 1, 1);
+        s = lua_tolstring(L, -1, &amp;l);  /* get result */
+        if (s == NULL)
+            return luaL_error(L, &quot;&#39;tostring&#39; must return a string to &#39;print&#39;&quot;);
+        if (i&gt;1) lua_writestring(&quot;\t&quot;, 1);
+        lua_writestring(s, l);
+        lua_pop(L, 1);  /* pop result */
+    &#125;
+    lua_writeline();
+    return 0;
+&#125;
+</code></pre>
 <p>luaB_print只接受一个参数<strong>lua_State* L</strong>。读到这里，你应该大体知道lua和C是如何进行数据交换的：通过栈。 luaB_print第一行代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> n = lua_gettop(L);  <span class="comment">/* number of arguments */</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">int n = lua_gettop(L);  /* number of arguments */
+</code></pre>
 <p>源代码中的注释写得很清楚了，获得栈上的参数数量。lua_gettop只是简单地计算了栈顶到当前函数index的差值，当然这个差值就代表了函数的参数数量。 继续往下看：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lua_getglobal(L, <span class="string">&quot;tostring&quot;</span>);<span class="comment">// lua--&gt;stack</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">lua_getglobal(L, &quot;tostring&quot;);// lua--&gt;stack
+</code></pre>
 <p>这行代码又是在做什么呢？很简单，在lua的全局表中找到名为tostring的函数，并将此函数push到栈上。此时栈上的情形大概是这样： 栈底 ……, function_index, arg1, ……, argn, tostring, 栈顶 接下来是一个for循环。这个循环的目的是依次将tostring函数和一个打印参数入栈，将打印参数转换成字符串并且出栈tostring和参数，然后打印字符串；打印完毕继续将tostring函数和下一个打印参数入栈，直到所有参数打印完毕。 继续分析代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lua_pushvalue(L, <span class="number">-1</span>);</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">lua_pushvalue(L, -1);
+</code></pre>
 <p>这里将栈顶元素push到栈上，也就是说将tostring函数再次push到栈上。栈的示意图： 栈底 ……, function_index, arg1, ……, argn, tostring, tostring, 栈顶 那么现在栈的最上面就两个tostring了。 再看下一行代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lua_pushvalue(L, i);</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">lua_pushvalue(L, i);
+</code></pre>
 <p>这里将第i个参数push到栈上。执行完此代码，栈就是这样了： 栈底 ……, function_index, arg1, ……, argn, tostring, tostring, arg1, 栈顶 继续看：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lua_call(L, <span class="number">1</span>, <span class="number">1</span>);<span class="comment">// 调用栈顶的函数，参数1个，返回值1个</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">lua_call(L, 1, 1);// 调用栈顶的函数，参数1个，返回值1个
+</code></pre>
 <p>调用lua_call,执行tostring函数将arg1转换成字符串。转换后，tostring和arg1将出栈，然后字符串将入栈，也就是说调用tostring的结果，占据了tostring和arg1原有的位置。执行完lua_call后，栈是这样： 栈底 ……, function_index, arg1, ……, argn, tostring, arg1的字符串, 栈顶 然后执行代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">s = lua_tolstring(L, <span class="number">-1</span>, &amp;l);  <span class="comment">/* get result */</span></span><br><span class="line"><span class="keyword">if</span> (s == <span class="literal">NULL</span>)</span><br><span class="line">    <span class="keyword">return</span> luaL_error(L, <span class="string">&quot;&#x27;tostring&#x27; must return a string to &#x27;print&#x27;&quot;</span>);</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">s = lua_tolstring(L, -1, &amp;l);  /* get result */
+if (s == NULL)
+    return luaL_error(L, &quot;&#39;tostring&#39; must return a string to &#39;print&#39;&quot;);
+</code></pre>
 <p>将栈上的字符串取出，并检测是否转换成功。 然后执行代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (i&gt;<span class="number">1</span>) </span><br><span class="line">    lua_writestring(<span class="string">&quot;\t&quot;</span>, <span class="number">1</span>);</span><br><span class="line">lua_writestring(s, l);</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">if (i&gt;1) 
+    lua_writestring(&quot;\t&quot;, 1);
+lua_writestring(s, l);
+</code></pre>
 <p>这里判断了一下参数是否不止一个。不止一个时，从第二个参数开始，打印参数前先打印一个制表符，这样打印出比较美观。这里的lua_writestring是一个宏定义，其定义如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> lua_writestring(s,l)   fwrite((s), sizeof(char), (l), stdout)</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">#define lua_writestring(s,l)   fwrite((s), sizeof(char), (l), stdout)
+</code></pre>
 <p>将字符串写入到标准输出流stdout。 然后执行：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lua_pop(L, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">lua_pop(L, 1);
+</code></pre>
 <p>参数已经打印完毕，参数就没用了，此时就需要将其出栈。所以执行lua_pop。执行玩lua_pop，进入下一次循环（如果能的话），直到所有参数打印完毕。 for循环执行完后，执行：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lua_writeline();</span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">lua_writeline();
+</code></pre>
 <p>lua_writeline()本身是一个宏定义：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> lua_writeline()        (lua_writestring(<span class="string">&quot;\n&quot;</span>, 1), fflush(stdout))</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">#define lua_writeline()        (lua_writestring(&quot;\n&quot;, 1), fflush(stdout))
+</code></pre>
 <p>写入一个换行符，并刷新缓冲区。 至此，luaB_print函数就分析完毕了。luaB_print就是简单地打印传入的所有参数，并用制表符对其分割，打印完所有参数后，换行。</p>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2019-04-24</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/lbaselib-c/'>
+                            lbaselib-c
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>

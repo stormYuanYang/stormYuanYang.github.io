@@ -1,4 +1,104 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.png"><title>定时器（一）——优化分析与思考</title><meta name="generator" content="Hexo 6.0.0"></head><body>　　<div class="inner"><h2>定时器（一）——优化分析与思考</h2><h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>最近新项目在进行底层代码的重构和优化（代码源自老项目D1），分配给我的任务是对原来的玩家定时器进行优化。</p>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="定时器（一）——优化分析与思考" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
+
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description"></span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            定时器（一）——优化分析与思考
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%B5%B7%E5%9B%A0"><span class="post-toc-text">起因</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%8E%9F%E6%96%B9%E6%A1%88%E5%88%86%E6%9E%90"><span class="post-toc-text">原方案分析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%96%B0%E6%96%B9%E6%A1%88%E6%8E%A2%E7%B4%A2"><span class="post-toc-text">新方案探索</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%A4%87%E6%B3%A8"><span class="post-toc-text">备注</span></a></li></ol>
+        
+        <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>最近新项目在进行底层代码的重构和优化（代码源自老项目D1），分配给我的任务是对原来的玩家定时器进行优化。</p>
 <h2 id="原方案分析"><a href="#原方案分析" class="headerlink" title="原方案分析"></a>原方案分析</h2><p>轮询的方式：</p>
 <ol start="2">
 <li>一个每隔1000毫秒触发一次的定时器负责触发playerManager对象上的tick(),当playerManager的tick()方法被调用时，遍历所有玩家并调用玩家的tick()方法；</li>
@@ -70,4 +170,92 @@
 <p>当然，不论采用何种方法实现定时器，定时器都只负责触发Task。Task的业务逻辑应当由相应业务线程去处理。</p>
 <h2 id="备注"><a href="#备注" class="headerlink" title="备注"></a>备注</h2><p>1.因为保密的原因，上文中涉及的项目均为代号；</p>
 <p>2.上文说的Task指定时任务。</p>
-<p><span></span><a href="/">返回首页</a><span></span></p></div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2021-01-07</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/%E5%AE%9A%E6%97%B6%E5%99%A8/'>
+                            定时器
+                        </a>
+                    
+                        <a href='/tags/%E6%97%B6%E9%97%B4%E8%BD%AE/'>
+                            时间轮
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/%E7%AE%97%E6%B3%95/'>
+                            算法
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>
