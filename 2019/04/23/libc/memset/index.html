@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -99,152 +103,154 @@
             
         
         <p>函数<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstring/memset/"><strong>memset</strong></a>对指定的数组进行填充，其声明如下：</p>
-<pre><code class="c">void* memset(void* ptr, int value, size_t num);
+<pre class="highlight"><code class="c"><span class="hljs-type">void</span>* <span class="hljs-title function_">memset</span><span class="hljs-params">(<span class="hljs-type">void</span>* ptr, <span class="hljs-type">int</span> value, <span class="hljs-type">size_t</span> num)</span>;
 </code></pre>
 <p>memset的使用倒也简单，但是仍然有需要注意的地方：</p>
 <ul>
 <li>ptr指向的数组能否存储num个字节需要调用者保证，memset不做任何检查；</li>
 <li>虽然指定的填充值value类型是int,但是memset是按<strong>字节</strong>为单位进行填充的。当value的值大于<strong>255</strong>时，一个字节就无法存储value了，此时value就会被截断，也就是说你指定的value和实际填充的value一定不同。我想当初设计memset的人是为了让memset更容易调用，毕竟int是我们使用得最多的整数类型，不然每次指定填充值还需要进行强制转换，还是有些麻烦。暂且不去评价这样的做法是否合理，既然其实现已是如此，作为调用者，我们就应当清楚明了memset的陷阱。</li>
 </ul>
-<p>让我们分析其源码(string&#x2F;memset.c):</p>
-<pre><code class="c">/* Copyright (C) 1991, 1997, 2003 Free Software Foundation, Inc.
+<p>让我们分析其源码(string/memset.c):</p>
+<pre class="highlight"><code class="c"><span class="hljs-comment">/* Copyright (C) 1991, 1997, 2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
- */
-void* memset(dstpp, c, len)
-    void *dstpp;
-    int c;
-    size_t len; 
+ */</span>
+<span class="hljs-type">void</span>* <span class="hljs-title function_">memset</span><span class="hljs-params">(dstpp, c, len)</span>
+    <span class="hljs-type">void</span> *dstpp;
+    <span class="hljs-type">int</span> c;
+    <span class="hljs-type">size_t</span> len; 
 &#123;
-    long int dstp = (long int) dstpp;
-    if (len &gt;= 8) &#123;
-        size_t xlen;
-        op_t cccc;
+    <span class="hljs-type">long</span> <span class="hljs-type">int</span> dstp = (<span class="hljs-type">long</span> <span class="hljs-type">int</span>) dstpp;
+    <span class="hljs-keyword">if</span> (len &gt;= <span class="hljs-number">8</span>) &#123;
+        <span class="hljs-type">size_t</span> xlen;
+        <span class="hljs-type">op_t</span> cccc;
 
-        cccc = (unsigned char) c;
-        cccc = cccc &lt;&lt; 8;
-        cccc = cccc &lt;&lt; 16;
-        if (OPSIZ &gt; 4) &#123;
-            /* Do the shift in two steps to avoid warning if long has 32 bits.  */
-            cccc = (cccc &lt;&lt; 16) &lt;&lt; 16;
+        cccc = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>) c;
+        cccc = cccc &lt;&lt; <span class="hljs-number">8</span>;
+        cccc = cccc &lt;&lt; <span class="hljs-number">16</span>;
+        <span class="hljs-keyword">if</span> (OPSIZ &gt; <span class="hljs-number">4</span>) &#123;
+            <span class="hljs-comment">/* Do the shift in two steps to avoid warning if long has 32 bits.  */</span>
+            cccc = (cccc &lt;&lt; <span class="hljs-number">16</span>) &lt;&lt; <span class="hljs-number">16</span>;
         &#125;
 
-        /* There are at least some bytes to set.
-           No need to test for LEN == 0 in this alignment loop.  */
-        while (dstp % OPSIZ != 0) &#123;
-            ((byte *) dstp)[0] = c;// 如果c大于255，赋的值就会被截断
-            dstp += 1;
-            len -= 1;
+        <span class="hljs-comment">/* There are at least some bytes to set.
+           No need to test for LEN == 0 in this alignment loop.  */</span>
+        <span class="hljs-keyword">while</span> (dstp % OPSIZ != <span class="hljs-number">0</span>) &#123;
+            ((byte *) dstp)[<span class="hljs-number">0</span>] = c;<span class="hljs-comment">// 如果c大于255，赋的值就会被截断</span>
+            dstp += <span class="hljs-number">1</span>;
+            len -= <span class="hljs-number">1</span>;
         &#125;
 
-        /* Write 8 `op_t&#39; per iteration until less than 8 `op_t&#39; remain.  */
-        xlen = len / (OPSIZ * 8);
-        while (xlen &gt; 0)
+        <span class="hljs-comment">/* Write 8 `op_t&#x27; per iteration until less than 8 `op_t&#x27; remain.  */</span>
+        xlen = len / (OPSIZ * <span class="hljs-number">8</span>);
+        <span class="hljs-keyword">while</span> (xlen &gt; <span class="hljs-number">0</span>)
         &#123;
-            ((op_t *) dstp)[0] = cccc;
-            ((op_t *) dstp)[1] = cccc; ((op_t *) dstp)[2] = cccc;
-            ((op_t *) dstp)[3] = cccc;
-            ((op_t *) dstp)[4] = cccc;
-            ((op_t *) dstp)[5] = cccc;
-            ((op_t *) dstp)[6] = cccc;
-            ((op_t *) dstp)[7] = cccc;
-            dstp += 8 * OPSIZ;
-            xlen -= 1;
+            ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">0</span>] = cccc;
+            ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">1</span>] = cccc; ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">2</span>] = cccc;
+            ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">3</span>] = cccc;
+            ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">4</span>] = cccc;
+            ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">5</span>] = cccc;
+            ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">6</span>] = cccc;
+            ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">7</span>] = cccc;
+            dstp += <span class="hljs-number">8</span> * OPSIZ;
+            xlen -= <span class="hljs-number">1</span>;
         &#125;
-        len %= OPSIZ * 8;// 求得剩余的字节长度
+        len %= OPSIZ * <span class="hljs-number">8</span>;<span class="hljs-comment">// 求得剩余的字节长度</span>
 
-        /* Write 1 `op_t&#39; per iteration until less than OPSIZ bytes remain.  */
+        <span class="hljs-comment">/* Write 1 `op_t&#x27; per iteration until less than OPSIZ bytes remain.  */</span>
         xlen = len / OPSIZ;
-        while (xlen &gt; 0)
+        <span class="hljs-keyword">while</span> (xlen &gt; <span class="hljs-number">0</span>)
         &#123;
-            ((op_t *) dstp)[0] = cccc;
+            ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">0</span>] = cccc;
             dstp += OPSIZ;
-            xlen -= 1;
+            xlen -= <span class="hljs-number">1</span>;
         &#125;
         len %= OPSIZ;
     &#125;
 
-    /* Write the last few bytes.  */
-    while (len &gt; 0)
+    <span class="hljs-comment">/* Write the last few bytes.  */</span>
+    <span class="hljs-keyword">while</span> (len &gt; <span class="hljs-number">0</span>)
     &#123;
-        ((byte *) dstp)[0] = c;
-        dstp += 1;
-        len -= 1;
+        ((byte *) dstp)[<span class="hljs-number">0</span>] = c;
+        dstp += <span class="hljs-number">1</span>;
+        len -= <span class="hljs-number">1</span>;
     &#125;
-    return dstpp;
+    <span class="hljs-keyword">return</span> dstpp;
 &#125;
 </code></pre>
 <p>先看函数第一行代码：</p>
-<pre><code class="c">long int dstp = (long int) dstpp;
+<pre class="highlight"><code class="c"><span class="hljs-type">long</span> <span class="hljs-type">int</span> dstp = (<span class="hljs-type">long</span> <span class="hljs-type">int</span>) dstpp;
 </code></pre>
-<p>这里将dstpp强制转换成long int并赋值给dstp。为什么不是强制转换成int并赋值呢？是为了确保dstp能完整的保存指针dstpp的所有信息。 在看<code>if (len &gt;= 8)&#123;&#125;</code>，这里做了一个判断：如果len的小于8，直接将写入剩下的字节;如果len&gt;&#x3D;8则进入if语句执行。继续往下看：</p>
-<pre><code class="c">size_t xlen;
-op_t cccc;
+<p>这里将dstpp强制转换成long int并赋值给dstp。为什么不是强制转换成int并赋值呢？是为了确保dstp能完整的保存指针dstpp的所有信息。 在看<code>if (len &gt;= 8)&#123;&#125;</code>，这里做了一个判断：如果len的小于8，直接将写入剩下的字节;如果len&gt;=8则进入if语句执行。继续往下看：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">size_t</span> xlen;
+<span class="hljs-type">op_t</span> cccc;
 
-cccc = (unsigned char) c;// c会被截断
-cccc = cccc &lt;&lt; 8;
-cccc = cccc &lt;&lt; 16;
-if (OPSIZ &gt; 4) &#123;
-    /* Do the shift in two steps to avoid warning if long has 32 bits.  */
-    cccc = (cccc &lt;&lt; 16) &lt;&lt; 16;
+cccc = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>) c;<span class="hljs-comment">// c会被截断</span>
+cccc = cccc &lt;&lt; <span class="hljs-number">8</span>;
+cccc = cccc &lt;&lt; <span class="hljs-number">16</span>;
+<span class="hljs-keyword">if</span> (OPSIZ &gt; <span class="hljs-number">4</span>) &#123;
+    <span class="hljs-comment">/* Do the shift in two steps to avoid warning if long has 32 bits.  */</span>
+    cccc = (cccc &lt;&lt; <span class="hljs-number">16</span>) &lt;&lt; <span class="hljs-number">16</span>;
 &#125;
 </code></pre>
 <p>上述代码很好理解：为了提升写入的效率，以<strong>word</strong>为单位进行写入，所以这里声明了变量cccc。通过位运算，将被截断的c（一个字节）填充进到cccc的每一个字节中（所以才叫cccc，很直观的）。至于这里的<code>if (OPSIZ &gt; 4)&#123;&#125;</code>的作用是处理64位操作系统（word占8字节）下的word填充。这里为什么不是直接位移32位呢？是因为在32系统中出现位移32位的代码，编译器会发出警告，所以这里分两次进行位移。 接着往下看：</p>
-<pre><code class="c">while (dstp % OPSIZ != 0) &#123;
-    ((byte *) dstp)[0] = c;// 如果c大于255，赋的值就会被截断
-    dstp += 1;
-    len -= 1;
+<pre class="highlight"><code class="c"><span class="hljs-keyword">while</span> (dstp % OPSIZ != <span class="hljs-number">0</span>) &#123;
+    ((byte *) dstp)[<span class="hljs-number">0</span>] = c;<span class="hljs-comment">// 如果c大于255，赋的值就会被截断</span>
+    dstp += <span class="hljs-number">1</span>;
+    len -= <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
 <p>这个<code>while (dstp % OPSIZ != 0)&#123;&#125;</code>循环的目的又是什么呢？看起来很奇怪，dstp代表的不是内存地址吗，为什么会对dstp求余呢？其实这个很好解释：咱们的计算机系统在寻址时，为了提升寻址速度，一般都会按<strong>aligned address</strong>(即对齐的地址)寻址。举个例子，64位操作系统以8个字节对齐地址。对于64位操作系统来说，寻址0、8、16、24、32等等是非常方便的。所以呢，为了加快寻址速度，<code>while (dstp % OPSIZ != 0)&#123;&#125;</code>就将未对齐的部分先写入被截断的c。 再看：</p>
-<pre><code class="c">xlen = len / (OPSIZ * 8);
-while (xlen &gt; 0)
+<pre class="highlight"><code class="c">xlen = len / (OPSIZ * <span class="hljs-number">8</span>);
+<span class="hljs-keyword">while</span> (xlen &gt; <span class="hljs-number">0</span>)
 &#123;
-    ((op_t *) dstp)[0] = cccc;
-    ((op_t *) dstp)[1] = cccc; 
-    ((op_t *) dstp)[2] = cccc;
-    ((op_t *) dstp)[3] = cccc;
-    ((op_t *) dstp)[4] = cccc;
-    ((op_t *) dstp)[5] = cccc;
-    ((op_t *) dstp)[6] = cccc;
-    ((op_t *) dstp)[7] = cccc;
-    dstp += 8 * OPSIZ;
-    xlen -= 1;
+    ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">0</span>] = cccc;
+    ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">1</span>] = cccc; 
+    ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">2</span>] = cccc;
+    ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">3</span>] = cccc;
+    ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">4</span>] = cccc;
+    ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">5</span>] = cccc;
+    ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">6</span>] = cccc;
+    ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">7</span>] = cccc;
+    dstp += <span class="hljs-number">8</span> * OPSIZ;
+    xlen -= <span class="hljs-number">1</span>;
 &#125;
-len %= OPSIZ * 8;// 求得剩余的字节长度
+len %= OPSIZ * <span class="hljs-number">8</span>;<span class="hljs-comment">// 求得剩余的字节长度</span>
 </code></pre>
-<p>这段代码进一步地做了优化。同样的思想在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strncpy/"><strong>strncpy</strong></a>中亦有采用,这里不再赘述。以8个op_t为一组进行拷贝，可减少7&#x2F;8的<code>--len</code>和<code>len &gt; 0</code>的判断，进一步提升执行效率。执行完这段代码，还可能剩余一些内容未写入。继续看：</p>
-<pre><code class="c">xlen = len / OPSIZ;
-while (xlen &gt; 0)
+<p>这段代码进一步地做了优化。同样的思想在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strncpy/"><strong>strncpy</strong></a>中亦有采用,这里不再赘述。以8个op_t为一组进行拷贝，可减少7/8的<code>--len</code>和<code>len &gt; 0</code>的判断，进一步提升执行效率。执行完这段代码，还可能剩余一些内容未写入。继续看：</p>
+<pre class="highlight"><code class="c">xlen = len / OPSIZ;
+<span class="hljs-keyword">while</span> (xlen &gt; <span class="hljs-number">0</span>)
 &#123;
-    ((op_t *) dstp)[0] = cccc;
+    ((<span class="hljs-type">op_t</span> *) dstp)[<span class="hljs-number">0</span>] = cccc;
     dstp += OPSIZ;
-    xlen -= 1;
+    xlen -= <span class="hljs-number">1</span>;
 &#125;
 len %= OPSIZ;
 </code></pre>
 <p>这段代码将剩余的内容（一定小于8个op_t），以op_t为单位进行填充。最后求得剩余的字节数len。至此，<code>if (len &gt;= 8) &#123;&#125;</code>就执行完毕。 最后看：</p>
-<pre><code class="c">while (len &gt; 0)
+<pre class="highlight"><code class="c"><span class="hljs-keyword">while</span> (len &gt; <span class="hljs-number">0</span>)
 &#123;
-    ((byte *) dstp)[0] = c;
-    dstp += 1;
-    len -= 1;
+    ((byte *) dstp)[<span class="hljs-number">0</span>] = c;
+    dstp += <span class="hljs-number">1</span>;
+    len -= <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
 <p>如果执行完<code>if (len &gt;= 8) &#123;&#125;</code>,还有剩余的字节（len &gt; 0）,则简单地执行<code>while(len&gt;0)&#123;&#125;</code>对剩余的字节进行填充。 最后，全部字节填充完毕，返回指针。</p>
-<hr>
+<hr />
 <p>一些说明：</p>
 <ul>
-<li><p><strong>op_t</strong>和<strong>OPSIZ</strong>（sysdeps&#x2F;generic&#x2F;memcopy.h）：</p>
-<pre><code class="c">/* Type to use for aligned memory operations.
+<li>
+<p><strong>op_t</strong>和<strong>OPSIZ</strong>（sysdeps/generic/memcopy.h）：</p>
+<pre class="highlight"><code class="c"><span class="hljs-comment">/* Type to use for aligned memory operations.
  This should normally be the biggest type supported by a single load
- and store. */
-#define op_t    unsigned long int
-#define OPSIZ   (sizeof(op_t))
+ and store. */</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> op_t    unsigned long int</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> OPSIZ   (sizeof(op_t))</span>
 </code></pre>
 </li>
-<li><p><strong>byte</strong>（sysdeps&#x2F;generic&#x2F;memcopy.h）：</p>
-<pre><code class="c">/* Type to use for unaligned operations.  */
-typedef unsigned char byte;
+<li>
+<p><strong>byte</strong>（sysdeps/generic/memcopy.h）：</p>
+<pre class="highlight"><code class="c"><span class="hljs-comment">/* Type to use for unaligned operations.  */</span>
+<span class="hljs-keyword">typedef</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> byte;
 </code></pre>
 </li>
 </ul>

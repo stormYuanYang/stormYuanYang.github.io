@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -99,35 +103,35 @@
             
         
         <p>函数<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstdlib/abs/"><strong>abs</strong></a>返回参数的绝对值。 其声明如下：</p>
-<pre><code class="c">int abs(int n);
+<pre class="highlight"><code class="c"><span class="hljs-type">int</span> <span class="hljs-title function_">abs</span><span class="hljs-params">(<span class="hljs-type">int</span> n)</span>;
 </code></pre>
-<p>这个函数的实现本身非常简单，让我们直接看源代码。abs的实现放在stdlib&#x2F;abs.c中：</p>
-<pre><code class="c">/* Copyright (C) 1991, 1997 Free Software Foundation, Inc.
+<p>这个函数的实现本身非常简单，让我们直接看源代码。abs的实现放在stdlib/abs.c中：</p>
+<pre class="highlight"><code class="c"><span class="hljs-comment">/* Copyright (C) 1991, 1997 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-*/
-#include &lt;stdlib.h&gt;
-#undef abs
-/* Return the absolute value of I.  */
-int 
-abs (int i) &#123;
-    return i &lt; 0 ? -i : i;
+*/</span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">undef</span> abs</span>
+<span class="hljs-comment">/* Return the absolute value of I.  */</span>
+<span class="hljs-type">int</span> 
+<span class="hljs-title function_">abs</span> <span class="hljs-params">(<span class="hljs-type">int</span> i)</span> &#123;
+    <span class="hljs-keyword">return</span> i &lt; <span class="hljs-number">0</span> ? -i : i;
 &#125;
 </code></pre>
 <p>abs的实现就一行代码。简单地判断i和0的大小，如果i小于0，直接返回-i，否则返回i本身。 有一个陷阱需要注意：当参数i是<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/climits/"><strong>INT_MIN</strong></a>时，即int的最小值时，这个函数就无法正确获取i的绝对值了。</p>
-<pre><code class="c">#include &lt;stdio.h&gt;
-#include &lt;limits.h&gt;
-#include &lt;stdlib.h&gt;
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;limits.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span>
 
-int main() &#123;
-    int a = 1 &lt;&lt; 31;//如果int是32位的话，1&lt;&lt;31就是最小值
-    int b = INT_MIN;
-    int c = INT_MIN + 1;
-    printf(&quot;abs(a):%d\tabs(b):%d\tabs(c):%d\n&quot;, abs(a), abs(b), abs(c));
-    return 0;
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-type">int</span> a = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">31</span>;<span class="hljs-comment">//如果int是32位的话，1&lt;&lt;31就是最小值</span>
+    <span class="hljs-type">int</span> b = INT_MIN;
+    <span class="hljs-type">int</span> c = INT_MIN + <span class="hljs-number">1</span>;
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;abs(a):%d\tabs(b):%d\tabs(c):%d\n&quot;</span>, <span class="hljs-built_in">abs</span>(a), <span class="hljs-built_in">abs</span>(b), <span class="hljs-built_in">abs</span>(c));
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
 <p>执行上述代码，在我的计算机上打印结果如下：</p>
-<pre><code class="c">abs(a):-2147483648   abs(b):-2147483648  abs(c):2147483647
+<pre class="highlight"><code class="c"><span class="hljs-built_in">abs</span>(a):<span class="hljs-number">-2147483648</span>   <span class="hljs-built_in">abs</span>(b):<span class="hljs-number">-2147483648</span>  <span class="hljs-built_in">abs</span>(c):<span class="hljs-number">2147483647</span>
 </code></pre>
 <p>是不是感到很奇怪，怎么a、b的绝对值打印出来还是个负数而且就是其本身。<strong>signed</strong>类型的整数在计算机内存中采用2进制的<strong>补码</strong>表示。其首位是<strong>符号位</strong>：</p>
 <p>符号位值</p>
@@ -158,7 +162,7 @@ int main() &#123;
 <li>步骤3：步骤2的结果即是相反数。</li>
 </ul>
 <p>同样的，我构造几个例子:</p>
-<p>步骤&#x2F;整数(二进制表示)</p>
+<p>步骤/整数(二进制表示)</p>
 <p>-255(即1000,0001)</p>
 <p>255(即0111,1111)</p>
 <p>-256(即1000,0000)</p>

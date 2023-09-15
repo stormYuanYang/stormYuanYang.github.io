@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -96,19 +100,22 @@
 
     <div class="post-md">
         
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-rad%E7%AE%80%E4%BB%8B"><span class="post-toc-text">math_rad简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-rad%E5%AE%9E%E7%8E%B0"><span class="post-toc-text">math_rad实现</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%80%E4%BA%9B%E8%AF%B4%E6%98%8E"><span class="post-toc-text">一些说明</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math_rad%E7%AE%80%E4%BB%8B"><span class="post-toc-text"> math_rad简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math_rad%E5%AE%9E%E7%8E%B0"><span class="post-toc-text"> math_rad实现</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%80%E4%BA%9B%E8%AF%B4%E6%98%8E"><span class="post-toc-text"> 一些说明</span></a></li></ol>
         
-        <h1 id="math-rad简介"><a href="#math-rad简介" class="headerlink" title="math_rad简介"></a>math_rad简介</h1><p><strong>math_rad</strong>是lua库函数<strong>math.rad</strong>的具体实现。<strong>math_rad</strong>是<a href="https://coderdeepwater.cn/lua/lua53codes/lmathlib_c/math_deg/"><strong>math_deg</strong></a>的逆运算：<strong>math_rad</strong>的目的是将以角度为单位的参数转换成以弧度为单位的值。<strong>math_rad</strong>的声明如下：</p>
-<pre><code class="c">static int math_rad (lua_State *L);
+        <h1 id="math_rad简介"><a class="markdownIt-Anchor" href="#math_rad简介"></a> math_rad简介</h1>
+<p><strong>math_rad</strong>是lua库函数<strong>math.rad</strong>的具体实现。<strong>math_rad</strong>是<a href="https://coderdeepwater.cn/lua/lua53codes/lmathlib_c/math_deg/"><strong>math_deg</strong></a>的逆运算：<strong>math_rad</strong>的目的是将以角度为单位的参数转换成以弧度为单位的值。<strong>math_rad</strong>的声明如下：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_rad</span> <span class="hljs-params">(lua_State *L)</span>;
 </code></pre>
-<h1 id="math-rad实现"><a href="#math-rad实现" class="headerlink" title="math_rad实现"></a>math_rad实现</h1><p><strong>math_rad</strong>的源码：</p>
-<pre><code class="c">static int math_rad (lua_State *L) &#123;                                                  
-    lua_pushnumber(L, luaL_checknumber(L, 1) * (PI / l_mathop(180.0)));
-    return 1;
+<h1 id="math_rad实现"><a class="markdownIt-Anchor" href="#math_rad实现"></a> math_rad实现</h1>
+<p><strong>math_rad</strong>的源码：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_rad</span> <span class="hljs-params">(lua_State *L)</span> &#123;                                                  
+    lua_pushnumber(L, luaL_checknumber(L, <span class="hljs-number">1</span>) * (PI / l_mathop(<span class="hljs-number">180.0</span>)));
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
-<p><strong>math_rad</strong>的实现和<a href="https://coderdeepwater.cn/lua/lua53codes/lmathlib_c/math_deg/"><strong>math_deg</strong></a>的实现同样简单。<strong>math_rad</strong>依赖的数学公式： $$ 角度 &#x3D; 弧度 \times \frac{\pi}{180^{\circ}} $$ <strong>math_rad</strong>通过上述的数学公式将单位为弧度的参数转换为角度值。</p>
-<h1 id="一些说明"><a href="#一些说明" class="headerlink" title="一些说明"></a>一些说明</h1><p><strong>math_rad</strong>和<strong>math_deg</strong>互为逆运算：<strong>math_rad</strong>将弧度变为角度，<strong>math_deg</strong>却将角度变为弧度。 math_<strong>rad</strong>中的<strong>rad</strong>是<strong>radian</strong>的缩写。</p>
+<p><strong>math_rad</strong>的实现和<a href="https://coderdeepwater.cn/lua/lua53codes/lmathlib_c/math_deg/"><strong>math_deg</strong></a>的实现同样简单。<strong>math_rad</strong>依赖的数学公式： $$ 角度 = 弧度 \times \frac{\pi}{180^{\circ}} $$ <strong>math_rad</strong>通过上述的数学公式将单位为弧度的参数转换为角度值。</p>
+<h1 id="一些说明"><a class="markdownIt-Anchor" href="#一些说明"></a> 一些说明</h1>
+<p><strong>math_rad</strong>和<strong>math_deg</strong>互为逆运算：<strong>math_rad</strong>将弧度变为角度，<strong>math_deg</strong>却将角度变为弧度。 math_<strong>rad</strong>中的<strong>rad</strong>是<strong>radian</strong>的缩写。</p>
 
     </div>
 

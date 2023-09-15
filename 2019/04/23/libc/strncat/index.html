@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -99,79 +103,79 @@
             
         
         <p><strong>strncat</strong>和strcat功能一致，对字符串进行连接。其声明如下：</p>
-<pre><code class="c">char * strncat ( char * str1, const char * str2, size_t num );
+<pre class="highlight"><code class="c"><span class="hljs-type">char</span> * <span class="hljs-title function_">strncat</span> <span class="hljs-params">( <span class="hljs-type">char</span> * str1, <span class="hljs-type">const</span> <span class="hljs-type">char</span> * str2, <span class="hljs-type">size_t</span> num )</span>;
 </code></pre>
 <p>strncat将str2中不超过num个字符<strong>追加</strong>到str1字符串的后面(str1的’\0’会被覆盖掉，然后在拼接最后添加’\0’)：</p>
 <ul>
 <li>num &lt; strlen(str2),只会拷贝部分str2中的字符到str1的末尾，最后添加上终止符’\0’；</li>
-<li>num &gt;&#x3D; strlen(str2),会拷贝完整的str2中的字符到str1的末尾，最后同样会加上终止符’\0’。</li>
+<li>num &gt;= strlen(str2),会拷贝完整的str2中的字符到str1的末尾，最后同样会加上终止符’\0’。</li>
 </ul>
 <p>总体来说，strncat比strcat功能更强大：可以选择拷贝部分字符，而不是全部字符。和strcat一样，strncat也要保证str1指向的字符数数组的容量要足够大。</p>
-<hr>
-<p>strncat的实现（string&#x2F;strncat.c）：</p>
-<pre><code class="c">/* Copyright (C) 1991, 1997 Free Software Foundation, Inc.
+<hr />
+<p>strncat的实现（string/strncat.c）：</p>
+<pre class="highlight"><code class="c"><span class="hljs-comment">/* Copyright (C) 1991, 1997 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-*/
-char * strncat (s1, s2, n)
-    char *s1;
-    const char *s2;
-    size_t n;
+*/</span>
+<span class="hljs-type">char</span> * <span class="hljs-title function_">strncat</span> <span class="hljs-params">(s1, s2, n)</span>
+    <span class="hljs-type">char</span> *s1;
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span> *s2;
+    <span class="hljs-type">size_t</span> n;
 &#123;
     reg_char c;
-    char *s = s1;
+    <span class="hljs-type">char</span> *s = s1;
 
-    /* Find the end of S1.  */
-    do
+    <span class="hljs-comment">/* Find the end of S1.  */</span>
+    <span class="hljs-keyword">do</span>
         c = *s1++;
-    while (c != &#39;\0&#39;);
+    <span class="hljs-keyword">while</span> (c != <span class="hljs-string">&#x27;\0&#x27;</span>);
 
-    /* Make S1 point before next character, so we can increment
-       it while memory is read (wins on pipelined cpus).  */
-    s1 -= 2;
+    <span class="hljs-comment">/* Make S1 point before next character, so we can increment
+       it while memory is read (wins on pipelined cpus).  */</span>
+    s1 -= <span class="hljs-number">2</span>;
 
-    if (n &gt;= 4) &#123;
-        size_t n4 = n &gt;&gt; 2;
-        do &#123;
+    <span class="hljs-keyword">if</span> (n &gt;= <span class="hljs-number">4</span>) &#123;
+        <span class="hljs-type">size_t</span> n4 = n &gt;&gt; <span class="hljs-number">2</span>;
+        <span class="hljs-keyword">do</span> &#123;
             c = *s2++;
             *++s1 = c;
-            if (c == &#39;\0&#39;)
-                return s;
+            <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)
+                <span class="hljs-keyword">return</span> s;
             c = *s2++;
             *++s1 = c;
-            if (c == &#39;\0&#39;)
-                return s;
+            <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)
+                <span class="hljs-keyword">return</span> s;
             c = *s2++;
             *++s1 = c;
-            if (c == &#39;\0&#39;)
-                return s;
+            <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)
+                <span class="hljs-keyword">return</span> s;
             c = *s2++;
             *++s1 = c;
-            if (c == &#39;\0&#39;)
-                return s;
-        &#125; while (--n4 &gt; 0);
-        n &amp;= 3;
+            <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)
+                <span class="hljs-keyword">return</span> s;
+        &#125; <span class="hljs-keyword">while</span> (--n4 &gt; <span class="hljs-number">0</span>);
+        n &amp;= <span class="hljs-number">3</span>;
     &#125;
 
-    while (n &gt; 0) &#123;
+    <span class="hljs-keyword">while</span> (n &gt; <span class="hljs-number">0</span>) &#123;
         c = *s2++;
         *++s1 = c;
-        if (c == &#39;\0&#39;)
-            return s;
+        <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)
+            <span class="hljs-keyword">return</span> s;
         n--;
     &#125;
 
-    if (c != &#39;\0&#39;)
-        *++s1 = &#39;\0&#39;;
+    <span class="hljs-keyword">if</span> (c != <span class="hljs-string">&#x27;\0&#x27;</span>)
+        *++s1 = <span class="hljs-string">&#x27;\0&#x27;</span>;
 
-    return s;
+    <span class="hljs-keyword">return</span> s;
 &#125;
 </code></pre>
-<p>strncat先遍历s1,找到s1的末尾。接下来是一个优化，以4个字符为一组进行拷贝，这样可以减少3&#x2F;4的<code>--n</code>操作和<code>n&gt;0</code>的判断（其思想已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strncpy/"><strong>《strncpy》</strong></a>中详细分析，不再赘述）。4个字符一组拷贝完后，还剩下字符的话，继续拷贝剩下的字符。最后的if判断：</p>
-<pre><code class="c">if (c != &#39;\0&#39;)
-    *++s1 = &#39;\0&#39;;
+<p>strncat先遍历s1,找到s1的末尾。接下来是一个优化，以4个字符为一组进行拷贝，这样可以减少3/4的<code>--n</code>操作和<code>n&gt;0</code>的判断（其思想已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strncpy/"><strong>《strncpy》</strong></a>中详细分析，不再赘述）。4个字符一组拷贝完后，还剩下字符的话，继续拷贝剩下的字符。最后的if判断：</p>
+<pre class="highlight"><code class="c"><span class="hljs-keyword">if</span> (c != <span class="hljs-string">&#x27;\0&#x27;</span>)
+    *++s1 = <span class="hljs-string">&#x27;\0&#x27;</span>;
 </code></pre>
 <p>这段代码的目的是：当<code>n &lt;= strlen(s2)</code>时，在s1字符串的最后添加上’\0’，以保证其正确性。</p>
-<hr>
+<hr />
 <p>一些说明：</p>
 <ul>
 <li><strong>reg_char</strong>：已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strcpy/"><strong>《strcpy》</strong></a>中解释，不再赘述。</li>

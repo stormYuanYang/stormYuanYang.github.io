@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -99,7 +103,7 @@
             
         
         <p>上回说到<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstring/strcpy/"><strong>strcpy</strong></a>：对C字符串进行拷贝。今天介绍的<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstring/strncpy/"><strong>strncpy</strong></a>和strcpy功能一致，同样是对C字符串进行拷贝。你可以将strncpy视作strcpy的升级版，一般而言，strncpy本身比strcpy更快、更安全。strncpy的声明如下：</p>
-<pre><code class="c">char * strncpy(char * dest, const char * src, size_t num);
+<pre class="highlight"><code class="c"><span class="hljs-type">char</span> * <span class="hljs-title function_">strncpy</span><span class="hljs-params">(<span class="hljs-type">char</span> * dest, <span class="hljs-type">const</span> <span class="hljs-type">char</span> * src, <span class="hljs-type">size_t</span> num)</span>;
 </code></pre>
 <p>参数num限制了strncpy从src拷贝到dest的字符数量上限，即最多拷贝num个字符。有了num参数，strncpy比起strcpy就更加安全，但是strncpy和strcpy一样没有判断dest指向的字符数组的容量是否能容纳拷贝内容，这个需要调用者去负责。但是strncpy有一个问题却是strcpy没有的，strcpy能完整地拷贝C字符串，而当指定的字符串长度num小于字符串本身的长度（包括字符’\0’）时，拷贝的字符串就不是一个完整的C字符串了，这个时候就要小心了：dest指向的字符串可能并没有终止符’\0’。 简单地总结strncpy的作用：</p>
 <ul>
@@ -107,101 +111,101 @@
 <li>当<code>num == strlen(src) + 1</code>时：此时strncpy和strcpy等价，恰好将字符串拷贝到dest。</li>
 <li>当<code>num &gt; strlen(src) + 1</code>时：此时strncpy会完整地将字符串拷贝到dest，并且填充<code>num - strlen(src) - 1</code>个’\0’到dest字符串之后。</li>
 </ul>
-<hr>
-<p>直接分析源码(string&#x2F;strncpy.c)：</p>
-<pre><code class="c">/* Copyright (C) 1991, 1997, 2003 Free Software Foundation, Inc.
+<hr />
+<p>直接分析源码(string/strncpy.c)：</p>
+<pre class="highlight"><code class="c"><span class="hljs-comment">/* Copyright (C) 1991, 1997, 2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-*/
-char* strncpy (s1, s2, n)
-    char *s1;
-    const char *s2;
-    size_t n;
+*/</span>
+<span class="hljs-type">char</span>* <span class="hljs-title function_">strncpy</span> <span class="hljs-params">(s1, s2, n)</span>
+    <span class="hljs-type">char</span> *s1;
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span> *s2;
+    <span class="hljs-type">size_t</span> n;
 &#123;
     reg_char c;
-    char *s = s1;
+    <span class="hljs-type">char</span> *s = s1;
     --s1;
-    if (n &gt;= 4)
+    <span class="hljs-keyword">if</span> (n &gt;= <span class="hljs-number">4</span>)
     &#123;
-        // 如果以四个字符为单位,这个单位叫做a,则n4表示有多少个a
-        size_t n4 = n &gt;&gt; 2;
-        for (;;)
+        <span class="hljs-comment">// 如果以四个字符为单位,这个单位叫做a,则n4表示有多少个a</span>
+        <span class="hljs-type">size_t</span> n4 = n &gt;&gt; <span class="hljs-number">2</span>;
+        <span class="hljs-keyword">for</span> (;;)
         &#123;
             c = *s2++;
             *++s1 = c;
-            if (c == &#39;\0&#39;)
-                break;
+            <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)
+                <span class="hljs-keyword">break</span>;
             c = *s2++;
             *++s1 = c;
-            if (c == &#39;\0&#39;)
-                break;
+            <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)
+                <span class="hljs-keyword">break</span>;
             c = *s2++;
             *++s1 = c;
-            if (c == &#39;\0&#39;)
-                break;
+            <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)
+                <span class="hljs-keyword">break</span>;
             c = *s2++;
             *++s1 = c;
-            if (c == &#39;\0&#39;)
-                break;
-            if (--n4 == 0)
-                goto last_chars;
+            <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)
+                <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">if</span> (--n4 == <span class="hljs-number">0</span>)
+                <span class="hljs-keyword">goto</span> last_chars;
         &#125;
-        n = n - (s1 - s) - 1;
-        if (n == 0) &#123;
-            return s;
+        n = n - (s1 - s) - <span class="hljs-number">1</span>;
+        <span class="hljs-keyword">if</span> (n == <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">return</span> s;
         &#125;
-        goto zero_fill;
+        <span class="hljs-keyword">goto</span> zero_fill;
     &#125;
 last_chars:
-    n &amp;= 3;
-    if (n == 0)
-        return s;
-    do
+    n &amp;= <span class="hljs-number">3</span>;
+    <span class="hljs-keyword">if</span> (n == <span class="hljs-number">0</span>)
+        <span class="hljs-keyword">return</span> s;
+    <span class="hljs-keyword">do</span>
     &#123;
         c = *s2++;
         *++s1 = c;
-        if (--n == 0)
-            return s;
+        <span class="hljs-keyword">if</span> (--n == <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">return</span> s;
     &#125;
-    while (c != &#39;\0&#39;);
+    <span class="hljs-keyword">while</span> (c != <span class="hljs-string">&#x27;\0&#x27;</span>);
 zero_fill:
-    do &#123;
-        *++s1 = &#39;\0&#39;;
-    &#125; while (--n &gt; 0);
-    return s;
+    <span class="hljs-keyword">do</span> &#123;
+        *++s1 = <span class="hljs-string">&#x27;\0&#x27;</span>;
+    &#125; <span class="hljs-keyword">while</span> (--n &gt; <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">return</span> s;
 &#125;
 </code></pre>
 <p>我们先分析<code>if (n &gt;= 4)&#123;&#125;</code>语句：</p>
-<pre><code class="c">if (n &gt;= 4) &#123;
-    // 如果以四个字符为单位,这个单位叫做a,则n4表示有多少个a
-    size_t n4 = n &gt;&gt; 2;
-    for (;;) &#123;
+<pre class="highlight"><code class="c"><span class="hljs-keyword">if</span> (n &gt;= <span class="hljs-number">4</span>) &#123;
+    <span class="hljs-comment">// 如果以四个字符为单位,这个单位叫做a,则n4表示有多少个a</span>
+    <span class="hljs-type">size_t</span> n4 = n &gt;&gt; <span class="hljs-number">2</span>;
+    <span class="hljs-keyword">for</span> (;;) &#123;
         c = *s2++;
         *++s1 = c;
-        if (c == &#39;\0&#39;)
-            break;
+        <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)
+            <span class="hljs-keyword">break</span>;
         c = *s2++;
         *++s1 = c;
-        if (c == &#39;\0&#39;)
-            break;
+        <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)
+            <span class="hljs-keyword">break</span>;
         c = *s2++;
         *++s1 = c;
-        if (c == &#39;\0&#39;)
-            break;
+        <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)
+            <span class="hljs-keyword">break</span>;
         c = *s2++;
         *++s1 = c;
-        if (c == &#39;\0&#39;)
-            break;
-        if (--n4 == 0)
-            goto last_chars;
+        <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)
+            <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">if</span> (--n4 == <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">goto</span> last_chars;
     &#125;
-    n = n - (s1 - s) - 1;
-    if (n == 0) &#123;
-        return s;
+    n = n - (s1 - s) - <span class="hljs-number">1</span>;
+    <span class="hljs-keyword">if</span> (n == <span class="hljs-number">0</span>) &#123;
+        <span class="hljs-keyword">return</span> s;
     &#125;
-    goto zero_fill;
+    <span class="hljs-keyword">goto</span> zero_fill;
 &#125;
 </code></pre>
-<p>strcpy在拷贝字符串时，是一个一个字符拷贝的。strncpy虽然同样是一个一个字符地拷贝，但strncpy做了优化(正是因为有了参数n才能做此优化)：以4个字符为一组进行拷贝。注意，这句话并不意味着strncpy会一次拷贝4个字符，仍然是一个一个字符拷贝。以4个字符为一组的目的是减少参数n的判断次数：原本在最坏情况下，需要做n次<code>--n</code>操作和n次<code>n &gt; 0</code>的判断；以4个字符一组进行拷贝，只在第四个字符拷贝时进行<code>--n4</code>操作和<code>n4 &gt; 0</code>的判断，这样可以减少3&#x2F;4的上述操作和判断。当拷贝的字符串较长时，上述优化提升的效率还是很可观的。这里的<code>for(;;)&#123;&#125;</code>虽然写得比较冗余，但是考虑到性能上的提升，则是利大于弊的。 这里为什么要单独执行<code>--s1</code>？是为了使用<code>++s1</code>而不是<code>s1++</code>去移动指针。这样做，是为了进一步提升执行效率，因为执行<code>++s1</code>的效率高于<code>s1++</code>。为什么<code>++s1</code>的效率又要高于<code>s1++</code>呢？简单来说，<code>++s1</code>比起<code>s1++</code>少做做一次旧的s1存储，直接得到s1加1的结果。 读完<code>for(;;)&#123;&#125;</code>，你可能会有这样的疑问：为什么不以8个字符甚至16个字符一组进行拷贝呢，这样的话可以减少7&#x2F;8甚至15&#x2F;16的上述操作和判断？是的，以8个字符甚至16个字符一组进行拷贝，执行效率肯定会更加高效，但是提升又有多少呢？看下表：</p>
+<p>strcpy在拷贝字符串时，是一个一个字符拷贝的。strncpy虽然同样是一个一个字符地拷贝，但strncpy做了优化(正是因为有了参数n才能做此优化)：以4个字符为一组进行拷贝。注意，这句话并不意味着strncpy会一次拷贝4个字符，仍然是一个一个字符拷贝。以4个字符为一组的目的是减少参数n的判断次数：原本在最坏情况下，需要做n次<code>--n</code>操作和n次<code>n &gt; 0</code>的判断；以4个字符一组进行拷贝，只在第四个字符拷贝时进行<code>--n4</code>操作和<code>n4 &gt; 0</code>的判断，这样可以减少3/4的上述操作和判断。当拷贝的字符串较长时，上述优化提升的效率还是很可观的。这里的<code>for(;;)&#123;&#125;</code>虽然写得比较冗余，但是考虑到性能上的提升，则是利大于弊的。 这里为什么要单独执行<code>--s1</code>？是为了使用<code>++s1</code>而不是<code>s1++</code>去移动指针。这样做，是为了进一步提升执行效率，因为执行<code>++s1</code>的效率高于<code>s1++</code>。为什么<code>++s1</code>的效率又要高于<code>s1++</code>呢？简单来说，<code>++s1</code>比起<code>s1++</code>少做做一次旧的s1存储，直接得到s1加1的结果。 读完<code>for(;;)&#123;&#125;</code>，你可能会有这样的疑问：为什么不以8个字符甚至16个字符一组进行拷贝呢，这样的话可以减少7/8甚至15/16的上述操作和判断？是的，以8个字符甚至16个字符一组进行拷贝，执行效率肯定会更加高效，但是提升又有多少呢？看下表：</p>
 <p>分组字符数</p>
 <p>减少的–n和n&gt;0执行次数百分比(以n为总数)</p>
 <p>4</p>
@@ -212,32 +216,32 @@ zero_fill:
 <p>%92.25</p>
 <p>4个字符一组的效率已经很高了，虽然以8个字符甚至16个字符一组效率能得到更好的提升，但是由上表结果来看，提升并不是很明显(%75和%87甚至%92.25比也差不了多少)，并且会导致代码的成倍增长、大量的冗余。这样肯定是不值得的，所以在执行效率和代码结构上做了一个权衡。有舍才有得，岂能面面俱到。 退出<code>for(;;)&#123;&#125;</code>有两种情况：</p>
 <ol>
-<li>拷贝了**’\0’**，则退出循环；</li>
+<li>拷贝了**‘\0’**，则退出循环；</li>
 <li><code>n4 == 0</code>即n4个字符组被拷贝完，则退出循环。</li>
 </ol>
-<p>先看**1.**：此时，指定的n个字符可能还未被拷贝完就遇到了终止符’\0’，通过<code>n = n - (s1 - s) - 1;</code>获取还需拷贝的字符数量，如果<code>n == 0</code>，说明字符恰好拷贝完毕，则直接返回；如果<code>n &gt; 0</code>，则代码跳转至<code>zero_fill</code>，继续拷贝n个’\0’到s1：</p>
-<pre><code class="c">zero_fill:
-    do &#123;
-        *++s1 = &#39;\0&#39;;
-    &#125; while (--n &gt; 0);
-    return s;
+<p>先看<strong>1.</strong>：此时，指定的n个字符可能还未被拷贝完就遇到了终止符’\0’，通过<code>n = n - (s1 - s) - 1;</code>获取还需拷贝的字符数量，如果<code>n == 0</code>，说明字符恰好拷贝完毕，则直接返回；如果<code>n &gt; 0</code>，则代码跳转至<code>zero_fill</code>，继续拷贝n个’\0’到s1：</p>
+<pre class="highlight"><code class="c">zero_fill:
+    <span class="hljs-keyword">do</span> &#123;
+        *++s1 = <span class="hljs-string">&#x27;\0&#x27;</span>;
+    &#125; <span class="hljs-keyword">while</span> (--n &gt; <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">return</span> s;
 </code></pre>
-<p>再看**2.**：此时，可能还有剩余的字符（一定不会超过4个字符），需要对剩余字符进行拷贝，所以代码跳转至<code>last_chars</code>：</p>
-<pre><code class="c">last_chars:
-    n &amp;= 3;
-    if (n == 0)
-        return s;
-    do
+<p>再看<strong>2.</strong>：此时，可能还有剩余的字符（一定不会超过4个字符），需要对剩余字符进行拷贝，所以代码跳转至<code>last_chars</code>：</p>
+<pre class="highlight"><code class="c">last_chars:
+    n &amp;= <span class="hljs-number">3</span>;
+    <span class="hljs-keyword">if</span> (n == <span class="hljs-number">0</span>)
+        <span class="hljs-keyword">return</span> s;
+    <span class="hljs-keyword">do</span>
     &#123;
         c = *s2++;
         *++s1 = c;
-        if (--n == 0)
-            return s;
+        <span class="hljs-keyword">if</span> (--n == <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">return</span> s;
     &#125;
-    while (c != &#39;\0&#39;);
+    <span class="hljs-keyword">while</span> (c != <span class="hljs-string">&#x27;\0&#x27;</span>);
 </code></pre>
 <p>在这里，<code>n &amp;= 3;</code>等价于<code>n %= 4;</code>(注意，并不是说<code>n &amp;= a</code>都等价与<code>n %= a</code>，这里a是一个整数；因为4是2的正整数幂，所以才能等价)，目的是通过求余运算，求得剩余的字符数量。至于为什么不写成容易理解的求余运算<code>n %= 4;</code>而是写成与运算<code>n &amp;= 3;</code>？是出于效率上的考量，毕竟<strong>与运算</strong>比<strong>求余运算</strong>快很多。 如果剩余字符数量为0，则直接返回。如果剩余字符不为0，对剩余的字符进行拷贝：如果尚未拷贝完就遇到’\0’，在拷贝完’\0’后，仍然需要对剩余字符进行<code>zero_fill</code>；如果将剩余字符拷贝完都没有遇到’\0’，则直接返回。</p>
-<hr>
+<hr />
 <p>一些说明：</p>
 <ul>
 <li><strong>reg_char</strong>：已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strcpy/"><strong>《strcpy》</strong></a>中解释，不再赘叙。</li>

@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -99,23 +103,23 @@
             
         
         <p><strong>math_toint</strong>是lua函数<strong>math.tointeger</strong>的具体实现，其声明如下：</p>
-<pre><code class="c">static int math_toint (lua_State *L);
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_toint</span> <span class="hljs-params">(lua_State *L)</span>;
 </code></pre>
 <p>math_toint接受一个参数，将其转换成整数；转换成功，就将转换后的整数压栈；否则，就将nil压入栈中。 math_toint的实现：</p>
-<pre><code class="c">static int math_toint (lua_State *L) &#123;
-    int valid;
-    lua_Integer n = lua_tointegerx(L, 1, &amp;valid);
-    if (valid)
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_toint</span> <span class="hljs-params">(lua_State *L)</span> &#123;
+    <span class="hljs-type">int</span> valid;
+    lua_Integer n = lua_tointegerx(L, <span class="hljs-number">1</span>, &amp;valid);
+    <span class="hljs-keyword">if</span> (valid)
         lua_pushinteger(L, n);
-    else &#123;
-        luaL_checkany(L, 1);
-        lua_pushnil(L);  /* value is not convertible to integer */
+    <span class="hljs-keyword">else</span> &#123;
+        luaL_checkany(L, <span class="hljs-number">1</span>);
+        lua_pushnil(L);  <span class="hljs-comment">/* value is not convertible to integer */</span>
     &#125;
-    return 1;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
 <p>math_toint首先调用lua_tointegerx（接受整数、浮点数、字符串）尝试将参数转换成整数：</p>
-<pre><code class="c">lua_Integer n = lua_tointegerx(L, 1, &amp;valid);
+<pre class="highlight"><code class="c">lua_Integer n = lua_tointegerx(L, <span class="hljs-number">1</span>, &amp;valid);
 </code></pre>
 <p>转换成功，<strong>valid</strong>为真；否则valid为假。 math_toint随后对valid进行真假判断：</p>
 <ul>

@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -98,20 +102,20 @@
         
             
         
-        <p>绝大部分编程语言都提供类似<strong>for</strong>、<strong>while</strong>等关键词的循环语句。这可能是我们使用得最频繁的语句之一。但是使用不当，也可能造成死循环，并且某些死循环是非常难以察觉和重现的。比如接下来会说到的情况。 最近在阅读<strong>Skynet</strong>的源代码(Skynet是由云风编写的一套游戏服务器框架，采用<strong>Actor</strong>模式)，在&#x2F;lualib-src&#x2F;lua-bson.c中有如下函数：</p>
-<pre><code class="c">static inline void 
-bson_reserve(struct bson *b, int sz) &#123;
-    if (b-&gt;size + sz &lt;= b-&gt;cap)
-        return;
-    do &#123; 
-        b-&gt;cap *= 2;
-    &#125; while (b-&gt;cap &lt;= b-&gt;size + sz); 
+        <p>绝大部分编程语言都提供类似<strong>for</strong>、<strong>while</strong>等关键词的循环语句。这可能是我们使用得最频繁的语句之一。但是使用不当，也可能造成死循环，并且某些死循环是非常难以察觉和重现的。比如接下来会说到的情况。 最近在阅读<strong>Skynet</strong>的源代码(Skynet是由云风编写的一套游戏服务器框架，采用<strong>Actor</strong>模式)，在/lualib-src/lua-bson.c中有如下函数：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> 
+<span class="hljs-title function_">bson_reserve</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> bson *b, <span class="hljs-type">int</span> sz)</span> &#123;
+    <span class="hljs-keyword">if</span> (b-&gt;size + sz &lt;= b-&gt;cap)
+        <span class="hljs-keyword">return</span>;
+    <span class="hljs-keyword">do</span> &#123; 
+        b-&gt;cap *= <span class="hljs-number">2</span>;
+    &#125; <span class="hljs-keyword">while</span> (b-&gt;cap &lt;= b-&gt;size + sz); 
 
-    if (b-&gt;ptr == b-&gt;buffer) &#123;
-        b-&gt;ptr = malloc(b-&gt;cap);
-        memcpy(b-&gt;ptr, b-&gt;buffer, b-&gt;size);
-    &#125; else &#123;
-        b-&gt;ptr = realloc(b-&gt;ptr, b-&gt;cap);
+    <span class="hljs-keyword">if</span> (b-&gt;ptr == b-&gt;buffer) &#123;
+        b-&gt;ptr = <span class="hljs-built_in">malloc</span>(b-&gt;cap);
+        <span class="hljs-built_in">memcpy</span>(b-&gt;ptr, b-&gt;buffer, b-&gt;size);
+    &#125; <span class="hljs-keyword">else</span> &#123;
+        b-&gt;ptr = <span class="hljs-built_in">realloc</span>(b-&gt;ptr, b-&gt;cap);
     &#125;
 &#125;
 </code></pre>
@@ -120,67 +124,67 @@ bson_reserve(struct bson *b, int sz) &#123;
 <li>在使用malloc()分配内存时，并未做返回值判断。如果malloc()分配内存失败，返回NULL，此时程序逻辑就已陷入异常，再直接使用memecpy()拷贝内容到b-&gt;ptr(此时是NULL)，程序崩溃。当然一般不会出现分配内存失败的情况，但确实写得很不严谨。</li>
 <li>并未对传入参数做前置判断。b为NULL, sz为负数等情况均未考虑。作为我个人的编程习惯，不管函数是外部接口或是内部方法，都会进行严格的参数检查，这样会帮助我在开发阶段就发现和避免了许多的Bug。除非是非常核心的代码——多一行if判断都对性能有影响的代码。但既然对性能要求如此严苛，何不换用更底层的编程语言来实现呢？特别是当我们的代码运行在极端情况下时——航天器、心脏起搏器里，我们必须要对异常甚至不可能出现的错误做好Plan B，因为没有人敢保证复杂项目中的代码就没有Bug。</li>
 </ul>
-<p>最后我们回到文章的主题。看函数中的do{}while()循环语句，大意是当b的内存容量翻倍后，如果b的内存容量仍然小于等于新的内存大小，则b的内存容量继续翻倍，直到b的容量可以满足新的内存大小，则退出循环。但是，这里的do{}while()循环可能会陷入死循环。当b-&gt;cap大于<strong>INT_MAX&#x2F;2</strong>时，<code>b-&gt;cap *= 2;</code>执行结束后，b-&gt;cap整数越界(此时一定会有new b-&gt;cap小于old b-&gt;cap),则while()中的条件判断一定成立。到此逻辑已经出现错误。更坏的情况是，某些情况下甚至会导致死循环。 接下来，我们构造一个更加简单的例子来说明，循环变量可能会如何引起死循环。写出这样的代码的几率一定不会低。</p>
-<pre><code class="c">#include &lt;stdio.h&gt;
-#include &lt;stdint.h&gt;
+<p>最后我们回到文章的主题。看函数中的do{}while()循环语句，大意是当b的内存容量翻倍后，如果b的内存容量仍然小于等于新的内存大小，则b的内存容量继续翻倍，直到b的容量可以满足新的内存大小，则退出循环。但是，这里的do{}while()循环可能会陷入死循环。当b-&gt;cap大于<strong>INT_MAX/2</strong>时，<code>b-&gt;cap *= 2;</code>执行结束后，b-&gt;cap整数越界(此时一定会有new b-&gt;cap小于old b-&gt;cap),则while()中的条件判断一定成立。到此逻辑已经出现错误。更坏的情况是，某些情况下甚至会导致死循环。 接下来，我们构造一个更加简单的例子来说明，循环变量可能会如何引起死循环。写出这样的代码的几率一定不会低。</p>
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdint.h&gt;</span></span>
 
-int main() &#123;
-    uint8_t max_uint8 = (uint8_t)~0;// 255
-    uint8_t i;
-    for (i = 0; i &lt; max_uint8; i += 10) &#123;
-        printf(&quot;i:%u\n&quot;, i);
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-type">uint8_t</span> max_uint8 = (<span class="hljs-type">uint8_t</span>)~<span class="hljs-number">0</span>;<span class="hljs-comment">// 255</span>
+    <span class="hljs-type">uint8_t</span> i;
+    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; max_uint8; i += <span class="hljs-number">10</span>) &#123;
+        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;i:%u\n&quot;</span>, i);
     &#125;
-    return 0;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
-<p>你可以在在你的PC上执行此代码，但请注意此程序会陷入死循环。在终端中请使用Ctrl+c强制终止此程序。引起死循环的原因就是整数越界。当i等于250时，i满足for循环的执行条件，可继续执行。执行<code>i += 10</code>，此时i越界了变成了4，是满足for循环的执行条件的，循环得以继续执行，但已经出错了。 那么我们如何避免因为循环变量越界而导致的错误甚至死循环呢？既然是因为在边界条件判断时出了错，那么我们给其限定执行次数不就行了吗，保证在限定的执行次数内一定是不会发生循环变量越界的，就像**strncpy()<strong>之于</strong>strcpy()**。那么这个执行次数应该如何确定呢？我们以上面的死循环代码为例，对其进行改进：</p>
-<pre><code class="c">#include &lt;stdio.h&gt;
-#include &lt;stdint.h&gt;
+<p>你可以在在你的PC上执行此代码，但请注意此程序会陷入死循环。在终端中请使用Ctrl+c强制终止此程序。引起死循环的原因就是整数越界。当i等于250时，i满足for循环的执行条件，可继续执行。执行<code>i += 10</code>，此时i越界了变成了4，是满足for循环的执行条件的，循环得以继续执行，但已经出错了。 那么我们如何避免因为循环变量越界而导致的错误甚至死循环呢？既然是因为在边界条件判断时出了错，那么我们给其限定执行次数不就行了吗，保证在限定的执行次数内一定是不会发生循环变量越界的，就像<strong>strncpy()<strong>之于</strong>strcpy()</strong>。那么这个执行次数应该如何确定呢？我们以上面的死循环代码为例，对其进行改进：</p>
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdint.h&gt;</span></span>
 
-int main() &#123;
-    uint8_t max_uint8 = (uint8_t)~0;// 255
-    uint8_t i;
-    uint8_t max_count = max_uint8 / 10; 
-    for (i = 0; i &lt;= max_count; i++) &#123;
-        printf(&quot;i:%u\n&quot;, i * 10);
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-type">uint8_t</span> max_uint8 = (<span class="hljs-type">uint8_t</span>)~<span class="hljs-number">0</span>;<span class="hljs-comment">// 255</span>
+    <span class="hljs-type">uint8_t</span> i;
+    <span class="hljs-type">uint8_t</span> max_count = max_uint8 / <span class="hljs-number">10</span>; 
+    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt;= max_count; i++) &#123;
+        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;i:%u\n&quot;</span>, i * <span class="hljs-number">10</span>);
     &#125;
-    return 0;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
 <p>我们先求得原来的for循环在不发生循环变量越界的前提下，最多能循环的次数。这样就修改为了我们最为常见的循环变量自增1的for循环，就不会在出现因循环变量越界而导致错误和死循环了。这个例子非常简单，那如果遇到bson_reserve()函数中乘法递增的循环变量又该如何确定其最大执行次数呢？我们构造一个例子：</p>
-<pre><code class="c">#include &lt;stdio.h&gt;                                                                      
-#include &lt;stdint.h&gt;
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span>                                                                      </span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdint.h&gt;</span></span>
 
-int main() &#123;
-    uint8_t max_uint8 = (uint8_t)~0;// 255
-    uint8_t capacity = 5;
-    do &#123;
-        if (max_uint8 / capacity &lt; 2) &#123;
-            printf(&quot;capacity:%u即将越界，请做异常处理\n&quot;, capacity);
-            break;
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-type">uint8_t</span> max_uint8 = (<span class="hljs-type">uint8_t</span>)~<span class="hljs-number">0</span>;<span class="hljs-comment">// 255</span>
+    <span class="hljs-type">uint8_t</span> capacity = <span class="hljs-number">5</span>;
+    <span class="hljs-keyword">do</span> &#123;
+        <span class="hljs-keyword">if</span> (max_uint8 / capacity &lt; <span class="hljs-number">2</span>) &#123;
+            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;capacity:%u即将越界，请做异常处理\n&quot;</span>, capacity);
+            <span class="hljs-keyword">break</span>;
         &#125;
-        printf(&quot;capacity:%u\n&quot;, capacity);
-        capacity *= 2;
-    &#125; while (capacity &lt;= 200);
-    return 0;
+        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;capacity:%u\n&quot;</span>, capacity);
+        capacity *= <span class="hljs-number">2</span>;
+    &#125; <span class="hljs-keyword">while</span> (capacity &lt;= <span class="hljs-number">200</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
 <p>在do{}while()循环中，去检测当前capacity是否能够进行下一次的翻倍，如果不能则报告错误或者做异常处理，当然例子里只是简单的跳出循环而已。其实上个例子同样可以使用这样的判断方式来界定循环变量会否越界，只是我一开始思考的思路是这样的——如何安全地确定其最大执行次数。现在我们将其修改如下：</p>
-<pre><code class="c">#include &lt;stdio.h&gt;
-#include &lt;stdint.h&gt;
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdint.h&gt;</span></span>
 
-int main() &#123;
-    uint8_t max_uint8 = (uint8_t)~0;// 255
-    uint8_t i;
-    for (i = 0; i &lt; max_uint8; i += 10) &#123;
-        printf(&quot;i:%u\n&quot;, i); 
-        // 检测循环变量下一次自增是否能成功
-        if (max_uint8 - i &lt; 10) &#123;                                                       
-            printf(&quot;再次循环将越界，请做异常处理\n&quot;);
-            break;
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-type">uint8_t</span> max_uint8 = (<span class="hljs-type">uint8_t</span>)~<span class="hljs-number">0</span>;<span class="hljs-comment">// 255</span>
+    <span class="hljs-type">uint8_t</span> i;
+    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; max_uint8; i += <span class="hljs-number">10</span>) &#123;
+        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;i:%u\n&quot;</span>, i); 
+        <span class="hljs-comment">// 检测循环变量下一次自增是否能成功</span>
+        <span class="hljs-keyword">if</span> (max_uint8 - i &lt; <span class="hljs-number">10</span>) &#123;                                                       
+            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;再次循环将越界，请做异常处理\n&quot;</span>);
+            <span class="hljs-keyword">break</span>;
         &#125;   
     &#125;
-    return 0;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
 <p>关键在于如何安全地提前判断下一次循环是否会发生越界，如果会就做异常处理，否则继续循环。记住这个陷阱，写出更加健壮的代码。</p>

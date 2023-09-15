@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -96,30 +100,32 @@
 
     <div class="post-md">
         
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-type%E7%AE%80%E4%BB%8B"><span class="post-toc-text">math_type简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-type%E5%AE%9E%E7%8E%B0"><span class="post-toc-text">math_type实现</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math_type%E7%AE%80%E4%BB%8B"><span class="post-toc-text"> math_type简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math_type%E5%AE%9E%E7%8E%B0"><span class="post-toc-text"> math_type实现</span></a></li></ol>
         
-        <h1 id="math-type简介"><a href="#math-type简介" class="headerlink" title="math_type简介"></a>math_type简介</h1><p><strong>math_type</strong>是lua库函数<strong>math.type</strong>的具体实现。<strong>math_type</strong>的作用是判断一个参数是整数还是浮点数：</p>
+        <h1 id="math_type简介"><a class="markdownIt-Anchor" href="#math_type简介"></a> math_type简介</h1>
+<p><strong>math_type</strong>是lua库函数<strong>math.type</strong>的具体实现。<strong>math_type</strong>的作用是判断一个参数是整数还是浮点数：</p>
 <ul>
 <li>如果参数是整数，则返回“integer”；</li>
 <li>如果参数是浮点数，则返回“float”；</li>
 <li>如果参数不是数字，则返回nil。</li>
 </ul>
 <p><strong>math_type</strong>的声明如下：</p>
-<pre><code class="c">static int math_type (lua_State *L);
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_type</span> <span class="hljs-params">(lua_State *L)</span>;
 </code></pre>
-<h1 id="math-type实现"><a href="#math-type实现" class="headerlink" title="math_type实现"></a>math_type实现</h1><p><strong>math_type</strong>的实现源码：</p>
-<pre><code class="c">static int math_type (lua_State *L) &#123;
-    if (lua_type(L, 1) == LUA_TNUMBER) &#123;
-        if (lua_isinteger(L, 1))
-            lua_pushliteral(L, &quot;integer&quot;);
-        else
-            lua_pushliteral(L, &quot;float&quot;);
+<h1 id="math_type实现"><a class="markdownIt-Anchor" href="#math_type实现"></a> math_type实现</h1>
+<p><strong>math_type</strong>的实现源码：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_type</span> <span class="hljs-params">(lua_State *L)</span> &#123;
+    <span class="hljs-keyword">if</span> (lua_type(L, <span class="hljs-number">1</span>) == LUA_TNUMBER) &#123;
+        <span class="hljs-keyword">if</span> (lua_isinteger(L, <span class="hljs-number">1</span>))
+            lua_pushliteral(L, <span class="hljs-string">&quot;integer&quot;</span>);
+        <span class="hljs-keyword">else</span>
+            lua_pushliteral(L, <span class="hljs-string">&quot;float&quot;</span>);
     &#125;
-    else &#123;
-        luaL_checkany(L, 1);
+    <span class="hljs-keyword">else</span> &#123;
+        luaL_checkany(L, <span class="hljs-number">1</span>);
         lua_pushnil(L);
     &#125;
-    return 1;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
 <p><strong>math_type</strong>判断参数是否是<strong>LUA_TNUMBER</strong>类型；如果是<strong>LUA_TNUMBER</strong>的话，则再判断参数是整数还是浮点数；否则，如果是传入了参数，则将nil入栈。</p>

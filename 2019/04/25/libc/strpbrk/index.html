@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -99,26 +103,26 @@
             
         
         <p><strong>strpbrk</strong>是一个字符串查找函数，其声明如下：</p>
-<pre><code class="c">char * strpbrk ( const char * s, const char * accept); 
+<pre class="highlight"><code class="c"><span class="hljs-type">char</span> * <span class="hljs-title function_">strpbrk</span> <span class="hljs-params">( <span class="hljs-type">const</span> <span class="hljs-type">char</span> * s, <span class="hljs-type">const</span> <span class="hljs-type">char</span> * accept)</span>; 
 </code></pre>
 <p>strpbrk接受两个合法的C字符串。strpbrk的目的是找到accept的任意一个字符在s中首次出现的位置。</p>
-<hr>
-<p>strpbrk的实现还是挺简单的（string&#x2F;strpbrk.c）：</p>
-<pre><code class="c">/* Copyright (C) 1991, 1994, 1996, 1997, 2003 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.*/
-/* Find the first occurrence in S of any character in ACCEPT.  */
-char * strpbrk (s, accept)
-    const char *s;
-    const char *accept;
+<hr />
+<p>strpbrk的实现还是挺简单的（string/strpbrk.c）：</p>
+<pre class="highlight"><code class="c"><span class="hljs-comment">/* Copyright (C) 1991, 1994, 1996, 1997, 2003 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.*/</span>
+<span class="hljs-comment">/* Find the first occurrence in S of any character in ACCEPT.  */</span>
+<span class="hljs-type">char</span> * <span class="hljs-title function_">strpbrk</span> <span class="hljs-params">(s, accept)</span>
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span> *s;
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span> *accept;
 &#123;
-    while (*s != &#39;\0&#39;) &#123;
-        const char *a = accept;
-        while (*a != &#39;\0&#39;)
-            if (*a++ == *s)
-                return (char *) s;
+    <span class="hljs-keyword">while</span> (*s != <span class="hljs-string">&#x27;\0&#x27;</span>) &#123;
+        <span class="hljs-type">const</span> <span class="hljs-type">char</span> *a = accept;
+        <span class="hljs-keyword">while</span> (*a != <span class="hljs-string">&#x27;\0&#x27;</span>)
+            <span class="hljs-keyword">if</span> (*a++ == *s)
+                <span class="hljs-keyword">return</span> (<span class="hljs-type">char</span> *) s;
         ++s;
     &#125;
-    return NULL;
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
 &#125;
 </code></pre>
 <p>strpbrk的代码非常直观，就只有两层嵌套循环：外层循环遍历s中的每一个字符，内循环遍历accept中的字符，如果能在accept中找到当前字符*<strong>s</strong>，则返回s；否则继续检查s中的下一个字符。如果遍历完s都找不到一个字符是accept中的字符，则返回NULL。 显而易见，strpbrk的时间复杂度是平方级的： $$ O(n^{2}) $$ 当然啦，一般使用这个函数的时候accept中的字符都只有常数个（多数情况下只有1个）。从实际的运用来看，其时间复杂度可以认为是线性的： $$ O(n) $$</p>

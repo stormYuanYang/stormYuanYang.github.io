@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -99,19 +103,19 @@
             
         
         <p><strong>math_ceil</strong>是lua库函数math.ceil的具体实现（<strong>math_ceil</strong>的实现和<strong>math_floor</strong>的实现非常类似），其声明为：</p>
-<pre><code class="c">static int math_ceil (lua_State *L);
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_ceil</span> <span class="hljs-params">(lua_State *L)</span>;
 </code></pre>
 <p><strong>math_ceil</strong>接受一个参数，这个参数必须是<strong>number</strong>类型（整数或者浮点数）或者字符串。<strong>math_ceil</strong>正确接受参数后，获取不小于参数的最小整数值；注意获取整数值不一定是lua内部的<strong>LUA_INTEGER</strong>类型，可能是<strong>LUA_NUMBER</strong>类型。</p>
-<hr>
+<hr />
 <p><strong>math_ceil</strong>的实现：</p>
-<pre><code class="c">static int math_ceil (lua_State *L) &#123;
-    if (lua_isinteger(L, 1))
-        lua_settop(L, 1);  /* integer is its own ceil */
-    else &#123;
-        lua_Number d = l_mathop(ceil)(luaL_checknumber(L, 1));
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_ceil</span> <span class="hljs-params">(lua_State *L)</span> &#123;
+    <span class="hljs-keyword">if</span> (lua_isinteger(L, <span class="hljs-number">1</span>))
+        lua_settop(L, <span class="hljs-number">1</span>);  <span class="hljs-comment">/* integer is its own ceil */</span>
+    <span class="hljs-keyword">else</span> &#123;
+        lua_Number d = l_mathop(<span class="hljs-built_in">ceil</span>)(luaL_checknumber(L, <span class="hljs-number">1</span>));
         pushnumint(L, d);
     &#125;
-    return 1;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
 <p><strong>math_ceil</strong>先判断栈上的参数类型：</p>

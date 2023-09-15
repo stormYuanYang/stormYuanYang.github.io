@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -96,43 +100,45 @@
 
     <div class="post-md">
         
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="post-toc-text">简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%88%86%E6%9E%90"><span class="post-toc-text">分析</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="post-toc-text"> 简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%88%86%E6%9E%90"><span class="post-toc-text"> 分析</span></a></li></ol>
         
-        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>C函数<strong>luaB_tonumber</strong>是lua库函数<strong>tonumber</strong>的具体实现。<strong>luaB_tonumber</strong>的目的是将传入的参数转换为一个数字。<strong>luaB_tonumber</strong>的声明如下：</p>
-<pre><code class="c">static int luaB_tonumber (lua_State *L);
+        <h1 id="简介"><a class="markdownIt-Anchor" href="#简介"></a> 简介</h1>
+<p>C函数<strong>luaB_tonumber</strong>是lua库函数<strong>tonumber</strong>的具体实现。<strong>luaB_tonumber</strong>的目的是将传入的参数转换为一个数字。<strong>luaB_tonumber</strong>的声明如下：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">luaB_tonumber</span> <span class="hljs-params">(lua_State *L)</span>;
 </code></pre>
 <p><strong>luaB_tonumber</strong>接受两个参数e和base，由<strong>L</strong>的栈携带。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>先看<strong>luaB_tonumber</strong>源码：</p>
-<pre><code class="c">static int luaB_tonumber (lua_State *L) &#123;
-    if (lua_isnoneornil(L, 2)) &#123;  /* standard conversion? */
-        luaL_checkany(L, 1);
-        if (lua_type(L, 1) == LUA_TNUMBER) &#123;  /* already a number? */
-            lua_settop(L, 1);  /* yes; return it */
-            return 1;
+<h1 id="分析"><a class="markdownIt-Anchor" href="#分析"></a> 分析</h1>
+<p>先看<strong>luaB_tonumber</strong>源码：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">luaB_tonumber</span> <span class="hljs-params">(lua_State *L)</span> &#123;
+    <span class="hljs-keyword">if</span> (lua_isnoneornil(L, <span class="hljs-number">2</span>)) &#123;  <span class="hljs-comment">/* standard conversion? */</span>
+        luaL_checkany(L, <span class="hljs-number">1</span>);
+        <span class="hljs-keyword">if</span> (lua_type(L, <span class="hljs-number">1</span>) == LUA_TNUMBER) &#123;  <span class="hljs-comment">/* already a number? */</span>
+            lua_settop(L, <span class="hljs-number">1</span>);  <span class="hljs-comment">/* yes; return it */</span>
+            <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
         &#125;
-        else &#123;
-            size_t l;
-            const char *s = lua_tolstring(L, 1, &amp;l);
-            if (s != NULL &amp;&amp; lua_stringtonumber(L, s) == l + 1)
-                return 1;  /* successful conversion to number */
-            /* else not a number */
+        <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-type">size_t</span> l;
+            <span class="hljs-type">const</span> <span class="hljs-type">char</span> *s = lua_tolstring(L, <span class="hljs-number">1</span>, &amp;l);
+            <span class="hljs-keyword">if</span> (s != <span class="hljs-literal">NULL</span> &amp;&amp; lua_stringtonumber(L, s) == l + <span class="hljs-number">1</span>)
+                <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;  <span class="hljs-comment">/* successful conversion to number */</span>
+            <span class="hljs-comment">/* else not a number */</span>
         &#125;
     &#125;
-    else &#123;
-        size_t l;
-        const char *s;
-        lua_Integer n = 0;  /* to avoid warnings */
-        lua_Integer base = luaL_checkinteger(L, 2);
-        luaL_checktype(L, 1, LUA_TSTRING);  /* no numbers as strings */
-        s = lua_tolstring(L, 1, &amp;l);
-        luaL_argcheck(L, 2 &lt;= base &amp;&amp; base &lt;= 36, 2, &quot;base out of range&quot;);
-        if (b_str2int(s, (int)base, &amp;n) == s + l) &#123;
+    <span class="hljs-keyword">else</span> &#123;
+        <span class="hljs-type">size_t</span> l;
+        <span class="hljs-type">const</span> <span class="hljs-type">char</span> *s;
+        lua_Integer n = <span class="hljs-number">0</span>;  <span class="hljs-comment">/* to avoid warnings */</span>
+        lua_Integer base = luaL_checkinteger(L, <span class="hljs-number">2</span>);
+        luaL_checktype(L, <span class="hljs-number">1</span>, LUA_TSTRING);  <span class="hljs-comment">/* no numbers as strings */</span>
+        s = lua_tolstring(L, <span class="hljs-number">1</span>, &amp;l);
+        luaL_argcheck(L, <span class="hljs-number">2</span> &lt;= base &amp;&amp; base &lt;= <span class="hljs-number">36</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&quot;base out of range&quot;</span>);
+        <span class="hljs-keyword">if</span> (b_str2int(s, (<span class="hljs-type">int</span>)base, &amp;n) == s + l) &#123;
             lua_pushinteger(L, n);
-            return 1;
-        &#125;  /* else not a number */
-    &#125;  /* else not a number */
-    lua_pushnil(L);  /* not a number */
-    return 1;
+            <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+        &#125;  <span class="hljs-comment">/* else not a number */</span>
+    &#125;  <span class="hljs-comment">/* else not a number */</span>
+    lua_pushnil(L);  <span class="hljs-comment">/* not a number */</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
 <p><strong>luaB_tonumber</strong>首先执行代码<code>if (lua_isnoneornil(L, 2))</code>判断是否传入了转换的基数<strong>base</strong>，如果不传入参数<strong>base</strong>，则是标准转换，即将参数转换成十进制：</p>
@@ -145,7 +151,7 @@
 <ul>
 <li>执行<code>lua_Integer base = luaL_checkinteger(L, 2);</code>获取<strong>base</strong>;</li>
 <li>然后执行<code>luaL_checktype(L, 1, LUA_TSTRING);</code>进行检查：如果参数<strong>e</strong>不是数字，则只能是字符串；</li>
-<li>注意<code>luaL_argcheck(L, 2 &lt;= base &amp;&amp; base &lt;= 36, 2, &quot;base out of range&quot;);</code>，这里对传入的<strong>base</strong>做了一次检查，转换的基数只能是$[2,36]$内的整数；</li>
+<li>注意<code>luaL_argcheck(L, 2 &lt;= base &amp;&amp; base &lt;= 36, 2, &quot;base out of range&quot;);</code>，这里对传入的<strong>base</strong>做了一次检查，转换的基数只能是<span class='katex-error' title='ParseError: KaTeX parse error: Undefined control sequence: \[ at position 1: \̲[̲2,36\]'>\[2,36\]</span>内的整数；</li>
 <li>然后执行<code>if (b_str2int(s, (int)base, &amp;n) == s + l)</code>尝试将字符串<strong>s</strong>转换成以<strong>base</strong>为基数的数字；其中<strong>b_str2int</strong>就是<strong>lbaselib.c</strong>中的一个内部方法；如果转换成功就将结果入站。</li>
 </ul>
 <p>最后，如果无法转换，<strong>luaB_tonumber</strong>调用<code>lua_pushnil(L);</code>将<strong>nil</strong>入站，表示无法转换成数字。</p>

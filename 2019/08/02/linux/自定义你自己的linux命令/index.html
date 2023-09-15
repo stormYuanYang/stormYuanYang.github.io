@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -98,12 +102,12 @@
         
             
         
-        <p>在大量使用linux命令之后就会感觉到疲劳😪，you know why？长时间输入大量完整的命令和参数，当然手累了呗🤷‍♂️。那作为一个懒人是不是应该想办法简化命令的输入呢，幸运的是linux提供这样的机制——为命令取<strong>别名</strong>。 linux提供一个名为<strong>alias</strong>的命令，这个命令就可以帮你自定义自己的linux命令。首先在你的home目录下找到类似.bashrc的文件（也可以直接找到&#x2F;etc&#x2F;bashrc，但是不推荐这样做，自定义你自己的命令肯定不希望影响其他人，对吧）。为什么说类似.bashrc的文件呢？因为你启动的shell可能不是bash shell，比如我修改了我的MAC的shell，由bash shell变为zsh，启动shell的配置文件就由.bashrc变成了.zshrc。 使用你最爱的编辑器打开.bashrc（推荐使用Vim）。在.bashrc文件的最后添加代码：</p>
-<pre><code class="bash">alias ll=&#39;ls -l&#39;
+        <p>在大量使用linux命令之后就会感觉到疲劳😪，you know why？长时间输入大量完整的命令和参数，当然手累了呗🤷‍♂️。那作为一个懒人是不是应该想办法简化命令的输入呢，幸运的是linux提供这样的机制——为命令取<strong>别名</strong>。 linux提供一个名为<strong>alias</strong>的命令，这个命令就可以帮你自定义自己的linux命令。首先在你的home目录下找到类似.bashrc的文件（也可以直接找到/etc/bashrc，但是不推荐这样做，自定义你自己的命令肯定不希望影响其他人，对吧）。为什么说类似.bashrc的文件呢？因为你启动的shell可能不是bash shell，比如我修改了我的MAC的shell，由bash shell变为zsh，启动shell的配置文件就由.bashrc变成了.zshrc。 使用你最爱的编辑器打开.bashrc（推荐使用Vim）。在.bashrc文件的最后添加代码：</p>
+<pre class="highlight"><code class="bash"><span class="hljs-built_in">alias</span> ll=<span class="hljs-string">&#x27;ls -l&#x27;</span>
 </code></pre>
 <p>alias将<code>ls -l</code>命令映射到ll，重启shell（重启shell才会重新加载.bashrc，否则就需要你手动重新加载.bashrc）执行ll命令的执行结果就和执行<code>ls -l</code>是相同的。需要注意的是：</p>
 <ul>
-<li>ll和&#x3D;之间不能有空格；</li>
+<li>ll和=之间不能有空格；</li>
 <li>=和’ls -l’也不能有空格；</li>
 <li><code>ls -l</code>必须用引号或者双引号包含起来。</li>
 </ul>

@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -104,55 +108,55 @@
 <li>否则将浮点数直接压入栈中。</li>
 </ul>
 <p>pushnumint的声明如下：</p>
-<pre><code class="c">static void pushnumint (lua_State* L, lua_Number d);
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">pushnumint</span> <span class="hljs-params">(lua_State* L, lua_Number d)</span>;
 </code></pre>
-<hr>
+<hr />
 <p>现在来看看pushnumint的实现：</p>
-<pre><code class="c">static void pushnumint (lua_State *L, lua_Number d) &#123;
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">pushnumint</span> <span class="hljs-params">(lua_State *L, lua_Number d)</span> &#123;
     lua_Integer n;
-    if (lua_numbertointeger(d, &amp;n))  /* does &#39;d&#39; fit in an integer? */
-        lua_pushinteger(L, n);  /* result is integer */
-    else
-        lua_pushnumber(L, d);  /* result is float */
+    <span class="hljs-keyword">if</span> (lua_numbertointeger(d, &amp;n))  <span class="hljs-comment">/* does &#x27;d&#x27; fit in an integer? */</span>
+        lua_pushinteger(L, n);  <span class="hljs-comment">/* result is integer */</span>
+    <span class="hljs-keyword">else</span>
+        lua_pushnumber(L, d);  <span class="hljs-comment">/* result is float */</span>
 &#125;
 </code></pre>
 <p>pushnumint的结构一目了然。调用<strong>lua_numbertointeger</strong>尝试将浮点数d转换成整数；如果d能转换成整数，则将其整数值n压入栈中；否则，直接将d压入栈中。 那这里的<strong>lua_numbertointeger</strong>又是如何判断d能否转换成一个整数的呢？ <strong>lua_numbertointeger</strong>并不是一个函数，而是一个宏定义（定义在luaconf.h中），其定义为：</p>
-<pre><code class="c">/*
+<pre class="highlight"><code class="c"><span class="hljs-comment">/*
 @@ lua_numbertointeger converts a float number to an integer, or
 ** returns 0 if float is not within the range of a lua_Integer.
 ** (The range comparisons are tricky because of rounding. The tests
 ** here assume a two-complement representation, where MININTEGER always
 ** has an exact representation as a float; MAXINTEGER may not have one,
 ** and therefore its conversion to float may have an ill-defined value.)
-*/
-#define lua_numbertointeger(n,p) \
+*/</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> lua_numbertointeger(n,p) \
   ((n) &gt;= (LUA_NUMBER)(LUA_MININTEGER) &amp;&amp; \
    (n) &lt; -(LUA_NUMBER)(LUA_MININTEGER) &amp;&amp; \
-      (*(p) = (LUA_INTEGER)(n), 1))
+      (*(p) = (LUA_INTEGER)(n), 1))</span>
 </code></pre>
-<p><strong>lua_numbertointeger</strong>对传入的浮点数n做两次条件判断，n必须要落在能被<strong>LUA_INTEGER</strong>表示的范围内，即n满足： $$ LUA_MININTEGER &lt;&#x3D; n &lt;&#x3D; LUA_MAXINTEGER $$ 当n满足条件时，直接将n强制转换成<strong>LUA_INTEGER</strong>类型并复制给*p，并返回真；否则返回假。 注意，这里并不是直接判断n是否小于等于**(LUA_NUMBER)LUA_MAXINTEGER<strong>，而是选择判断n是否小于</strong>-(LUA_NUMBER)LUA_MININTEGER<strong>；这样做的目的，注释中已经给出了解释，但是并未说明为什么</strong>LUA_MAXINTEGER<strong>可能无法用</strong>LUA_NUMBER<strong>类型表示： LUA_NUMBER实际上是double(也可能是float、long double)的别名。LUA_INTEGER实际上是long int(也可能是int、long long int)的别名。而double在内存中存储结构导致，double表示的浮点数是拥有精度限制的，可能无法向long int一样准确地表示一个整数。 double可以用公式表示为： $$ 精度 a\times 2^{指数e} $$ 对于double来说，大于等于$2^{53}$的无符号整数就</strong>可能<strong>无法被精确表示了；因为double用53个bit表示精度，在指数确定时，最多只能表示$2^{53}$个不同的数。特别地，当指数e为0时： $$ [0, 2^{53}-1] $$ 对于有符号整数来说这个范围就是: $$ [-2^{52},2^{52}-1] $$ 当超过double能精确表示的整数范围后，就只有2的整数幂一定能被double精确表示，其他的数字则</strong>可能<strong>无法精确被表示；所lua在这里用</strong>-(LUA_NUMBER)LUA_MININTEGER**(即$2^{63}​$)来做判断。 举个例子：</p>
-<pre><code class="c">#include &lt;stdio.h&gt;
-#include &lt;limits.h&gt;
+<p><strong>lua_numbertointeger</strong>对传入的浮点数n做两次条件判断，n必须要落在能被<strong>LUA_INTEGER</strong>表示的范围内，即n满足： $$ LUA_MININTEGER &lt;= n &lt;= LUA_MAXINTEGER $$ 当n满足条件时，直接将n强制转换成<strong>LUA_INTEGER</strong>类型并复制给*p，并返回真；否则返回假。 注意，这里并不是直接判断n是否小于等于**(LUA_NUMBER)LUA_MAXINTEGER**，而是选择判断n是否小于**-(LUA_NUMBER)LUA_MININTEGER**；这样做的目的，注释中已经给出了解释，但是并未说明为什么<strong>LUA_MAXINTEGER</strong>可能无法用<strong>LUA_NUMBER</strong>类型表示： LUA_NUMBER实际上是double(也可能是float、long double)的别名。LUA_INTEGER实际上是long int(也可能是int、long long int)的别名。而double在内存中存储结构导致，double表示的浮点数是拥有精度限制的，可能无法向long int一样准确地表示一个整数。 double可以用公式表示为： $$ 精度 a\times 2^{指数e} $$ 对于double来说，大于等于<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>53</mn></msup></mrow><annotation encoding="application/x-tex">2^{53}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">5</span><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span></span>的无符号整数就<strong>可能</strong>无法被精确表示了；因为double用53个bit表示精度，在指数确定时，最多只能表示<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>53</mn></msup></mrow><annotation encoding="application/x-tex">2^{53}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">5</span><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span></span>个不同的数。特别地，当指数e为0时： $$ [0, 2^{53}-1] $$ 对于有符号整数来说这个范围就是: $$ [-2<sup>{52},2</sup>{52}-1] $$ 当超过double能精确表示的整数范围后，就只有2的整数幂一定能被double精确表示，其他的数字则<strong>可能</strong>无法精确被表示；所lua在这里用**-(LUA_NUMBER)LUA_MININTEGER**(即<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>63</mn></msup><mtext>​</mtext></mrow><annotation encoding="application/x-tex">2^{63}​</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span><span class="mord mtight">3</span></span></span></span></span></span></span></span></span><span class="mord">​</span></span></span></span>)来做判断。 举个例子：</p>
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;limits.h&gt;</span></span>
 
-int main() &#123;
-    printf(&quot;%u %u\n&quot;, sizeof(long long int), sizeof(double));
-    printf(&quot;%ld\n&quot;, LLONG_MAX);
-    double a = (double)LLONG_MAX;
-    printf(&quot;%lf\n&quot;, a);
-    printf(&quot;将a转换成整数:%ld\n&quot;, (long long int)a);
-    printf(&quot;%ld\n&quot;, LLONG_MIN);
-    a = (double)LLONG_MIN;
-    printf(&quot;%lf\n&quot;, a);
-    return 0;
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%u %u\n&quot;</span>, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">long</span> <span class="hljs-type">long</span> <span class="hljs-type">int</span>), <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">double</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%ld\n&quot;</span>, LLONG_MAX);
+    <span class="hljs-type">double</span> a = (<span class="hljs-type">double</span>)LLONG_MAX;
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%lf\n&quot;</span>, a);
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;将a转换成整数:%ld\n&quot;</span>, (<span class="hljs-type">long</span> <span class="hljs-type">long</span> <span class="hljs-type">int</span>)a);
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%ld\n&quot;</span>, LLONG_MIN);
+    a = (<span class="hljs-type">double</span>)LLONG_MIN;
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%lf\n&quot;</span>, a);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
 <p>在我的PC上，打印结果：</p>
-<pre><code class="c">8 8
-9223372036854775807
-9223372036854775808.000000
-将a转换成整数:-9223372036854775808
--9223372036854775808
--9223372036854775808.000000
+<pre class="highlight"><code class="c"><span class="hljs-number">8</span> <span class="hljs-number">8</span>
+<span class="hljs-number">9223372036854775807</span>
+<span class="hljs-number">9223372036854775808.000000</span>
+将a转换成整数:<span class="hljs-number">-9223372036854775808</span>
+<span class="hljs-number">-9223372036854775808</span>
+<span class="hljs-number">-9223372036854775808.000000</span>
 </code></pre>
 <p><strong>LLONG_MAX</strong>被强制转换成double类型后，其结果并不等于<strong>LLONG_MAX</strong>了，已经有大小为1的误差了；再将a强转回<strong>long long int</strong>，其结果已经变成<strong>LLONG_MIN</strong>，这就是真正的天差地别。<strong>LLONG_MIN</strong>被强制转换成double类型后，其结果仍然正确地等于<strong>LLONG_MIN</strong>。</p>
 

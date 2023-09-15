@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -99,7 +103,7 @@
             
         
         <p>函数<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstring/strcmp/"><strong>strcmp</strong></a>对两个C字符串按<strong>字典序</strong>进行比较。其声明如下：</p>
-<pre><code class="c">int strcmp (const char * str1, const char * str2);
+<pre class="highlight"><code class="c"><span class="hljs-type">int</span> <span class="hljs-title function_">strcmp</span> <span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> * str1, <span class="hljs-type">const</span> <span class="hljs-type">char</span> * str2)</span>;
 </code></pre>
 <p>strcmp的返回值类型是int，不同返回值有不同含义：</p>
 <ul>
@@ -108,34 +112,34 @@
 <li>返回值大于0时，str1大于str2。</li>
 </ul>
 <p>一定要注意，并不一定返回-1、0、1这三个值，我就曾经被人误导过。使用strcmp有一点需要注意：必须保证传入的str1和str2是合法的C字符串（以’\0’结尾的字符串），否则可能导致<strong>overflow</strong>。</p>
-<hr>
-<p>让我们看其实现（string&#x2F;strcmp.c）:</p>
-<pre><code class="c">/* Copyright (C) 1991, 1996, 1997, 2003 Free Software Foundation, Inc.
+<hr />
+<p>让我们看其实现（string/strcmp.c）:</p>
+<pre class="highlight"><code class="c"><span class="hljs-comment">/* Copyright (C) 1991, 1996, 1997, 2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-*/
+*/</span>
 
-/* Compare S1 and S2, returning less than, equal to or
+<span class="hljs-comment">/* Compare S1 and S2, returning less than, equal to or
    greater than zero if S1 is lexicographically less than,
-   equal to or greater than S2.  */
-int strcmp (p1, p2)
-    const char *p1;
-    const char *p2; &#123;
-    register const unsigned char *s1 = (const unsigned char *) p1;
-    register const unsigned char *s2 = (const unsigned char *) p2;
-    unsigned reg_char c1, c2;
+   equal to or greater than S2.  */</span>
+<span class="hljs-type">int</span> <span class="hljs-title function_">strcmp</span> <span class="hljs-params">(p1, p2)</span>
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span> *p1;
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span> *p2; &#123;
+    <span class="hljs-keyword">register</span> <span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *s1 = (<span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *) p1;
+    <span class="hljs-keyword">register</span> <span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *s2 = (<span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *) p2;
+    <span class="hljs-type">unsigned</span> reg_char c1, c2;
 
-    do &#123;
-        c1 = (unsigned char) *s1++;
-        c2 = (unsigned char) *s2++;
-        if (c1 == &#39;\0&#39;)
-            return c1 - c2;
-    &#125; while (c1 == c2);
+    <span class="hljs-keyword">do</span> &#123;
+        c1 = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>) *s1++;
+        c2 = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>) *s2++;
+        <span class="hljs-keyword">if</span> (c1 == <span class="hljs-string">&#x27;\0&#x27;</span>)
+            <span class="hljs-keyword">return</span> c1 - c2;
+    &#125; <span class="hljs-keyword">while</span> (c1 == c2);
 
-    return c1 - c2;
+    <span class="hljs-keyword">return</span> c1 - c2;
 &#125;
 </code></pre>
 <p>首先声明并定义了s1和s2。因为s1和s2由<strong>register</strong>修饰，在存取s1和s2时可能会更加高效。 接下来是一个<code>do&#123;&#125;while();</code>循环，对传入的两个字符串的字符一一做比较。这里的代码十分简单，没什么好详细说明的，要注意的就是：这里两处语句返回的都是<code>c1 - c2</code>，在使用strcmp的返回值时要注意。</p>
-<hr>
+<hr />
 <p>一些说明：</p>
 <ul>
 <li><strong>reg_char</strong>：已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strcpy/"><strong>《strcpy》</strong></a>中解释，不再赘叙。</li>

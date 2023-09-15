@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -96,24 +100,25 @@
 
     <div class="post-md">
         
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#nanoTime"><span class="post-toc-text">nanoTime</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#nanoTime%E5%9C%A8Linux%E4%B8%8B%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="post-toc-text">nanoTime在Linux下的实现</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#nanoTime%E5%9C%A8Windows%E4%B8%8B%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="post-toc-text">nanoTime在Windows下的实现</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%80%BB%E7%BB%93"><span class="post-toc-text">总结</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%A4%87%E6%B3%A8"><span class="post-toc-text">备注</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#nanotime"><span class="post-toc-text"> nanoTime</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#nanotime%E5%9C%A8linux%E4%B8%8B%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="post-toc-text"> nanoTime在Linux下的实现</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#nanotime%E5%9C%A8windows%E4%B8%8B%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="post-toc-text"> nanoTime在Windows下的实现</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%80%BB%E7%BB%93"><span class="post-toc-text"> 总结</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%A4%87%E6%B3%A8"><span class="post-toc-text"> 备注</span></a></li></ol>
         
-        <h2 id="nanoTime"><a href="#nanoTime" class="headerlink" title="nanoTime"></a>nanoTime</h2><p>前几天分析了<code>System.currentTimeMillis()</code>的实现，今天我们来看看和它比较相似但又不同的<code>System.nanoTime()</code>。<code>System.nanoTime()</code>的目的是用于<strong>测量时间的差值或者说时间的流逝</strong>：</p>
-<pre><code class="java">void func() &#123;
-  // do something
+        <h2 id="nanotime"><a class="markdownIt-Anchor" href="#nanotime"></a> nanoTime</h2>
+<p>前几天分析了<code>System.currentTimeMillis()</code>的实现，今天我们来看看和它比较相似但又不同的<code>System.nanoTime()</code>。<code>System.nanoTime()</code>的目的是用于<strong>测量时间的差值或者说时间的流逝</strong>：</p>
+<pre class="highlight"><code class="java"><span class="hljs-keyword">void</span> <span class="hljs-title function_">func</span><span class="hljs-params">()</span> &#123;
+  <span class="hljs-comment">// do something</span>
 &#125;
 
-void test() &#123;
-  long begin = System.nanoTime();
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">test</span><span class="hljs-params">()</span> &#123;
+  <span class="hljs-type">long</span> <span class="hljs-variable">begin</span> <span class="hljs-operator">=</span> System.nanoTime();
   func();
-  long end = System.nanoTime();
-  long diff = end - begin;
+  <span class="hljs-type">long</span> <span class="hljs-variable">end</span> <span class="hljs-operator">=</span> System.nanoTime();
+  <span class="hljs-type">long</span> <span class="hljs-variable">diff</span> <span class="hljs-operator">=</span> end - begin;
 &#125;
 </code></pre>
 <p>注意，<code>System.nanoTime()</code>返回的并不是当前时间（和<code>System.currentTimeMillis()</code>的含义不一样），而是<strong>当前时刻</strong>到<strong>一个固定但是可以任意的时间点</strong>的差值（是不是有点绕😜，为了表述的严谨只能如此)，也就是说返回值可能是正数也可能是负数，但实际中的实现一般是当前时刻到过去的某个时间点（比如Linux用的系统启动时间点）的差值；所以只能用若干<code>System.nanoTime()</code>调用获取其差值做一些判断或运算，换而言之一次调用基本是没有意义的；而且不同Java虚拟机调用<code>System.nanoTime()</code>用的起始点可能是不一样的，也就是说不同虚拟机之间不能用其值来判断时间流逝。</p>
 <p>接下来我们看看，<code>System.nanoTime()</code>在Java中的声明：</p>
-<pre><code class="java">/**
-     * Returns the current value of the running Java Virtual Machine&#39;s
+<pre class="highlight"><code class="java"><span class="hljs-comment">/**
+     * Returns the current value of the running Java Virtual Machine&#x27;s
      * high-resolution time source, in nanoseconds.
      *
      * This method can only be used to measure elapsed time and is
@@ -127,7 +132,7 @@ void test() &#123;
      * &lt;p&gt;This method provides nanosecond precision, but not necessarily
      * nanosecond resolution (that is, how frequently the value changes)
      * - no guarantees are made except that the resolution is at least as
-     * good as that of &#123;@link #currentTimeMillis()&#125;.
+     * good as that of &#123;<span class="hljs-doctag">@link</span> #currentTimeMillis()&#125;.
      *
      * &lt;p&gt;Differences in successive calls that span greater than
      * approximately 292 years (2&lt;sup&gt;63&lt;/sup&gt; nanoseconds) will not
@@ -138,174 +143,174 @@ void test() &#123;
      * instance of a Java virtual machine, is computed.
      *
      * &lt;p&gt;For example, to measure how long some code takes to execute:
-     * &lt;pre&gt; &#123;@code
+     * &lt;pre&gt; &#123;<span class="hljs-doctag">@code</span>
      * long startTime = System.nanoTime();
      * // ... the code being measured ...
      * long elapsedNanos = System.nanoTime() - startTime;&#125;&lt;/pre&gt;
      *
-     * &lt;p&gt;To compare elapsed time against a timeout, use &lt;pre&gt; &#123;@code
+     * &lt;p&gt;To compare elapsed time against a timeout, use &lt;pre&gt; &#123;<span class="hljs-doctag">@code</span>
      * if (System.nanoTime() - startTime &gt;= timeoutNanos) ...&#125;&lt;/pre&gt;
-     * instead of &lt;pre&gt; &#123;@code
+     * instead of &lt;pre&gt; &#123;<span class="hljs-doctag">@code</span>
      * if (System.nanoTime() &gt;= startTime + timeoutNanos) ...&#125;&lt;/pre&gt;
      * because of the possibility of numerical overflow.
      *
-     * @return the current value of the running Java Virtual Machine&#39;s
+     * <span class="hljs-doctag">@return</span> the current value of the running Java Virtual Machine&#x27;s
      *         high-resolution time source, in nanoseconds
-     * @since 1.5
-     */
-    @HotSpotIntrinsicCandidate
-    public static native long nanoTime();
+     * <span class="hljs-doctag">@since</span> 1.5
+     */</span>
+    <span class="hljs-meta">@HotSpotIntrinsicCandidate</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">native</span> <span class="hljs-type">long</span> <span class="hljs-title function_">nanoTime</span><span class="hljs-params">()</span>;
 </code></pre>
 <p>由上述声明和注释我们可以知道，Java提供的<code>System.nanoTime()</code>返回以纳秒为单位的高精度时间，不过这并不意味着其准确度就是1纳秒。特别注意这这里：</p>
 <blockquote><p>This method can only be used to measure elapsed time and is not related to any other notion of system or wall-clock time.</p>
 <footer><strong>Java</strong><cite>System.nanoTime()</cite></footer></blockquote>
-<p>和<code>System.currentTimeMillis()</code>一样，<code>System.nanoTime()</code>在这里只有声明，而没有具体实现，其实现由更底层的C&#x2F;C++完成。<code>System.nanoTime()</code>对应到实现源码在System.c中：</p>
-<pre><code class="c">/* Only register the performance-critical methods */static JNINativeMethod methods[] = &#123;
-    &#123;&quot;currentTimeMillis&quot;, &quot;()J&quot;,              (void *)&amp;JVM_CurrentTimeMillis&#125;,
-    &#123;&quot;nanoTime&quot;,          &quot;()J&quot;,              (void *)&amp;JVM_NanoTime&#125;,
-    &#123;&quot;arraycopy&quot;,     &quot;(&quot; OBJ &quot;I&quot; OBJ &quot;II)V&quot;, (void *)&amp;JVM_ArrayCopy&#125;,
+<p>和<code>System.currentTimeMillis()</code>一样，<code>System.nanoTime()</code>在这里只有声明，而没有具体实现，其实现由更底层的C/C++完成。<code>System.nanoTime()</code>对应到实现源码在System.c中：</p>
+<pre class="highlight"><code class="c"><span class="hljs-comment">/* Only register the performance-critical methods */</span><span class="hljs-type">static</span> JNINativeMethod methods[] = &#123;
+    &#123;<span class="hljs-string">&quot;currentTimeMillis&quot;</span>, <span class="hljs-string">&quot;()J&quot;</span>,              (<span class="hljs-type">void</span> *)&amp;JVM_CurrentTimeMillis&#125;,
+    &#123;<span class="hljs-string">&quot;nanoTime&quot;</span>,          <span class="hljs-string">&quot;()J&quot;</span>,              (<span class="hljs-type">void</span> *)&amp;JVM_NanoTime&#125;,
+    &#123;<span class="hljs-string">&quot;arraycopy&quot;</span>,     <span class="hljs-string">&quot;(&quot;</span> OBJ <span class="hljs-string">&quot;I&quot;</span> OBJ <span class="hljs-string">&quot;II)V&quot;</span>, (<span class="hljs-type">void</span> *)&amp;JVM_ArrayCopy&#125;,
 &#125;;
 </code></pre>
 <p>通过函数指针JVM_NanoTime找到其对应实现：</p>
-<pre><code class="c++">JVM_LEAF(jlong, JVM_NanoTime(JNIEnv *env, jclass ignored))
-  JVMWrapper(&quot;JVM_NanoTime&quot;);
-  return os::javaTimeNanos();      
+<pre class="highlight"><code class="c++"><span class="hljs-built_in">JVM_LEAF</span>(jlong, <span class="hljs-built_in">JVM_NanoTime</span>(JNIEnv *env, jclass ignored))
+  <span class="hljs-built_in">JVMWrapper</span>(<span class="hljs-string">&quot;JVM_NanoTime&quot;</span>);
+  <span class="hljs-keyword">return</span> os::<span class="hljs-built_in">javaTimeNanos</span>();      
 JVM_END
 </code></pre>
 <p>到这里我们发现，Java实现<code>System.nanoTime()</code>还是依赖不同OS的实现；接下来，我们就看看Linux和Window平台下的实现。</p>
-<h3 id="nanoTime在Linux下的实现"><a href="#nanoTime在Linux下的实现" class="headerlink" title="nanoTime在Linux下的实现"></a>nanoTime在Linux下的实现</h3><p>我们在os_linux.cpp文件中找到nanoTime的实现:</p>
-<pre><code class="c++">jlong os::javaTimeNanos() &#123;
-  // 先检查当前的OS是否支持monotonic clock
-  if (os::supports_monotonic_clock()) &#123;
-    // 支持monotonic clock
-    struct timespec tp;
-    // 调用Linux平台下的clock_gettime()获取事件信息
-    // 注意这里的传入类型是CLOCK_MONOTONIC
-    int status = Linux::clock_gettime(CLOCK_MONOTONIC, &amp;tp);
-    assert(status == 0, &quot;gettime error&quot;);
-    // 对clock_gettime()返回的时间信息，进行单位转换后返回
-    jlong result = jlong(tp.tv_sec) * (1000 * 1000 * 1000) + jlong(tp.tv_nsec);
-    return result;
-  &#125; else &#123;
-    // 不支持monotonic clock，则调用gettimeofday()获取时间信息
-    // 这部分代码和System.currentTimeMillis()在Linux平台实现
-    // 完全一样
+<h3 id="nanotime在linux下的实现"><a class="markdownIt-Anchor" href="#nanotime在linux下的实现"></a> nanoTime在Linux下的实现</h3>
+<p>我们在os_linux.cpp文件中找到nanoTime的实现:</p>
+<pre class="highlight"><code class="c++"><span class="hljs-function">jlong <span class="hljs-title">os::javaTimeNanos</span><span class="hljs-params">()</span> </span>&#123;
+  <span class="hljs-comment">// 先检查当前的OS是否支持monotonic clock</span>
+  <span class="hljs-keyword">if</span> (os::<span class="hljs-built_in">supports_monotonic_clock</span>()) &#123;
+    <span class="hljs-comment">// 支持monotonic clock</span>
+    <span class="hljs-keyword">struct</span> <span class="hljs-title class_">timespec</span> tp;
+    <span class="hljs-comment">// 调用Linux平台下的clock_gettime()获取事件信息</span>
+    <span class="hljs-comment">// 注意这里的传入类型是CLOCK_MONOTONIC</span>
+    <span class="hljs-type">int</span> status = Linux::<span class="hljs-built_in">clock_gettime</span>(CLOCK_MONOTONIC, &amp;tp);
+    <span class="hljs-built_in">assert</span>(status == <span class="hljs-number">0</span>, <span class="hljs-string">&quot;gettime error&quot;</span>);
+    <span class="hljs-comment">// 对clock_gettime()返回的时间信息，进行单位转换后返回</span>
+    jlong result = <span class="hljs-built_in">jlong</span>(tp.tv_sec) * (<span class="hljs-number">1000</span> * <span class="hljs-number">1000</span> * <span class="hljs-number">1000</span>) + <span class="hljs-built_in">jlong</span>(tp.tv_nsec);
+    <span class="hljs-keyword">return</span> result;
+  &#125; <span class="hljs-keyword">else</span> &#123;
+    <span class="hljs-comment">// 不支持monotonic clock，则调用gettimeofday()获取时间信息</span>
+    <span class="hljs-comment">// 这部分代码和System.currentTimeMillis()在Linux平台实现</span>
+    <span class="hljs-comment">// 完全一样</span>
     timeval time;
-    int status = gettimeofday(&amp;time, NULL);
-    assert(status != -1, &quot;linux error&quot;);
-    jlong usecs = jlong(time.tv_sec) * (1000 * 1000) + jlong(time.tv_usec);
-    return 1000 * usecs;
+    <span class="hljs-type">int</span> status = <span class="hljs-built_in">gettimeofday</span>(&amp;time, <span class="hljs-literal">NULL</span>);
+    <span class="hljs-built_in">assert</span>(status != <span class="hljs-number">-1</span>, <span class="hljs-string">&quot;linux error&quot;</span>);
+    jlong usecs = <span class="hljs-built_in">jlong</span>(time.tv_sec) * (<span class="hljs-number">1000</span> * <span class="hljs-number">1000</span>) + <span class="hljs-built_in">jlong</span>(time.tv_usec);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1000</span> * usecs;
   &#125;
 &#125;
 </code></pre>
 <p>通过上述代码和注释，我们可以对javaTimeNanos()有一个大致的了解，其本身也不复杂,其基本流程如下图:<img src="/2021/01/05/java_source_code/nanoTime/javaTimeNanos.png" class=""></p>
 <p>如果当前Linux并不支持monotonic clock,System.nanoTime()和System.currentTimeMillis()实际上就是等价的,但这种情况目前一般不会出现，可能会出现在一些非常古老的Linux版本上，并且如果当前系统不支持monotonic clock,Java也给出了警告：</p>
-<pre><code class="c++">// os_linux.cpp
-void os::Linux::clock_init() &#123;
-  // we do dlopen&#39;s in this particular order due to bug in linux
-  // dynamical loader (see 6348968) leading to crash on exit
-  void* handle = dlopen(&quot;librt.so.1&quot;, RTLD_LAZY);
-  if (handle == NULL) &#123;
-    handle = dlopen(&quot;librt.so&quot;, RTLD_LAZY);
+<pre class="highlight"><code class="c++"><span class="hljs-comment">// os_linux.cpp</span>
+<span class="hljs-type">void</span> os::Linux::<span class="hljs-built_in">clock_init</span>() &#123;
+  <span class="hljs-comment">// we do dlopen&#x27;s in this particular order due to bug in linux</span>
+  <span class="hljs-comment">// dynamical loader (see 6348968) leading to crash on exit</span>
+  <span class="hljs-type">void</span>* handle = <span class="hljs-built_in">dlopen</span>(<span class="hljs-string">&quot;librt.so.1&quot;</span>, RTLD_LAZY);
+  <span class="hljs-keyword">if</span> (handle == <span class="hljs-literal">NULL</span>) &#123;
+    handle = <span class="hljs-built_in">dlopen</span>(<span class="hljs-string">&quot;librt.so&quot;</span>, RTLD_LAZY);
   &#125;
 
-  if (handle) &#123;
-    int (*clock_getres_func)(clockid_t, struct timespec*) =
-           (int(*)(clockid_t, struct timespec*))dlsym(handle, &quot;clock_getres&quot;);
-    int (*clock_gettime_func)(clockid_t, struct timespec*) =
-           (int(*)(clockid_t, struct timespec*))dlsym(handle, &quot;clock_gettime&quot;);
-    if (clock_getres_func &amp;&amp; clock_gettime_func) &#123;
-      // See if monotonic clock is supported by the kernel. Note that some
-      // early implementations simply return kernel jiffies (updated every
-      // 1/100 or 1/1000 second). It would be bad to use such a low res clock
-      // for nano time (though the monotonic property is still nice to have).
-      // It&#39;s fixed in newer kernels, however clock_getres() still returns
-      // 1/HZ. We check if clock_getres() works, but will ignore its reported
-      // resolution for now. Hopefully as people move to new kernels, this
-      // won&#39;t be a problem.
-      struct timespec res;
-      struct timespec tp;
-      if (clock_getres_func (CLOCK_MONOTONIC, &amp;res) == 0 &amp;&amp;
-          clock_gettime_func(CLOCK_MONOTONIC, &amp;tp)  == 0) &#123;
-        // yes, monotonic clock is supported
+  <span class="hljs-keyword">if</span> (handle) &#123;
+    <span class="hljs-built_in">int</span> (*clock_getres_func)(<span class="hljs-type">clockid_t</span>, <span class="hljs-keyword">struct</span> timespec*) =
+           (<span class="hljs-built_in">int</span>(*)(<span class="hljs-type">clockid_t</span>, <span class="hljs-keyword">struct</span> timespec*))<span class="hljs-built_in">dlsym</span>(handle, <span class="hljs-string">&quot;clock_getres&quot;</span>);
+    <span class="hljs-built_in">int</span> (*clock_gettime_func)(<span class="hljs-type">clockid_t</span>, <span class="hljs-keyword">struct</span> timespec*) =
+           (<span class="hljs-built_in">int</span>(*)(<span class="hljs-type">clockid_t</span>, <span class="hljs-keyword">struct</span> timespec*))<span class="hljs-built_in">dlsym</span>(handle, <span class="hljs-string">&quot;clock_gettime&quot;</span>);
+    <span class="hljs-keyword">if</span> (clock_getres_func &amp;&amp; clock_gettime_func) &#123;
+      <span class="hljs-comment">// See if monotonic clock is supported by the kernel. Note that some</span>
+      <span class="hljs-comment">// early implementations simply return kernel jiffies (updated every</span>
+      <span class="hljs-comment">// 1/100 or 1/1000 second). It would be bad to use such a low res clock</span>
+      <span class="hljs-comment">// for nano time (though the monotonic property is still nice to have).</span>
+      <span class="hljs-comment">// It&#x27;s fixed in newer kernels, however clock_getres() still returns</span>
+      <span class="hljs-comment">// 1/HZ. We check if clock_getres() works, but will ignore its reported</span>
+      <span class="hljs-comment">// resolution for now. Hopefully as people move to new kernels, this</span>
+      <span class="hljs-comment">// won&#x27;t be a problem.</span>
+      <span class="hljs-keyword">struct</span> <span class="hljs-title class_">timespec</span> res;
+      <span class="hljs-keyword">struct</span> <span class="hljs-title class_">timespec</span> tp;
+      <span class="hljs-keyword">if</span> (<span class="hljs-built_in">clock_getres_func</span> (CLOCK_MONOTONIC, &amp;res) == <span class="hljs-number">0</span> &amp;&amp;
+          <span class="hljs-built_in">clock_gettime_func</span>(CLOCK_MONOTONIC, &amp;tp)  == <span class="hljs-number">0</span>) &#123;
+        <span class="hljs-comment">// yes, monotonic clock is supported</span>
         _clock_gettime = clock_gettime_func;
-        return;
-      &#125; else &#123;
-        // close librt if there is no monotonic clock
-        dlclose(handle);
+        <span class="hljs-keyword">return</span>;
+      &#125; <span class="hljs-keyword">else</span> &#123;
+        <span class="hljs-comment">// close librt if there is no monotonic clock</span>
+        <span class="hljs-built_in">dlclose</span>(handle);
       &#125;
     &#125;
   &#125;
-  warning(&quot;No monotonic clock was available - timed services may &quot; \
-          &quot;be adversely affected if the time-of-day clock changes&quot;);
+  <span class="hljs-built_in">warning</span>(<span class="hljs-string">&quot;No monotonic clock was available - timed services may &quot;</span> \
+          <span class="hljs-string">&quot;be adversely affected if the time-of-day clock changes&quot;</span>);
 &#125;
 </code></pre>
 <p>在初始化时，会检测Linux内核是否支持<code>clock_getres</code>和<code>clock_gettime</code>,如果不支持,Java会给出警告：</p>
 <blockquote><p>No monotonic clock was available - timed services may be adversely affected if the time-of-day clock changes.</p>
 <footer><strong>os_linux.cpp</strong><cite>lock_init()</cite></footer></blockquote>
-
 <p>关于<code>clock_getres</code>和<code>clock_gettime</code>的介绍请戳<a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/clock_gettime.2.html">这里</a>，特别注意里面关于时间类型CLOCK_MONOTONIC的描述：</p>
 <blockquote><p>A nonsettable system-wide clock that represents monotonic time since—as described by POSIX—“some unspecified point in the past”.  <strong>On Linux, that point corresponds to the number of seconds that the system has been running since it was booted.</strong></p>
 <p>The CLOCK_MONOTONIC clock is not affected by discontinuous jumps in the system time (e.g., if the system administrator manually changes the clock), but is affected by the incremental adjustments performed by adjtime(3) and NTP.  This clock does not count time that the system is suspended.  All CLOCK_MONOTONIC variants guarantee that the time returned by consecutive calls will not go backwards, but successive calls may—depending on the architecture—return identical (not-increased) time values.</p>
 <footer><strong>Linux clock_gettime,</strong><cite><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/clock_gettime.2.html">man7.org/linux/man-pages/man2/clock_gettime.2.html</a></cite></footer></blockquote>
-
 <p>由上述可知，以类型ClOCK_MONOTONIC获取时间信息时：</p>
 <ul>
 <li>在Linux下和系统的启动时间点相关；</li>
 <li>手动修改本地时间，并不会影响clock_gettime()获取的clock；但是会受到adjtime和NTP的影响；</li>
 <li>并不会计算系统暂停的时间流逝。</li>
 </ul>
-<h3 id="nanoTime在Windows下的实现"><a href="#nanoTime在Windows下的实现" class="headerlink" title="nanoTime在Windows下的实现"></a>nanoTime在Windows下的实现</h3><p>在os_windows.cpp中找到javaTimeNanos()的实现：</p>
-<pre><code class="c++">jlong os::javaTimeNanos() &#123;
+<h3 id="nanotime在windows下的实现"><a class="markdownIt-Anchor" href="#nanotime在windows下的实现"></a> nanoTime在Windows下的实现</h3>
+<p>在os_windows.cpp中找到javaTimeNanos()的实现：</p>
+<pre class="highlight"><code class="c++"><span class="hljs-function">jlong <span class="hljs-title">os::javaTimeNanos</span><span class="hljs-params">()</span> </span>&#123;
     LARGE_INTEGER current_count;
-      // Windows提供的函数：查询当前的计数
-    QueryPerformanceCounter(&amp;current_count);
-    double current = as_long(current_count);
-    // 获取频率
-    double freq = performance_frequency;
-      // current除以freq才是对应的时间信息
-    // 将时间信息转换成纳秒单位
+  	<span class="hljs-comment">// Windows提供的函数：查询当前的计数</span>
+    <span class="hljs-built_in">QueryPerformanceCounter</span>(&amp;current_count);
+    <span class="hljs-type">double</span> current = <span class="hljs-built_in">as_long</span>(current_count);
+    <span class="hljs-comment">// 获取频率</span>
+    <span class="hljs-type">double</span> freq = performance_frequency;
+  	<span class="hljs-comment">// current除以freq才是对应的时间信息</span>
+    <span class="hljs-comment">// 将时间信息转换成纳秒单位</span>
     jlong time = (jlong)((current/freq) * NANOSECS_PER_SEC);
-    return time;
+    <span class="hljs-keyword">return</span> time;
 &#125;
 </code></pre>
 <p>由上述代码，我们推测Windows获取高精度的时间信息是通过一个单调递增的计数器，计数器的增长就意味着时间的流逝；那么计数器的增长必然是有一个频率的，也就是说多长时间执行一次计数器增长操作。接下来我们就看看：</p>
-<pre><code class="c++">// os_windows.cpp
-static jlong initial_performance_count;
-static jlong performance_frequency;
-void os::win32::initialize_performance_counter() &#123;
+<pre class="highlight"><code class="c++"><span class="hljs-comment">// os_windows.cpp</span>
+<span class="hljs-type">static</span> jlong initial_performance_count;
+<span class="hljs-type">static</span> jlong performance_frequency;
+<span class="hljs-type">void</span> os::win32::<span class="hljs-built_in">initialize_performance_counter</span>() &#123;
   LARGE_INTEGER count;
-  // Windows提供的函数：查询更新计数的频率
-  QueryPerformanceFrequency(&amp;count);
-  performance_frequency = as_long(count);
-  // 查询当前的计数
-  QueryPerformanceCounter(&amp;count);
-  // 记录起始的计数
-  initial_performance_count = as_long(count);
+  <span class="hljs-comment">// Windows提供的函数：查询更新计数的频率</span>
+  <span class="hljs-built_in">QueryPerformanceFrequency</span>(&amp;count);
+  performance_frequency = <span class="hljs-built_in">as_long</span>(count);
+  <span class="hljs-comment">// 查询当前的计数</span>
+  <span class="hljs-built_in">QueryPerformanceCounter</span>(&amp;count);
+  <span class="hljs-comment">// 记录起始的计数</span>
+  initial_performance_count = <span class="hljs-built_in">as_long</span>(count);
 &#125;
-// 初始化系统信息
-void os::win32::initialize_system_info() &#123;
-  /**
+<span class="hljs-comment">// 初始化系统信息</span>
+<span class="hljs-type">void</span> os::win32::<span class="hljs-built_in">initialize_system_info</span>() &#123;
+  <span class="hljs-comment">/**
    * 。。。 省略
-   */
-  initialize_performance_counter();
+   */</span>
+  <span class="hljs-built_in">initialize_performance_counter</span>();
 &#125;
 </code></pre>
 <p>上述初始化操作，印证了我们的推测；这也意味着在Windows平台下QueryPerformanceFrequency()返回的信息——这个频率决定了我们获取时间的准确度。</p>
 <p>Windows关于QueryPerformanceFrequency()的解释：</p>
 <blockquote><p>Retrieves the frequency of the performance counter. <strong>The frequency of the performance counter is fixed at system boot and is consistent across all processors.</strong> Therefore, the frequency need only be queried upon application initialization, and the result can be cached.</p>
 <footer><strong>Windows API,</strong><cite><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancefrequency">docs.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancefrequency</a></cite></footer></blockquote>
-
 <p>Windows关于QueryPerformanceCounter()的解释：</p>
 <blockquote><p>Retrieves the current value of the performance counter, which is a high resolution (&lt;1us) time stamp that can be used for time-interval measurements.</p>
 <footer><strong>Windows API,</strong><cite><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancecounter">docs.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancecounter</a></cite></footer></blockquote>
-
 <p>根据上述信息，我们可以知道在Windows平台下，这个高精度时间信息同样和系统启动时间相关。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过深入理解System.nanoTime()在Linux平台和Windows平台的不同实现代码，我们可以发现不论是Linux还是Windows都是通过系统启动时间点来获取我们需要的高精度单调递增的时间信息。通过System.nanoTime()我们获取了以纳秒为单位的高精度时间信息（记住，其准确度不一定是1纳秒），但同时我们也会付出更大的性能代价（比起System.currentTimeMillis()来说）。最后，也有其他方式获取精度更高的时间信息（CPU时钟），当然性能代价更大，这就可能需要依赖具体某个平台的实现了，这里只关心Java源码的实现，就不继续深入探讨了。</p>
-<h2 id="备注"><a href="#备注" class="headerlink" title="备注"></a>备注</h2><p>0.以上所说java的版本均为java11，实现java本身的源码来自OpenJdk 11。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>通过深入理解System.nanoTime()在Linux平台和Windows平台的不同实现代码，我们可以发现不论是Linux还是Windows都是通过系统启动时间点来获取我们需要的高精度单调递增的时间信息。通过System.nanoTime()我们获取了以纳秒为单位的高精度时间信息（记住，其准确度不一定是1纳秒），但同时我们也会付出更大的性能代价（比起System.currentTimeMillis()来说）。最后，也有其他方式获取精度更高的时间信息（CPU时钟），当然性能代价更大，这就可能需要依赖具体某个平台的实现了，这里只关心Java源码的实现，就不继续深入探讨了。</p>
+<h2 id="备注"><a class="markdownIt-Anchor" href="#备注"></a> 备注</h2>
+<p>0.以上所说java的版本均为java11，实现java本身的源码来自OpenJdk 11。</p>
 <p>1.OS是operater system，即操作系统的缩写。</p>
-<p>2.System.c位于Java源码目录下的java.base&#x2F;share&#x2F;native&#x2F;libjava&#x2F;System.c。</p>
-<p>3.探究java方法的实现，目的是理解其原理做到知其然知其所以然，但并不会陷入过多的实现细节，比如c&#x2F;C++里的宏定义等。</p>
+<p>2.System.c位于Java源码目录下的java.base/share/native/libjava/System.c。</p>
+<p>3.探究java方法的实现，目的是理解其原理做到知其然知其所以然，但并不会陷入过多的实现细节，比如c/C++里的宏定义等。</p>
 <p>4.NTP指Network Time Protocol，即网络时间协议。</p>
 
     </div>

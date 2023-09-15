@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -96,41 +100,43 @@
 
     <div class="post-md">
         
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#switch%E7%9A%84%E5%AD%A4%E7%8B%AC"><span class="post-toc-text">switch的孤独</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88switch%E6%9B%B4%E9%AB%98%E6%95%88%EF%BC%9F"><span class="post-toc-text">为什么switch更高效？</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#switch%E5%90%8D%E8%A8%80%EF%BC%9A%E2%80%9C%E6%88%91%E4%B8%8D%E6%98%AF%E4%B8%87%E8%83%BD%E7%9A%84%E2%80%9D"><span class="post-toc-text">switch名言：“我不是万能的”</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#switch%E7%9A%84%E8%B5%A0%E8%AF%AD"><span class="post-toc-text">switch的赠语</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#switch%E7%9A%84%E5%AD%A4%E7%8B%AC"><span class="post-toc-text"> switch的孤独</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88switch%E6%9B%B4%E9%AB%98%E6%95%88"><span class="post-toc-text"> 为什么switch更高效？</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#switch%E5%90%8D%E8%A8%80%E6%88%91%E4%B8%8D%E6%98%AF%E4%B8%87%E8%83%BD%E7%9A%84"><span class="post-toc-text"> switch名言：“我不是万能的”</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#switch%E7%9A%84%E8%B5%A0%E8%AF%AD"><span class="post-toc-text"> switch的赠语</span></a></li></ol>
         
-        <h1 id="switch的孤独"><a href="#switch的孤独" class="headerlink" title="switch的孤独"></a>switch的孤独</h1><p>“我还以为你从来都不会选我呢？”，switch孤独地呢喃着。 在C语言中，关于条件判定、分支执行，我们使用的最多的应该就是<code>if else</code>语句了吧；是不是都快忘记<strong>switch</strong>，switch同样地可以进行条件判定和分支执行，甚至很多时候，switch让代码更加灵活和高效。</p>
-<h1 id="为什么switch更高效？"><a href="#为什么switch更高效？" class="headerlink" title="为什么switch更高效？"></a>为什么switch更高效？</h1><p>switch会在可能时，采用<strong>跳转表</strong>的方式来实现代码的跳转；这比起写一大堆的<code>if else</code>的效率来得高得多。“talk is cheap，show me the code”，让我们直接看例子：</p>
-<pre><code class="c">void func(int x) &#123;
-    switch (x) &#123;
-        case 1001:
-            x = 1001;
-            break;
-        case 1021:
-            x = 1021;
-            break;
-        case 1031:
-            x = 1031;
-        case 1041:
-            x = 1041;
-            break;
-        case 1051:
-            x = 1051;
-            break;
+        <h1 id="switch的孤独"><a class="markdownIt-Anchor" href="#switch的孤独"></a> switch的孤独</h1>
+<p>“我还以为你从来都不会选我呢？”，switch孤独地呢喃着。 在C语言中，关于条件判定、分支执行，我们使用的最多的应该就是<code>if else</code>语句了吧；是不是都快忘记<strong>switch</strong>，switch同样地可以进行条件判定和分支执行，甚至很多时候，switch让代码更加灵活和高效。</p>
+<h1 id="为什么switch更高效"><a class="markdownIt-Anchor" href="#为什么switch更高效"></a> 为什么switch更高效？</h1>
+<p>switch会在可能时，采用<strong>跳转表</strong>的方式来实现代码的跳转；这比起写一大堆的<code>if else</code>的效率来得高得多。“talk is cheap，show me the code”，让我们直接看例子：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">void</span> <span class="hljs-title function_">func</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span> &#123;
+    <span class="hljs-keyword">switch</span> (x) &#123;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">1001</span>:
+            x = <span class="hljs-number">1001</span>;
+            <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">1021</span>:
+            x = <span class="hljs-number">1021</span>;
+            <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">1031</span>:
+            x = <span class="hljs-number">1031</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">1041</span>:
+            x = <span class="hljs-number">1041</span>;
+            <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">1051</span>:
+            x = <span class="hljs-number">1051</span>;
+            <span class="hljs-keyword">break</span>;
     &#125;
 &#125;
 </code></pre>
 <p>如果func()用<code>if else</code>来进行代码跳转，看起来大概是这样子：</p>
-<pre><code class="c">void func(int x) &#123;
-    if (x == 1001) &#123;
-        x = 1001
-    &#125; else if (x == 1021) &#123;
-        x == 1021
-    &#125; else if (x == 1031  x == 1041) &#123;
-        x = 1041;
-    &#125; else if (x == 1051) &#123;
-        x = 1051;
-    &#125; else &#123;
-    &#125; // do nothing
+<pre class="highlight"><code class="c"><span class="hljs-type">void</span> <span class="hljs-title function_">func</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span> &#123;
+    <span class="hljs-keyword">if</span> (x == <span class="hljs-number">1001</span>) &#123;
+        x = <span class="hljs-number">1001</span>
+    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (x == <span class="hljs-number">1021</span>) &#123;
+        x == <span class="hljs-number">1021</span>
+    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (x == <span class="hljs-number">1031</span>  x == <span class="hljs-number">1041</span>) &#123;
+        x = <span class="hljs-number">1041</span>;
+    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (x == <span class="hljs-number">1051</span>) &#123;
+        x = <span class="hljs-number">1051</span>;
+    &#125; <span class="hljs-keyword">else</span> &#123;
+    &#125; <span class="hljs-comment">// do nothing</span>
 &#125;
 </code></pre>
 <p>如果x等于1051的话，采用<code>if else</code>需要进行4次跳转才能执行<code>x = 1051;</code>；而采用switch则只需要2次判断，即可（分支数量不会改变switch的判断次数，而随着分支数量的增加<code>if else</code>的执行效率就会严重下降）:</p>
@@ -139,46 +145,46 @@
 <li>如果x等于1051，那么switch会直接跳转到<code>case 1051</code>处执行代码。同样地x等于1001，switch会直接跳转到<code>case 1001</code>处执行代码，依次类推。</li>
 </ul>
 <p>如果我们将1001到1051之间的所有分支填满，此时<code>if else</code>语句的数量是异常多的，并且当x等于1051时，func()需要进行51次左右的判断；但是switch仍然只需要2次判断。此时，<code>switch</code>的执行效率和<code>if else</code>的执行效率一比较，高下立判。那么，switch是如何做到如此高效的进行代码跳转的呢？答案是<strong>跳转表</strong>。下面用一段伪代码来表示：</p>
-<pre><code class="c">void func(int x) &#123;
-    int jump_table[51];
-    jump_table[1001-1001] = 代码case 1001的地址
-    jump_table[1002-1001] = 跳出switch
+<pre class="highlight"><code class="c"><span class="hljs-type">void</span> <span class="hljs-title function_">func</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span> &#123;
+    <span class="hljs-type">int</span> jump_table[<span class="hljs-number">51</span>];
+    jump_table[<span class="hljs-number">1001</span><span class="hljs-number">-1001</span>] = 代码<span class="hljs-keyword">case</span> <span class="hljs-number">1001</span>的地址
+    jump_table[<span class="hljs-number">1002</span><span class="hljs-number">-1001</span>] = 跳出<span class="hljs-keyword">switch</span>
     ... 
-    jump_table[1021-1001] = 代码case 1021的地址
-    jump_table[1022-1001] = 跳出switch
+    jump_table[<span class="hljs-number">1021</span><span class="hljs-number">-1001</span>] = 代码<span class="hljs-keyword">case</span> <span class="hljs-number">1021</span>的地址
+    jump_table[<span class="hljs-number">1022</span><span class="hljs-number">-1001</span>] = 跳出<span class="hljs-keyword">switch</span>
     ...
-    jump_table[1031-1001] = 代码case 1031的地址
-    jump_table[1032-1001] = 跳出switch
+    jump_table[<span class="hljs-number">1031</span><span class="hljs-number">-1001</span>] = 代码<span class="hljs-keyword">case</span> <span class="hljs-number">1031</span>的地址
+    jump_table[<span class="hljs-number">1032</span><span class="hljs-number">-1001</span>] = 跳出<span class="hljs-keyword">switch</span>
     ...
-    jump_table[1041-1001] = 代码case 1041的地址
-    jump_table[1042-1001] = 跳出switch
+    jump_table[<span class="hljs-number">1041</span><span class="hljs-number">-1001</span>] = 代码<span class="hljs-keyword">case</span> <span class="hljs-number">1041</span>的地址
+    jump_table[<span class="hljs-number">1042</span><span class="hljs-number">-1001</span>] = 跳出<span class="hljs-keyword">switch</span>
     ... 
-    jump_table[1051-1001] = 代码case 1051的地址
+    jump_table[<span class="hljs-number">1051</span><span class="hljs-number">-1001</span>] = 代码<span class="hljs-keyword">case</span> <span class="hljs-number">1051</span>的地址
 
-    跳转表会尝试对case的值进行操作，将其值对应到
+    跳转表会尝试对<span class="hljs-keyword">case</span>的值进行操作，将其值对应到
     跳转表的下标；下标对应的就是应该执行的代码地址；
     以此达到快速执行代码跳转的目的
 
-    switch (x) &#123;
-        case 1001:
-            x = 1001;
-            break;
-        case 1021:
-            x = 1021;
-            break;
-        case 1031:
-            x = 1031;
-        case 1041:
-            x = 1041;
-            break;
-        case 1051:
-            x = 1051;
-            break;
+    <span class="hljs-keyword">switch</span> (x) &#123;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">1001</span>:
+            x = <span class="hljs-number">1001</span>;
+            <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">1021</span>:
+            x = <span class="hljs-number">1021</span>;
+            <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">1031</span>:
+            x = <span class="hljs-number">1031</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">1041</span>:
+            x = <span class="hljs-number">1041</span>;
+            <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">1051</span>:
+            x = <span class="hljs-number">1051</span>;
+            <span class="hljs-keyword">break</span>;
     &#125;
 &#125;
 </code></pre>
 <p>switch通过对case的值进行计算，将所有case的代码执行地址映射到一个数组中去，这样就可以根据x的值直接进行代码跳转了，非常灵活而高效。那么，GCC真的是通过上述伪代码类似的跳转表来实现switch语句的吗？在linux下对使用switch的func()进行编译（只编译成汇编代码，执行命令gcc -S func.c，注意某些低版本的gcc不会用跳转表实现switch，笔者自测gcc4.4版本以上会使用跳转表实现switch，笔者使用macbook pro中的gcc 4.2版本并未使用跳转表实现switch）:</p>
-<pre><code class="assembly">    .file   &quot;func.c&quot;
+<pre class="highlight"><code class="assembly">    .file   &quot;func.c&quot;
     .text
     .globl  func
     .type   func, @function
@@ -286,30 +292,32 @@ func:
     .section    .note.GNU-stack,&quot;&quot;,@progbits
 </code></pre>
 <p>gcc编译后的汇编代码，非常清晰，其中的<code>.L4</code>就是跳转表了，<code>.L4</code>中出现最多的就是<code>.L9-.L4</code>，这就是未出现在switch中的case，默认都是跳出switch语句。</p>
-<h1 id="switch名言：“我不是万能的”"><a href="#switch名言：“我不是万能的”" class="headerlink" title="switch名言：“我不是万能的”"></a>switch名言：“我不是万能的”</h1><p>“亲爱的程序员，我不是万能的。” 由上文可以，在跳转分支较多时，switch比起<code>if else</code>是有很大优势的，但是switch也不是万能的。请你思考一下： 使用跳转表固然大幅提升了代码跳转的效率，但是使用跳转表本身就是一种消耗。如果我的case范围差距非常大，那我的跳转表岂不是也会非常大？如果我的func()是这样的：</p>
-<pre><code class="c">void func(int x) &#123;
-    switch (x) &#123;
-        case 1001:
-            x = 1001;
-            break;
-        case 1021:
-            x = 1021;
-            break;
-        case 1031:
-            x = 1031;
-        case 1041:
-            x = 1041;
-            break;
-        case 2000:
-            x = 2000;
-        case 3000:
-            x = 3000;
-            break;
+<h1 id="switch名言我不是万能的"><a class="markdownIt-Anchor" href="#switch名言我不是万能的"></a> switch名言：“我不是万能的”</h1>
+<p>“亲爱的程序员，我不是万能的。” 由上文可以，在跳转分支较多时，switch比起<code>if else</code>是有很大优势的，但是switch也不是万能的。请你思考一下： 使用跳转表固然大幅提升了代码跳转的效率，但是使用跳转表本身就是一种消耗。如果我的case范围差距非常大，那我的跳转表岂不是也会非常大？如果我的func()是这样的：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">void</span> <span class="hljs-title function_">func</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span> &#123;
+    <span class="hljs-keyword">switch</span> (x) &#123;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">1001</span>:
+            x = <span class="hljs-number">1001</span>;
+            <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">1021</span>:
+            x = <span class="hljs-number">1021</span>;
+            <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">1031</span>:
+            x = <span class="hljs-number">1031</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">1041</span>:
+            x = <span class="hljs-number">1041</span>;
+            <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">2000</span>:
+            x = <span class="hljs-number">2000</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">3000</span>:
+            x = <span class="hljs-number">3000</span>;
+            <span class="hljs-keyword">break</span>;
     &#125;
 &#125;
 </code></pre>
 <p>那我的跳转表岂不是要容纳3000个执行地址？这样岂不是会得不偿失。请你放心，51已经是switch的极限了（针对笔者当前测试的数据而言，这也是为什么上述例子中的case最小值是1001，case最大值是1051），一旦计算后的case范围大于51，switch就会放弃使用<strong>跳转表</strong>，转而使用普通的条件分支判断（就像<code>if else</code>那样）。你可以将<code>case 51</code>中的51改为52，再使用gcc进行编译，查看汇编代码：跳转表就不见了。</p>
-<h1 id="switch的赠语"><a href="#switch的赠语" class="headerlink" title="switch的赠语"></a>switch的赠语</h1><p>“亲爱的程序员，我在大多数情况下都能比<code>if else</code>更加高效和灵活哦，请不要忘记我:-)”。</p>
+<h1 id="switch的赠语"><a class="markdownIt-Anchor" href="#switch的赠语"></a> switch的赠语</h1>
+<p>“亲爱的程序员，我在大多数情况下都能比<code>if else</code>更加高效和灵活哦，请不要忘记我:-)”。</p>
 
     </div>
 

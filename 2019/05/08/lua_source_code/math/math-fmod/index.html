@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -99,48 +103,48 @@
             
         
         <p><strong>math_fmod</strong>是lua库函数<strong>math.fmod</strong>的具体实现，<strong>math_fmod</strong>的声明如下：</p>
-<pre><code class="c">static int math_fmod (lua_State *L);
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_fmod</span> <span class="hljs-params">(lua_State *L)</span>;
 </code></pre>
 <p><strong>math_fmod</strong>接受两个参数，命名这两个参数为x、y，<strong>math_fmod</strong>求x除以y的余数。</p>
-<hr>
+<hr />
 <p><strong>math_fmod</strong>的实现：</p>
-<pre><code class="c">static int math_fmod (lua_State *L) &#123;
-    if (lua_isinteger(L, 1) &amp;&amp; lua_isinteger(L, 2)) &#123;
-        lua_Integer d = lua_tointeger(L, 2);
-        if ((lua_Unsigned)d + 1u &lt;= 1u) &#123;  /* special cases: -1 or 0 */
-            luaL_argcheck(L, d != 0, 2, &quot;zero&quot;);
-            lua_pushinteger(L, 0);  /* avoid overflow with 0x80000... / -1 */
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_fmod</span> <span class="hljs-params">(lua_State *L)</span> &#123;
+    <span class="hljs-keyword">if</span> (lua_isinteger(L, <span class="hljs-number">1</span>) &amp;&amp; lua_isinteger(L, <span class="hljs-number">2</span>)) &#123;
+        lua_Integer d = lua_tointeger(L, <span class="hljs-number">2</span>);
+        <span class="hljs-keyword">if</span> ((lua_Unsigned)d + <span class="hljs-number">1u</span> &lt;= <span class="hljs-number">1u</span>) &#123;  <span class="hljs-comment">/* special cases: -1 or 0 */</span>
+            luaL_argcheck(L, d != <span class="hljs-number">0</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&quot;zero&quot;</span>);
+            lua_pushinteger(L, <span class="hljs-number">0</span>);  <span class="hljs-comment">/* avoid overflow with 0x80000... / -1 */</span>
         &#125;
-        else
-            lua_pushinteger(L, lua_tointeger(L, 1) % d);
+        <span class="hljs-keyword">else</span>
+            lua_pushinteger(L, lua_tointeger(L, <span class="hljs-number">1</span>) % d);
     &#125;
-    else
-        lua_pushnumber(L, l_mathop(fmod)(luaL_checknumber(L, 1),
-                    luaL_checknumber(L, 2)));
-    return 1;
+    <span class="hljs-keyword">else</span>
+        lua_pushnumber(L, l_mathop(<span class="hljs-built_in">fmod</span>)(luaL_checknumber(L, <span class="hljs-number">1</span>),
+                    luaL_checknumber(L, <span class="hljs-number">2</span>)));
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
-<p><strong>math_fmod</strong>首先判断传入参数的类型。如果两个参数都是整数类型，则单独处理求余；否则调用C语言的库函数fmod对浮点数进行余数求解。 当参数x、y都是整数时，lua对第二个参数即y做了安全判断，避免算术运算的异常。<code>luaL_argcheck(L, d != 0, 2, &quot;zero&quot;);</code>对y等于0做了检查；当y等于-1时，如果x等于<strong>0x8000…<strong>（LUA_MININTEGER），而</strong>0x8000…<strong>除以</strong>-1</strong>的结果是无法用当前的整数表示的（因为这个值实际等于<strong>LUA_MAXINTEGER+1</strong>）；为避免溢出，<code>lua_pushinteger(L, 0);</code>对此情况做了一个简单处理：直接将余数设置为0。 当参数x、y不都是整数时，lua先调用<strong>luaL_checknumber</strong>尝试将其转换成浮点数；转换成功后，调用C标准库方法<strong>fmod</strong>求x除以y的余数。注意，求得的余数结果可能并不是你想要的，因为浮点数是存在误差的。看一个例子：</p>
-<pre><code class="c">// test.c
-#include &lt;stdio.h&gt;      
-#include &lt;math.h&gt;       
-int main ()
+<p><strong>math_fmod</strong>首先判断传入参数的类型。如果两个参数都是整数类型，则单独处理求余；否则调用C语言的库函数fmod对浮点数进行余数求解。 当参数x、y都是整数时，lua对第二个参数即y做了安全判断，避免算术运算的异常。<code>luaL_argcheck(L, d != 0, 2, &quot;zero&quot;);</code>对y等于0做了检查；当y等于-1时，如果x等于<strong>0x8000…</strong>（LUA_MININTEGER），而<strong>0x8000…<strong>除以</strong>-1</strong>的结果是无法用当前的整数表示的（因为这个值实际等于<strong>LUA_MAXINTEGER+1</strong>）；为避免溢出，<code>lua_pushinteger(L, 0);</code>对此情况做了一个简单处理：直接将余数设置为0。 当参数x、y不都是整数时，lua先调用<strong>luaL_checknumber</strong>尝试将其转换成浮点数；转换成功后，调用C标准库方法<strong>fmod</strong>求x除以y的余数。注意，求得的余数结果可能并不是你想要的，因为浮点数是存在误差的。看一个例子：</p>
+<pre class="highlight"><code class="c"><span class="hljs-comment">// test.c</span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span>      </span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;math.h&gt;</span>       </span>
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span> <span class="hljs-params">()</span>
 &#123;
-    printf( &quot;%lf\n%lf\n&quot;, 0.6 / 0.2, fmod(0.6,0.2));
-    return 0;
+    <span class="hljs-built_in">printf</span>( <span class="hljs-string">&quot;%lf\n%lf\n&quot;</span>, <span class="hljs-number">0.6</span> / <span class="hljs-number">0.2</span>, <span class="hljs-built_in">fmod</span>(<span class="hljs-number">0.6</span>,<span class="hljs-number">0.2</span>));
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
-<p>这里顺便提醒一下：如果你是用gcc编译上述代码，记得在编译时加上参数<strong>-lm</strong>，表示链接数学库，否则gcc可能会报告<strong>fmod</strong>是未定义的引用。完整的编译并执行程序命令可参考：</p>
-<pre><code class="bash">gcc -lm -o test test.c &amp;&amp; ./test
+<p>这里顺便提醒一下：如果你是用gcc编译上述代码，记得在编译时加上参数**-lm**，表示链接数学库，否则gcc可能会报告<strong>fmod</strong>是未定义的引用。完整的编译并执行程序命令可参考：</p>
+<pre class="highlight"><code class="bash">gcc -lm -o <span class="hljs-built_in">test</span> test.c &amp;&amp; ./test
 </code></pre>
 <p>在我的PC上，<strong>fmod(0.6,0.2)<strong>的打印结果是</strong>0.2</strong>，这个结果明显是错误的，因为0.6除以0.2能够整数，其商为3；那为什么**fmod(0.6,0.2)**的结果是0.2呢？根本原因就是浮点数是有精度限制的，0.6除以0.2理应等于3，但是在计算机中的结果可能并不是这样；对test.c代码进行修改：</p>
-<pre><code class="c">//test1.c
-#include &lt;stdio.h&gt;      
-#include &lt;math.h&gt;       
-int main ()
+<pre class="highlight"><code class="c"><span class="hljs-comment">//test1.c</span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span>      </span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;math.h&gt;</span>       </span>
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span> <span class="hljs-params">()</span>
 &#123;
-    printf( &quot;%0.17lf\n%0.17f\n&quot;, 0.6 / 0.2, fmod(0.6,0.2));
-    return 0;
+    <span class="hljs-built_in">printf</span>( <span class="hljs-string">&quot;%0.17lf\n%0.17f\n&quot;</span>, <span class="hljs-number">0.6</span> / <span class="hljs-number">0.2</span>, <span class="hljs-built_in">fmod</span>(<span class="hljs-number">0.6</span>,<span class="hljs-number">0.2</span>));
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
 <p>运行此程序，得到打印结果： <strong>2.99999999999999956</strong> <strong>0.19999999999999996</strong> 0.6除以0.2实际等于<strong>2.99999999999999956</strong>（近似于<strong>3</strong>），这就导致了0.6除以0.2的余数是<strong>0.19999999999999996</strong>（近似于<strong>0.2</strong>）。所以求两个浮点数的余数时，要特别小心，实际的结果和你预期的结果可能是南辕北辙的。</p>

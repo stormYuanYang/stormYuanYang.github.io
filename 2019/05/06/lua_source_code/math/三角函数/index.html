@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -96,50 +100,57 @@
 
     <div class="post-md">
         
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%BA%8F%E8%A8%80"><span class="post-toc-text">序言</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-sin"><span class="post-toc-text">math_sin</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-cos"><span class="post-toc-text">math_cos</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-tan"><span class="post-toc-text">math_tan</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-asin"><span class="post-toc-text">math_asin</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-acos"><span class="post-toc-text">math_acos</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-atan"><span class="post-toc-text">math_atan</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%BA%8F%E8%A8%80"><span class="post-toc-text"> 序言</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math_sin"><span class="post-toc-text"> math_sin</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math_cos"><span class="post-toc-text"> math_cos</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math_tan"><span class="post-toc-text"> math_tan</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math_asin"><span class="post-toc-text"> math_asin</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math_acos"><span class="post-toc-text"> math_acos</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math_atan"><span class="post-toc-text"> math_atan</span></a></li></ol>
         
-        <h1 id="序言"><a href="#序言" class="headerlink" title="序言"></a>序言</h1><p>此文并未按照一个函数一篇blog的方式进行写作；原因很简单，接下来要介绍到的几个函数都是三角函数，并且都只是对C标准库中的三角函数的一次调用，并未有其他任何处理，十分清晰明了。</p>
-<h1 id="math-sin"><a href="#math-sin" class="headerlink" title="math_sin"></a>math_sin</h1><p>math_sin是lua函数math.sin的具体实现，其目的是返回正弦值。 math_sin的实现：</p>
-<pre><code class="c">static int math_sin (lua_State *L) &#123;
-    lua_pushnumber(L, l_mathop(sin)(luaL_checknumber(L, 1)));
-    return 1;            
+        <h1 id="序言"><a class="markdownIt-Anchor" href="#序言"></a> 序言</h1>
+<p>此文并未按照一个函数一篇blog的方式进行写作；原因很简单，接下来要介绍到的几个函数都是三角函数，并且都只是对C标准库中的三角函数的一次调用，并未有其他任何处理，十分清晰明了。</p>
+<h1 id="math_sin"><a class="markdownIt-Anchor" href="#math_sin"></a> math_sin</h1>
+<p>math_sin是lua函数math.sin的具体实现，其目的是返回正弦值。 math_sin的实现：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_sin</span> <span class="hljs-params">(lua_State *L)</span> &#123;
+    lua_pushnumber(L, l_mathop(<span class="hljs-built_in">sin</span>)(luaL_checknumber(L, <span class="hljs-number">1</span>)));
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;            
 &#125;
 </code></pre>
 <p>math_sin直接调用sin求正弦值，并将结果压栈。</p>
-<h1 id="math-cos"><a href="#math-cos" class="headerlink" title="math_cos"></a>math_cos</h1><p>math_cos是lua函数math.cos的具体实现，其目的是返回余弦值。 math_cos的实现：</p>
-<pre><code class="c">static int math_cos (lua_State *L) &#123;
-    lua_pushnumber(L, l_mathop(cos)(luaL_checknumber(L, 1)));
-    return 1;
+<h1 id="math_cos"><a class="markdownIt-Anchor" href="#math_cos"></a> math_cos</h1>
+<p>math_cos是lua函数math.cos的具体实现，其目的是返回余弦值。 math_cos的实现：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_cos</span> <span class="hljs-params">(lua_State *L)</span> &#123;
+    lua_pushnumber(L, l_mathop(<span class="hljs-built_in">cos</span>)(luaL_checknumber(L, <span class="hljs-number">1</span>)));
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
 <p>math_cos直接调用cos求余弦值，将结果压栈。</p>
-<h1 id="math-tan"><a href="#math-tan" class="headerlink" title="math_tan"></a>math_tan</h1><p>math_tan是lua函数math.tan的具体实现，其目的是返回正切值。 math_tan的实现：</p>
-<pre><code class="c">static int math_tan (lua_State *L) &#123;
-    lua_pushnumber(L, l_mathop(tan)(luaL_checknumber(L, 1)));
-    return 1;
+<h1 id="math_tan"><a class="markdownIt-Anchor" href="#math_tan"></a> math_tan</h1>
+<p>math_tan是lua函数math.tan的具体实现，其目的是返回正切值。 math_tan的实现：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_tan</span> <span class="hljs-params">(lua_State *L)</span> &#123;
+    lua_pushnumber(L, l_mathop(<span class="hljs-built_in">tan</span>)(luaL_checknumber(L, <span class="hljs-number">1</span>)));
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
 <p>math_tan直接调用tan求正切值，将结果压栈。</p>
-<h1 id="math-asin"><a href="#math-asin" class="headerlink" title="math_asin"></a>math_asin</h1><p>math_asin是lua函数math.asin的具体实现，其目的是返回反正弦值。 math_asin的实现：</p>
-<pre><code class="c">static int math_asin (lua_State *L) &#123;
-    lua_pushnumber(L, l_mathop(asin)(luaL_checknumber(L, 1)));
-    return 1;
+<h1 id="math_asin"><a class="markdownIt-Anchor" href="#math_asin"></a> math_asin</h1>
+<p>math_asin是lua函数math.asin的具体实现，其目的是返回反正弦值。 math_asin的实现：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_asin</span> <span class="hljs-params">(lua_State *L)</span> &#123;
+    lua_pushnumber(L, l_mathop(<span class="hljs-built_in">asin</span>)(luaL_checknumber(L, <span class="hljs-number">1</span>)));
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
 <p>math_asin直接调用asin求反正弦值，将结果压栈。</p>
-<h1 id="math-acos"><a href="#math-acos" class="headerlink" title="math_acos"></a>math_acos</h1><p>math_acos是lua函数math.acos的具体实现，其目的是返回反余弦值。 math_acos的实现：</p>
-<pre><code class="c">static int math_acos (lua_State *L) &#123;
-    lua_pushnumber(L, l_mathop(acos)(luaL_checknumber(L, 1)));
-    return 1;
+<h1 id="math_acos"><a class="markdownIt-Anchor" href="#math_acos"></a> math_acos</h1>
+<p>math_acos是lua函数math.acos的具体实现，其目的是返回反余弦值。 math_acos的实现：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_acos</span> <span class="hljs-params">(lua_State *L)</span> &#123;
+    lua_pushnumber(L, l_mathop(<span class="hljs-built_in">acos</span>)(luaL_checknumber(L, <span class="hljs-number">1</span>)));
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
 <p>math_acos直接调用acos求反余弦值，将结果压栈。</p>
-<h1 id="math-atan"><a href="#math-atan" class="headerlink" title="math_atan"></a>math_atan</h1><p>math_atan是lua函数math.atan的具体实现，其目的是返回反正切值。 math_atan的实现：</p>
-<pre><code class="c">static int math_atan (lua_State *L) &#123;
-    lua_Number y = luaL_checknumber(L, 1);
-    lua_Number x = luaL_optnumber(L, 2, 1);
-    lua_pushnumber(L, l_mathop(atan2)(y, x));
-    return 1;
+<h1 id="math_atan"><a class="markdownIt-Anchor" href="#math_atan"></a> math_atan</h1>
+<p>math_atan是lua函数math.atan的具体实现，其目的是返回反正切值。 math_atan的实现：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_atan</span> <span class="hljs-params">(lua_State *L)</span> &#123;
+    lua_Number y = luaL_checknumber(L, <span class="hljs-number">1</span>);
+    lua_Number x = luaL_optnumber(L, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>);
+    lua_pushnumber(L, l_mathop(<span class="hljs-built_in">atan2</span>)(y, x));
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
 <p>math_atan使用两个参数y，x来找到结果落在哪个象限。当只有一个参数y时，默认赋值1给x。math_atan通过atan2求反正切值，将结果压栈。</p>

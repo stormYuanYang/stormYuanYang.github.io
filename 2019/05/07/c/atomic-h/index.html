@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -99,48 +103,48 @@
             
         
         <p>头文件<strong>atomic.h</strong>定义了系列的原子操作宏定义以保证线程安全，这些原子操作宏定义是对GCC提供的内置原子操作api的一次封装。关于GCC的内置原子操作api已在<a href="https://coderdeepwater.cn/c_cpp/gcc/%E5%86%85%E5%BB%BA%E7%9A%84%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9Capi/">《GCC内建的原子操作api》</a>中详细介绍，不再赘述。 atomic.h的实现：</p>
-<pre><code class="c">#ifndef SKYNET_ATOMIC_H
-#define SKYNET_ATOMIC_H
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> SKYNET_ATOMIC_H</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> SKYNET_ATOMIC_H</span>
 
-#define ATOM_CAS(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)
-#define ATOM_CAS_POINTER(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)
-#define ATOM_INC(ptr) __sync_add_and_fetch(ptr, 1)
-#define ATOM_FINC(ptr) __sync_fetch_and_add(ptr, 1)
-#define ATOM_DEC(ptr) __sync_sub_and_fetch(ptr, 1)
-#define ATOM_FDEC(ptr) __sync_fetch_and_sub(ptr, 1)
-#define ATOM_ADD(ptr,n) __sync_add_and_fetch(ptr, n)
-#define ATOM_SUB(ptr,n) __sync_sub_and_fetch(ptr, n)
-#define ATOM_AND(ptr,n) __sync_and_and_fetch(ptr, n)
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_CAS(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_CAS_POINTER(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_INC(ptr) __sync_add_and_fetch(ptr, 1)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_FINC(ptr) __sync_fetch_and_add(ptr, 1)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_DEC(ptr) __sync_sub_and_fetch(ptr, 1)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_FDEC(ptr) __sync_fetch_and_sub(ptr, 1)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_ADD(ptr,n) __sync_add_and_fetch(ptr, n)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_SUB(ptr,n) __sync_sub_and_fetch(ptr, n)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_AND(ptr,n) __sync_and_and_fetch(ptr, n)</span>
 
-#endif
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
 </code></pre>
 <p>现在对atomic.h定义的原子操作宏定义一一说明。 CAS操作：</p>
-<pre><code class="c">#define ATOM_CAS(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)
-#define ATOM_CAS_POINTER(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_CAS(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_CAS_POINTER(ptr, oval, nval) __sync_bool_compare_and_swap(ptr, oval, nval)</span>
 </code></pre>
-<p><strong>ATOM_CAS</strong>和<strong>ATOM_CAS_POINTER</strong>对应的文本是一致的，通过调用<strong>__sync_bool_compare_and_swap</strong>执行CAS操作。 自增操作：</p>
-<pre><code class="c">#define ATOM_INC(ptr) __sync_add_and_fetch(ptr, 1)
-#define ATOM_FINC(ptr) __sync_fetch_and_add(ptr, 1)
+<p><strong>ATOM_CAS</strong>和<strong>ATOM_CAS_POINTER</strong>对应的文本是一致的，通过调用**__sync_bool_compare_and_swap**执行CAS操作。 自增操作：</p>
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_INC(ptr) __sync_add_and_fetch(ptr, 1)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_FINC(ptr) __sync_fetch_and_add(ptr, 1)</span>
 </code></pre>
-<p>注意<strong>ATOM_INC</strong>和<strong>ATOM_FINC</strong>的不同之处：<strong>ATOM_INC</strong>类似++n，<strong>ATOM_FINC</strong>类似n++。 自减操作：</p>
-<pre><code class="c">#define ATOM_DEC(ptr) __sync_sub_and_fetch(ptr, 1)
-#define ATOM_FDEC(ptr) __sync_fetch_and_sub(ptr, 1)
+<p>注意<strong>ATOM_INC</strong>和<strong>ATOM_FINC</strong>的不同之处：<strong>ATOM_INC</strong>类似<ins>n，<strong>ATOM_FINC</strong>类似n</ins>。 自减操作：</p>
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_DEC(ptr) __sync_sub_and_fetch(ptr, 1)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_FDEC(ptr) __sync_fetch_and_sub(ptr, 1)</span>
 </code></pre>
 <p>注意<strong>ATOM_DEC</strong>和<strong>ATOM_FDEC</strong>的不同之处：<strong>ATOM_DEC</strong>类似–n，<strong>ATOM_FDEC</strong>类似n–。 加法操作：</p>
-<pre><code class="c">#define ATOM_ADD(ptr,n) __sync_add_and_fetch(ptr, n)
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_ADD(ptr,n) __sync_add_and_fetch(ptr, n)</span>
 </code></pre>
 <p>注意，这里的加法类似<code>&#123;*ptr += n; return *ptr;&#125;</code>；可以仿造<strong>ATOM_FINC</strong>定义一个新的原子操作宏定义<strong>ATOM_FADD</strong>：</p>
-<pre><code class="c">// 构造的例子（skynet源码中并未有此宏定义）
-#define ATOM_FADD(ptr,n) __sync_fetch_and_add(ptr, n)
+<pre class="highlight"><code class="c"><span class="hljs-comment">// 构造的例子（skynet源码中并未有此宏定义）</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_FADD(ptr,n) __sync_fetch_and_add(ptr, n)</span>
 </code></pre>
 <p>ATOM_FADD类似<code>&#123;tmp = *ptr; *ptr += n; return *tmp;&#125;</code>。 减法操作：</p>
-<pre><code class="c">#define ATOM_SUB(ptr,n) __sync_sub_and_fetch(ptr, n)
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_SUB(ptr,n) __sync_sub_and_fetch(ptr, n)</span>
 </code></pre>
 <p><strong>ATOM_SUB</strong>类似<code>&#123;*ptr -= n; return *ptr;&#125;</code>。 与操作：</p>
-<pre><code class="c">#define ATOM_AND(ptr,n) __sync_and_and_fetch(ptr, n)
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> ATOM_AND(ptr,n) __sync_and_and_fetch(ptr, n)</span>
 </code></pre>
 <p><strong>ATOM_AND</strong>类似<code>&#123;*ptr &amp;= n; return *ptr;&#125;</code>。</p>
-<hr>
+<hr />
 <p>atomic.h并未使用到所有的内置原子操作函数，想对内置原子操作函数有更多了解，可以阅读<a href="https://coderdeepwater.cn/c_cpp/gcc/%E5%86%85%E5%BB%BA%E7%9A%84%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9Capi/">《GCC内建的原子操作api》</a>。</p>
 
     </div>

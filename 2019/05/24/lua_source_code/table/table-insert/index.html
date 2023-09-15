@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -96,67 +100,70 @@
 
     <div class="post-md">
         
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="post-toc-text">简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%88%86%E6%9E%90"><span class="post-toc-text">分析</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%BC%95%E7%94%A8"><span class="post-toc-text">引用</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="post-toc-text"> 简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%88%86%E6%9E%90"><span class="post-toc-text"> 分析</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%BC%95%E7%94%A8"><span class="post-toc-text"> 引用</span></a></li></ol>
         
-        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p><strong>table.insert</strong>声明如下：</p>
-<pre><code class="lua">table.insert(list, [pos,] value)
+        <h1 id="简介"><a class="markdownIt-Anchor" href="#简介"></a> 简介</h1>
+<p><strong>table.insert</strong>声明如下：</p>
+<pre class="highlight"><code class="lua"><span class="hljs-built_in">table</span>.<span class="hljs-built_in">insert</span>(list, [pos,] value)
 </code></pre>
 <p><strong>table.insert</strong>的目的是在list的位置pos处插入元素value，并后移元素list[pos]，list[pos+1]，…，list[#list]。pos的默认值就是#list+1，因此调用table.insert(t, x)会将x插在列表t的末尾（类似C++中的vector::push_back()）。 lua库函数<strong>table.insert</strong>对应的具体实现是C函数<strong>tinsert</strong>。<strong>tinsert</strong>声明如下：</p>
-<pre><code class="c">static int tinsert(lua_State* L);
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">tinsert</span><span class="hljs-params">(lua_State* L)</span>;
 </code></pre>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p><strong>tinsert</strong>源码：</p>
-<pre><code class="c">static int tinsert (lua_State *L) &#123;
-    /*
+<h1 id="分析"><a class="markdownIt-Anchor" href="#分析"></a> 分析</h1>
+<p><strong>tinsert</strong>源码：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">tinsert</span> <span class="hljs-params">(lua_State *L)</span> &#123;
+    <span class="hljs-comment">/*
      * aux_getn()的作用是获取序列当前的实际长度,
      * aux_getn()+1表示第一个空元素
-     */
-    lua_Integer e = aux_getn(L, 1, TAB_RW) + 1;  /* first empty element */
-    lua_Integer pos;  /* where to insert new element */
-    // lua_gettop()获取栈上的参数数量
-    switch (lua_gettop(L)) &#123;
-        // 只有两个参数，说明一定是在末尾插入元素
-        case 2: &#123;  /* called with only 2 arguments */
-                    // 确定元素插入位置
-                    pos = e;  /* insert new element at the end */
-                    break;
+     */</span>
+    lua_Integer e = aux_getn(L, <span class="hljs-number">1</span>, TAB_RW) + <span class="hljs-number">1</span>;  <span class="hljs-comment">/* first empty element */</span>
+    lua_Integer pos;  <span class="hljs-comment">/* where to insert new element */</span>
+    <span class="hljs-comment">// lua_gettop()获取栈上的参数数量</span>
+    <span class="hljs-keyword">switch</span> (lua_gettop(L)) &#123;
+        <span class="hljs-comment">// 只有两个参数，说明一定是在末尾插入元素</span>
+        <span class="hljs-keyword">case</span> <span class="hljs-number">2</span>: &#123;  <span class="hljs-comment">/* called with only 2 arguments */</span>
+                    <span class="hljs-comment">// 确定元素插入位置</span>
+                    pos = e;  <span class="hljs-comment">/* insert new element at the end */</span>
+                    <span class="hljs-keyword">break</span>;
                 &#125;
-        // 有3个参数，说明调用者指定了插入位置
-        case 3: &#123;
+        <span class="hljs-comment">// 有3个参数，说明调用者指定了插入位置</span>
+        <span class="hljs-keyword">case</span> <span class="hljs-number">3</span>: &#123;
                     lua_Integer i;
-                    // 获取指定的插入位置 pos
-                    pos = luaL_checkinteger(L, 2);  /* 2nd argument is the position */
-                    // 对插入位置的合法性做一次检查
-                    luaL_argcheck(L, 1 &lt;= pos &amp;&amp; pos &lt;= e, 2, &quot;position out of bounds&quot;);
-                    // 将位于插入位置以及其后面的元素，依次向后移动一个位置
-                    for (i = e; i &gt; pos; i--) &#123;  /* move up elements */
-                        // 取出元素放入栈顶
-                        lua_geti(L, 1, i - 1);
-                        // 将栈顶元素放入表中
-                        lua_seti(L, 1, i);  /* t[i] = t[i - 1] */
+                    <span class="hljs-comment">// 获取指定的插入位置 pos</span>
+                    pos = luaL_checkinteger(L, <span class="hljs-number">2</span>);  <span class="hljs-comment">/* 2nd argument is the position */</span>
+                    <span class="hljs-comment">// 对插入位置的合法性做一次检查</span>
+                    luaL_argcheck(L, <span class="hljs-number">1</span> &lt;= pos &amp;&amp; pos &lt;= e, <span class="hljs-number">2</span>, <span class="hljs-string">&quot;position out of bounds&quot;</span>);
+                    <span class="hljs-comment">// 将位于插入位置以及其后面的元素，依次向后移动一个位置</span>
+                    <span class="hljs-keyword">for</span> (i = e; i &gt; pos; i--) &#123;  <span class="hljs-comment">/* move up elements */</span>
+                        <span class="hljs-comment">// 取出元素放入栈顶</span>
+                        lua_geti(L, <span class="hljs-number">1</span>, i - <span class="hljs-number">1</span>);
+                        <span class="hljs-comment">// 将栈顶元素放入表中</span>
+                        lua_seti(L, <span class="hljs-number">1</span>, i);  <span class="hljs-comment">/* t[i] = t[i - 1] */</span>
                     &#125;
-                    break;
+                    <span class="hljs-keyword">break</span>;
                 &#125;
-        default: &#123;
-                     return luaL_error(L, &quot;wrong number of arguments to &#39;insert&#39;&quot;);
+        <span class="hljs-keyword">default</span>: &#123;
+                     <span class="hljs-keyword">return</span> luaL_error(L, <span class="hljs-string">&quot;wrong number of arguments to &#x27;insert&#x27;&quot;</span>);
                  &#125;
     &#125;
-    // 将指定元素赋值到指定位置
-    lua_seti(L, 1, pos);  /* t[pos] = v */
-    return 0;
+    <span class="hljs-comment">// 将指定元素赋值到指定位置</span>
+    lua_seti(L, <span class="hljs-number">1</span>, pos);  <span class="hljs-comment">/* t[pos] = v */</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
 <p>关于代码的解释已由注释说明，不在赘述。现在分析一下<strong>tinsert</strong>的时间复杂度：</p>
 <ol>
 <li>当插入位置<strong>pos</strong>就是<strong>e</strong>时，<strong>tinsert</strong>只有常量时间操作；</li>
-<li>当插入位置<strong>pos</strong>不是<strong>e</strong>时，<strong>tinsert</strong>会将范围$[pos,e-1]$的元素依次移动到$[pos+1,e]$，需要线性时间操作；</li>
-<li>不论插入位置<strong>pos</strong>在何处，执行<strong>lua_seti()<strong>时都可能会导致表扩容；表扩容时，</strong>lua_seti()<strong>的时间复杂度是$O(n)$；表未扩容时，</strong>lua_seti()<strong>的时间复杂度是$O(1)$；但是依据</strong>摊还分析</strong>，可以认为<strong>lua_seti</strong>的时间复杂度就是$O(1)$。</li>
+<li>当插入位置<strong>pos</strong>不是<strong>e</strong>时，<strong>tinsert</strong>会将范围<span class='katex-error' title='ParseError: KaTeX parse error: Undefined control sequence: \[ at position 1: \̲[̲pos,e-1\]'>\[pos,e-1\]</span>的元素依次移动到<span class='katex-error' title='ParseError: KaTeX parse error: Undefined control sequence: \[ at position 1: \̲[̲pos+1,e\]'>\[pos+1,e\]</span>，需要线性时间操作；</li>
+<li>不论插入位置<strong>pos</strong>在何处，执行**lua_seti()**时都可能会导致表扩容；表扩容时，<strong>lua_seti()<strong>的时间复杂度是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>；表未扩容时，<strong>lua_seti()<strong>的时间复杂度是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(1)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>；但是依据</strong>摊还分析</strong>，可以认为</strong>lua_seti</strong>的时间复杂度就是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(1)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>。</li>
 </ol>
 <p>由以上3点，我们可以得出以下结论：</p>
 <ol>
-<li>使用<strong>table.insert</strong>在序列末尾插入元素时，<strong>table.insert</strong>的时间复杂度是$O(1)$；</li>
-<li>使用<strong>table.insert</strong>在序列内部插入元素时，<strong>table.insert</strong>的时间复杂度是$O(n)$。</li>
+<li>使用<strong>table.insert</strong>在序列末尾插入元素时，<strong>table.insert</strong>的时间复杂度是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(1)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>；</li>
+<li>使用<strong>table.insert</strong>在序列内部插入元素时，<strong>table.insert</strong>的时间复杂度是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>。</li>
 </ol>
-<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><p><a target="_blank" rel="noopener" href="https://www.lua.org/manual/5.3/manual.html#pdf-table.insert"><strong>lua5.3参考手册之table.insert</strong></a></p>
+<h1 id="引用"><a class="markdownIt-Anchor" href="#引用"></a> 引用</h1>
+<p><a target="_blank" rel="noopener" href="https://www.lua.org/manual/5.3/manual.html#pdf-table.insert"><strong>lua5.3参考手册之table.insert</strong></a></p>
 
     </div>
 

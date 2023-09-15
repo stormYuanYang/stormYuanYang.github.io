@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -99,25 +103,25 @@
             
         
         <p>C函数<strong>math_abs是</strong>lua函数<strong>math.abs</strong>的具体实现。math_abs本身是对C函数<strong>fabs</strong>的一次封装。math_abs的声明如下：</p>
-<pre><code class="c">static int math_abs (lua_State *L);
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_abs</span> <span class="hljs-params">(lua_State *L)</span>;
 </code></pre>
 <p>math_abs只受一个lua虚拟机作为参数，实际被操作的参数存储在虚拟机的栈上。math_abs本身是比较简单的，直接看其源代码：</p>
-<pre><code class="c">static int math_abs (lua_State *L) &#123;                                             
-    if (lua_isinteger(L, 1)) &#123;
-        lua_Integer n = lua_tointeger(L, 1);
-        if (n &lt; 0) n = (lua_Integer)(0u - (lua_Unsigned)n);
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_abs</span> <span class="hljs-params">(lua_State *L)</span> &#123;                                             
+    <span class="hljs-keyword">if</span> (lua_isinteger(L, <span class="hljs-number">1</span>)) &#123;
+        lua_Integer n = lua_tointeger(L, <span class="hljs-number">1</span>);
+        <span class="hljs-keyword">if</span> (n &lt; <span class="hljs-number">0</span>) n = (lua_Integer)(<span class="hljs-number">0u</span> - (lua_Unsigned)n);
         lua_pushinteger(L, n);
     &#125;
-    else
-        lua_pushnumber(L, l_mathop(fabs)(luaL_checknumber(L, 1)));
-    return 1;
+    <span class="hljs-keyword">else</span>
+        lua_pushnumber(L, l_mathop(<span class="hljs-built_in">fabs</span>)(luaL_checknumber(L, <span class="hljs-number">1</span>)));
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
 <p>math_abs先对栈上的参数进行检查；如果参数是整数，则不调用fabs，直接对参数做一次简单的绝对值转换，并将绝对值压栈即可；如果参数是浮点数，则调用fabs求参数的绝对值，并将绝对值压栈。 注意，在lua中调用math.abs求math.mininteger的绝对值：</p>
-<pre><code class="lua">print(math.abs(math.mininteger))-- 等价于
-print(math.mininteger)
+<pre class="highlight"><code class="lua"><span class="hljs-built_in">print</span>(<span class="hljs-built_in">math</span>.<span class="hljs-built_in">abs</span>(<span class="hljs-built_in">math</span>.mininteger))<span class="hljs-comment">-- 等价于</span>
+<span class="hljs-built_in">print</span>(<span class="hljs-built_in">math</span>.mininteger)
 </code></pre>
-<p>math.mininteger的绝对值仍然是math.mininteger，在我的PC上是： $$ -2^{63} &#x3D; -9223372036854775808 $$ 使用math.abs要小心，对math.mininteger求绝对值不能获得正确结果。其原因已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/stdlib_h/abs/"><strong>abs</strong></a>详细说明，不再赘述。</p>
+<p>math.mininteger的绝对值仍然是math.mininteger，在我的PC上是： $$ -2^{63} = -9223372036854775808 $$ 使用math.abs要小心，对math.mininteger求绝对值不能获得正确结果。其原因已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/stdlib_h/abs/"><strong>abs</strong></a>详细说明，不再赘述。</p>
 
     </div>
 

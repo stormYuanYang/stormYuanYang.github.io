@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -99,7 +103,7 @@
             
         
         <p>函数<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstring/strncmp/"><strong>strncmp</strong></a>类似strcmp，可以视作strcmp的升级版本，按字典序对字符串进行大小比较。其声明如下：</p>
-<pre><code class="c">int strncmp ( const char * str1, const char * str2, size_t num );
+<pre class="highlight"><code class="c"><span class="hljs-type">int</span> <span class="hljs-title function_">strncmp</span> <span class="hljs-params">( <span class="hljs-type">const</span> <span class="hljs-type">char</span> * str1, <span class="hljs-type">const</span> <span class="hljs-type">char</span> * str2, <span class="hljs-type">size_t</span> num )</span>;
 </code></pre>
 <p>strncmp的返回值类型是int，不同返回值有不同含义（同strcmp一致）：</p>
 <ul>
@@ -112,58 +116,58 @@
 <li>num大于str1和str2中任意一个的长度（包括’\0’）时；strncmp就等价于strcmp；</li>
 <li>否则，就只会比较部分字符，而不是完整地比较str1和str2。</li>
 </ul>
-<hr>
-<p>其实现如下（string&#x2F;strncmp.c）：</p>
-<pre><code class="c">/* Copyright (C) 1991, 1996, 1997, 2003 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.*/
-/* Compare no more than N characters of S1 and S2,
+<hr />
+<p>其实现如下（string/strncmp.c）：</p>
+<pre class="highlight"><code class="c"><span class="hljs-comment">/* Copyright (C) 1991, 1996, 1997, 2003 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.*/</span>
+<span class="hljs-comment">/* Compare no more than N characters of S1 and S2,
    returning less than, equal to or greater than zero
    if S1 is lexicographically less than, equal to or
-   greater than S2.  */
-int strncmp (s1, s2, n)
-    const char *s1;
-    const char *s2;
-    size_t n;
+   greater than S2.  */</span>
+<span class="hljs-type">int</span> <span class="hljs-title function_">strncmp</span> <span class="hljs-params">(s1, s2, n)</span>
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span> *s1;
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span> *s2;
+    <span class="hljs-type">size_t</span> n;
 &#123;
-    unsigned reg_char c1 = &#39;\0&#39;;
-    unsigned reg_char c2 = &#39;\0&#39;;
+    <span class="hljs-type">unsigned</span> reg_char c1 = <span class="hljs-string">&#x27;\0&#x27;</span>;
+    <span class="hljs-type">unsigned</span> reg_char c2 = <span class="hljs-string">&#x27;\0&#x27;</span>;
 
-    if (n &gt;= 4) &#123;
-        size_t n4 = n &gt;&gt; 2;
-        do &#123;
-            c1 = (unsigned char) *s1++;
-            c2 = (unsigned char) *s2++;
-            if (c1 == &#39;\0&#39;  c1 != c2)
-                return c1 - c2;
-            c1 = (unsigned char) *s1++;
-            c2 = (unsigned char) *s2++;
-            if (c1 == &#39;\0&#39;  c1 != c2)
-                return c1 - c2;
-            c1 = (unsigned char) *s1++;
-            c2 = (unsigned char) *s2++;
-            if (c1 == &#39;\0&#39;  c1 != c2)
-                return c1 - c2;
-            c1 = (unsigned char) *s1++;
-            c2 = (unsigned char) *s2++;
-            if (c1 == &#39;\0&#39;  c1 != c2)
-                return c1 - c2;
-        &#125; while (--n4 &gt; 0);
-        n &amp;= 3;
+    <span class="hljs-keyword">if</span> (n &gt;= <span class="hljs-number">4</span>) &#123;
+        <span class="hljs-type">size_t</span> n4 = n &gt;&gt; <span class="hljs-number">2</span>;
+        <span class="hljs-keyword">do</span> &#123;
+            c1 = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>) *s1++;
+            c2 = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>) *s2++;
+            <span class="hljs-keyword">if</span> (c1 == <span class="hljs-string">&#x27;\0&#x27;</span>  c1 != c2)
+                <span class="hljs-keyword">return</span> c1 - c2;
+            c1 = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>) *s1++;
+            c2 = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>) *s2++;
+            <span class="hljs-keyword">if</span> (c1 == <span class="hljs-string">&#x27;\0&#x27;</span>  c1 != c2)
+                <span class="hljs-keyword">return</span> c1 - c2;
+            c1 = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>) *s1++;
+            c2 = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>) *s2++;
+            <span class="hljs-keyword">if</span> (c1 == <span class="hljs-string">&#x27;\0&#x27;</span>  c1 != c2)
+                <span class="hljs-keyword">return</span> c1 - c2;
+            c1 = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>) *s1++;
+            c2 = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>) *s2++;
+            <span class="hljs-keyword">if</span> (c1 == <span class="hljs-string">&#x27;\0&#x27;</span>  c1 != c2)
+                <span class="hljs-keyword">return</span> c1 - c2;
+        &#125; <span class="hljs-keyword">while</span> (--n4 &gt; <span class="hljs-number">0</span>);
+        n &amp;= <span class="hljs-number">3</span>;
     &#125;
 
-    while (n &gt; 0) &#123;
-        c1 = (unsigned char) *s1++;
-        c2 = (unsigned char) *s2++;
-        if (c1 == &#39;\0&#39;  c1 != c2)
-            return c1 - c2;
+    <span class="hljs-keyword">while</span> (n &gt; <span class="hljs-number">0</span>) &#123;
+        c1 = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>) *s1++;
+        c2 = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>) *s2++;
+        <span class="hljs-keyword">if</span> (c1 == <span class="hljs-string">&#x27;\0&#x27;</span>  c1 != c2)
+            <span class="hljs-keyword">return</span> c1 - c2;
         n--;
     &#125;
 
-    return c1 - c2;
+    <span class="hljs-keyword">return</span> c1 - c2;
 &#125;
 </code></pre>
-<p>strncmp的实现还是挺简单的。 首先看<code>if (n &gt;= 4) &#123;&#125;</code>，这里做了一定优化：以4个字符为一组进行比较，这样可以减少3&#x2F;4的<code>--n</code>和<code>n==0</code>判断，可以提升一定性能（其思想已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strncpy/"><strong>《strncpy》</strong></a>中详细分析，不再赘述)。执行完<code>if(n&gt;=4)&#123;&#125;</code>，可能还有剩余的字符尚未比较，所以用<code>while (n&gt;0)&#123;&#125;</code>循环比较即可。</p>
-<hr>
+<p>strncmp的实现还是挺简单的。 首先看<code>if (n &gt;= 4) &#123;&#125;</code>，这里做了一定优化：以4个字符为一组进行比较，这样可以减少3/4的<code>--n</code>和<code>n==0</code>判断，可以提升一定性能（其思想已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strncpy/"><strong>《strncpy》</strong></a>中详细分析，不再赘述)。执行完<code>if(n&gt;=4)&#123;&#125;</code>，可能还有剩余的字符尚未比较，所以用<code>while (n&gt;0)&#123;&#125;</code>循环比较即可。</p>
+<hr />
 <p>一些说明：</p>
 <ul>
 <li><strong>reg_char</strong>：已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strcpy/"><strong>《strcpy》</strong></a>中解释，不再赘述。</li>

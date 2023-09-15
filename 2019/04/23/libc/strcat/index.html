@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -99,7 +103,7 @@
             
         
         <p>函数<strong>strcat</strong>的作用是将两个<strong>C字符串</strong>连接起来。其声明如下：</p>
-<pre><code class="c">char * strcat (char * dest, const char * src);
+<pre class="highlight"><code class="c"><span class="hljs-type">char</span> * <span class="hljs-title function_">strcat</span> <span class="hljs-params">(<span class="hljs-type">char</span> * dest, <span class="hljs-type">const</span> <span class="hljs-type">char</span> * src)</span>;
 </code></pre>
 <p>将src指向的C字符串连接到dest指向的C字符串后面,会覆盖掉dest处的C字符串的终止符’\0’。调用strcat需要调用者保证：</p>
 <ul>
@@ -108,36 +112,36 @@
 <li>dest指向的字符数组的容量足够容纳两个C字符串（dest指向的字符数组容量必须大于等<code>strlen(dest)+strlen(src)+1</code>）。</li>
 </ul>
 <p>当连接完成后，返回dest。</p>
-<hr>
-<p>分析strcat的实现（string&#x2F;strcat.c）：</p>
-<pre><code class="c">/* Copyright (C) 1991, 1997, 2003 Free Software Foundation, Inc.
+<hr />
+<p>分析strcat的实现（string/strcat.c）：</p>
+<pre class="highlight"><code class="c"><span class="hljs-comment">/* Copyright (C) 1991, 1997, 2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-*/
-/* Append SRC on the end of DEST.  */
-char* strcat (dest, src)
-    char *dest;
-    const char *src;
+*/</span>
+<span class="hljs-comment">/* Append SRC on the end of DEST.  */</span>
+<span class="hljs-type">char</span>* <span class="hljs-title function_">strcat</span> <span class="hljs-params">(dest, src)</span>
+    <span class="hljs-type">char</span> *dest;
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span> *src;
 &#123;
-    char *s1 = dest;
-    const char *s2 = src;
+    <span class="hljs-type">char</span> *s1 = dest;
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span> *s2 = src;
     reg_char c;
 
-    /* Find the end of the string.  */
-    do &#123;
+    <span class="hljs-comment">/* Find the end of the string.  */</span>
+    <span class="hljs-keyword">do</span> &#123;
         c = *s1++;
-    &#125; while (c != &#39;\0&#39;);
+    &#125; <span class="hljs-keyword">while</span> (c != <span class="hljs-string">&#x27;\0&#x27;</span>);
 
-    /* Make S1 point before the next character, so we can increment
-       it while memory is read (wins on pipelined cpus).  */
-    s1 -= 2;
+    <span class="hljs-comment">/* Make S1 point before the next character, so we can increment
+       it while memory is read (wins on pipelined cpus).  */</span>
+    s1 -= <span class="hljs-number">2</span>;
 
-    do &#123;
+    <span class="hljs-keyword">do</span> &#123;
         c = *s2++;
         *++s1 = c;
     &#125;
-    while (c != &#39;\0&#39;);
+    <span class="hljs-keyword">while</span> (c != <span class="hljs-string">&#x27;\0&#x27;</span>);
 
-    return dest;
+    <span class="hljs-keyword">return</span> dest;
 &#125;
 </code></pre>
 <p>strcat实现没什么复杂的地方：</p>
@@ -146,7 +150,7 @@ char* strcat (dest, src)
 <li>第二部，遍历src，依次将s2指向的字符拷贝到s1。</li>
 </ul>
 <p>这里需要注意的是<code>s1 -= 2;</code>，这样做的目的，上述代码注释已经解释：是为了在执行流水线方式指令的CPU时获得更好的读取性能。但是具体是如何提升的性能，我就不太清楚了，如果你知道，还请告知:-)。 分析strcat的时间复杂度。根据上文很容易得出，strcat的最坏时间复杂度为: $$ O(n) $$</p>
-<hr>
+<hr />
 <p>一些说明：</p>
 <ul>
 <li><strong>reg_char</strong>：已在<a href="https://coderdeepwater.cn/c_cpp/stdlibc/string_h/strcpy/"><strong>《strcpy》</strong></a>中解释，不再赘述。</li>

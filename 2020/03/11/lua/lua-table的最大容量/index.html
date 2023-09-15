@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -99,21 +103,22 @@
             
         
         <p>话说都半年没写博客了呢😁。哈哈哈哈哈，没办法，项目上线以来，自己太过匆忙（其实是自己变懒了）。 昨天晚上，建东问我lua提供的table最多能放下多少个元素。这个问题，其实之前通过看lua的源代码就已知晓，不过长时间不温习，已经忘却😢。正好乘着为建东解惑的机会，做一个笔记。 table由数组部分和哈希表部分组成，table的容量也就等于数组容量与哈希表容量之和。table的一切秘密都可以到ltable.c中挖掘，table的极限容量也是如此:</p>
-<pre><code class="c">/*
+<pre class="highlight"><code class="c"><span class="hljs-comment">/*
  ** Maximum size of array part (MAXASIZE) is 2^MAXABITS. MAXABITS is
  ** the largest integer such that MAXASIZE fits in an unsigned int.
- */
-#define MAXABITS   cast_int(sizeof(int) * CHAR_BIT - 1)
-#define MAXASIZE   (1u &amp;lt;&amp;lt; MAXABITS)
+ */</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> MAXABITS   cast_int(sizeof(int) * CHAR_BIT - 1)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> MAXASIZE   (1u &amp;lt;&amp;lt; MAXABITS)</span>
 </code></pre>
 <p>由上述宏定义可知，table的数组部分最大容量是 <strong>2的MAXABITS次方</strong>，这个值的大小取决于int的字节数：int是32位，table的数组部分最大容量就是<strong>2的31次方</strong>；int是64位，table的数组部分最大容量就是<strong>2的63次方</strong>。</p>
-<pre><code class="c">/*
+<pre class="highlight"><code class="c"><span class="hljs-comment">/*
  ** Maximum size of hash part is 2^MAXHBITS. MAXHBITS is the largest
  ** integer such that 2^MAXHBITS fits in a signed int. (Note that the
  ** maximum number of elements in a table, 2^MAXABITS + 2^MAXHBITS, still
  ** fits comfortably in an unsigned int.)
- */
-#define MAXHBITS   (MAXABITS - 1)
+ */</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> MAXHBITS   (MAXABITS - 1)</span>
+
 </code></pre>
 <p>由上述宏定义和注释可知，table的哈希表部分最大容量只有数组部分最大容量的一半。注意，这里说的哈希表容量并不代表哈希表可以存储元素的数量，而是指实现哈希表的数组的最大容量，哈希表的实现方法的不同，哈希表存储元素的数量上限也就不同（链接法、开放寻址法）。 table的数组最大容量与哈希表最大容量之和能够用unsigned int表示。可以这样简单地记忆table的最大容量：最大unsigned int的一半就是数组部分的最大容量，数组部分最大容量的一半就是哈希表部分的最大容量。</p>
 

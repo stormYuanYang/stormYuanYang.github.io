@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -96,85 +100,90 @@
 
     <div class="post-md">
         
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="post-toc-text">简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%88%86%E6%9E%90"><span class="post-toc-text">分析</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="post-toc-text">时间复杂度</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="post-toc-text">空间复杂度</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%BC%95%E7%94%A8"><span class="post-toc-text">引用</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="post-toc-text"> 简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%88%86%E6%9E%90"><span class="post-toc-text"> 分析</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="post-toc-text"> 时间复杂度</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="post-toc-text"> 空间复杂度</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%BC%95%E7%94%A8"><span class="post-toc-text"> 引用</span></a></li></ol>
         
-        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>lua库函数<strong>table.concat</strong>的声明如下：</p>
-<pre><code class="lua">table.concat(list [, sep [, i [, j]]])
+        <h1 id="简介"><a class="markdownIt-Anchor" href="#简介"></a> 简介</h1>
+<p>lua库函数<strong>table.concat</strong>的声明如下：</p>
+<pre class="highlight"><code class="lua"><span class="hljs-built_in">table</span>.<span class="hljs-built_in">concat</span>(list [, sep [, i [, j]]])
 </code></pre>
 <p>顾名思义，<strong>table.concat</strong>的目的是将序列list中指定的的元素连接成一个字符串。<strong>table.concat</strong>允许你传递1到4个参数：</p>
 <ul>
-<li>只传入list，表明将序列中全部元素连接成一个字符串（范围：[1,#list]），以空字符串””做分隔符；</li>
+<li>只传入list，表明将序列中全部元素连接成一个字符串（范围：[1,#list]），以空字符串&quot;&quot;做分隔符；</li>
 <li>传入list、sep，表明将序列中全部元素连接成一个字符串（范围：[1,#list]），以<strong>sep</strong>做分隔符；</li>
 <li>传入list、sep、i，表明将序列中范围为[i,#list]的元素连接成一个字符串，以<strong>sep</strong>做分隔符；</li>
 <li>传入list、sep、i、j，表明将序列中范围为[i,j]的元素连接成一个字符串，以<strong>sep</strong>做分隔符；</li>
 </ul>
 <p>注意，可选项参数都可以赋nil值，此时<strong>table.concat</strong>会启用默认值：</p>
 <ul>
-<li><strong>sep</strong>默认就是””；</li>
+<li><strong>sep</strong>默认就是&quot;&quot;；</li>
 <li><strong>i</strong>默认就是1；</li>
 <li>j默认就是#list。</li>
 </ul>
 <p>使用<strong>table.concat</strong>需要你保证被连接的元素都可以转换成字符串（常见的就是字符串和数字），否则<strong>table.concat</strong>会报告错误。 实现<strong>table.concat</strong>的C函数就是<strong>tconcat</strong>，下文将对<strong>tconcat</strong>进行分析。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>首先注解<strong>tconcat</strong>和其辅助函数<strong>addfield</strong>。 <strong>addfield</strong>:</p>
-<pre><code class="c">// 将t[i]转换成字符串并追加到Buffer b中
-static void addfield (lua_State *L, luaL_Buffer *b, lua_Integer i) &#123;
-    // 获取下标为i对应的元素,并将其入栈
-    lua_geti(L, 1, i);
-    // 判断栈顶元素是否是字符串或者能否转换成字符串 
-    // 如果不能，就报错
-    if (!lua_isstring(L, -1)) &#123;
-        luaL_error(L, &quot;invalid value (%s) at index %d in table for &#39;concat&#39;&quot;,
-                luaL_typename(L, -1), i);
+<h1 id="分析"><a class="markdownIt-Anchor" href="#分析"></a> 分析</h1>
+<p>首先注解<strong>tconcat</strong>和其辅助函数<strong>addfield</strong>。 <strong>addfield</strong>:</p>
+<pre class="highlight"><code class="c"><span class="hljs-comment">// 将t[i]转换成字符串并追加到Buffer b中</span>
+<span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">addfield</span> <span class="hljs-params">(lua_State *L, luaL_Buffer *b, lua_Integer i)</span> &#123;
+    <span class="hljs-comment">// 获取下标为i对应的元素,并将其入栈</span>
+    lua_geti(L, <span class="hljs-number">1</span>, i);
+    <span class="hljs-comment">// 判断栈顶元素是否是字符串或者能否转换成字符串 </span>
+    <span class="hljs-comment">// 如果不能，就报错</span>
+    <span class="hljs-keyword">if</span> (!lua_isstring(L, <span class="hljs-number">-1</span>)) &#123;
+        luaL_error(L, <span class="hljs-string">&quot;invalid value (%s) at index %d in table for &#x27;concat&#x27;&quot;</span>,
+                luaL_typename(L, <span class="hljs-number">-1</span>), i);
     &#125;
-    // 将字符串追加到b中
-    // 或者将能转换成字符串的元素转换成字符串再追加到b中
+    <span class="hljs-comment">// 将字符串追加到b中</span>
+    <span class="hljs-comment">// 或者将能转换成字符串的元素转换成字符串再追加到b中</span>
     luaL_addvalue(b);
 &#125;
 </code></pre>
 <p><strong>addfield</strong>的目的就是将序列中指定下标的元素转换成字符串后，追加到Buffer中。 <strong>tconcat</strong>：</p>
-<pre><code class="c">static int tconcat (lua_State *L) &#123;
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">tconcat</span> <span class="hljs-params">(lua_State *L)</span> &#123;
     luaL_Buffer b;
-    // 获取序列中最后一个元素的下标，也是整个序列的长度
-    lua_Integer last = aux_getn(L, 1, TAB_R);
-    size_t lsep;
-    // 从栈上获取分隔符，默认分隔符是空字符串--&gt;&quot;&quot;
-    const char *sep = luaL_optlstring(L, 2, &quot;&quot;, &amp;lsep);
-    // 获取concat的第一个元素下标，默认是1
-    lua_Integer i = luaL_optinteger(L, 3, 1);
-    // 获取last的值，默认就是最后一个元素的下标
-    last = luaL_optinteger(L, 4, last);
-    // 初始化缓存b,luaL_buffinit实际上并没有分配内存
-    // 只是设置了一些初始值
+    <span class="hljs-comment">// 获取序列中最后一个元素的下标，也是整个序列的长度</span>
+    lua_Integer last = aux_getn(L, <span class="hljs-number">1</span>, TAB_R);
+    <span class="hljs-type">size_t</span> lsep;
+    <span class="hljs-comment">// 从栈上获取分隔符，默认分隔符是空字符串--&gt;&quot;&quot;</span>
+    <span class="hljs-type">const</span> <span class="hljs-type">char</span> *sep = luaL_optlstring(L, <span class="hljs-number">2</span>, <span class="hljs-string">&quot;&quot;</span>, &amp;lsep);
+    <span class="hljs-comment">// 获取concat的第一个元素下标，默认是1</span>
+    lua_Integer i = luaL_optinteger(L, <span class="hljs-number">3</span>, <span class="hljs-number">1</span>);
+    <span class="hljs-comment">// 获取last的值，默认就是最后一个元素的下标</span>
+    last = luaL_optinteger(L, <span class="hljs-number">4</span>, last);
+    <span class="hljs-comment">// 初始化缓存b,luaL_buffinit实际上并没有分配内存</span>
+    <span class="hljs-comment">// 只是设置了一些初始值</span>
     luaL_buffinit(L, &amp;b);
-    // 遍历：将序列中的元素和分隔符添加到缓存b
-    for (; i &lt; last; i++) &#123;
-        // 添加序列中的元素
-        // 实际上是将t[i]先转换成字符串再追加到b中
-        // 当b的容量不够时，b会自动扩容
+    <span class="hljs-comment">// 遍历：将序列中的元素和分隔符添加到缓存b</span>
+    <span class="hljs-keyword">for</span> (; i &lt; last; i++) &#123;
+        <span class="hljs-comment">// 添加序列中的元素</span>
+        <span class="hljs-comment">// 实际上是将t[i]先转换成字符串再追加到b中</span>
+        <span class="hljs-comment">// 当b的容量不够时，b会自动扩容</span>
         addfield(L, &amp;b, i);
-        // 添加分割符
+        <span class="hljs-comment">// 添加分割符</span>
         luaL_addlstring(&amp;b, sep, lsep);
     &#125;
-    // 因为有分隔符的存在，所以这里只能单独地添加t[last]
-    // 因为t[last]后不会有分隔符了
-    if (i == last)  /* add last value (if interval was not empty) */
+    <span class="hljs-comment">// 因为有分隔符的存在，所以这里只能单独地添加t[last]</span>
+    <span class="hljs-comment">// 因为t[last]后不会有分隔符了</span>
+    <span class="hljs-keyword">if</span> (i == last)  <span class="hljs-comment">/* add last value (if interval was not empty) */</span>
         addfield(L, &amp;b, i);
-    // 将缓存b中的字符串入栈，得到concat的最终结果
+    <span class="hljs-comment">// 将缓存b中的字符串入栈，得到concat的最终结果</span>
     luaL_pushresult(&amp;b);
-    // 返回1，表明concat就一个返回值
-    return 1;
+    <span class="hljs-comment">// 返回1，表明concat就一个返回值</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
-<p><strong>tconcat</strong>采用缓存的思想：分配一块内存Buffer，不停地追加字符串到这个Buffer中；当前Buffer不足以容纳新的字符串时，就将开辟新的容量翻倍的NewBuffer（如果容量翻倍之后还是不足以容纳新追加的字符串，则开辟足以容纳新字符串的容量），将已存放到Buffer中的字符串，拷贝至NewBuffer，然后将新字符串拷贝至NewBuffer。 比起每连接一个字符串就分配新的内存，这样做的好处就是，避免连接的元素过多时分配大量的内存。例如在JAVA中使用String类型的字符串进行连接操作，都会分配至少两个字符串长度的内存大小（实际上肯定不止，因为String类头部还会占用若干字节）：如果你连接100个字符串，每个字符串的大小都为1MByte，那么你在循环连接这100个字符串时，总共会分配$2+3+…+100$MByte的内存，也就是$5049$MByte（大概$5$GByte）的内存。JAVA也考虑到了这个问题，所以其推出了StringBuffer类；StringBuffer在连接字符串时，就会采用<strong>缓存机制</strong>了。 最后来分析一下<strong>tconcat</strong>的时间复杂度和空间复杂度。</p>
-<h2 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h2><p><strong>tconcat</strong>会将元素转换成字符串并将其追加到缓存Buffer中：</p>
+<p><strong>tconcat</strong>采用缓存的思想：分配一块内存Buffer，不停地追加字符串到这个Buffer中；当前Buffer不足以容纳新的字符串时，就将开辟新的容量翻倍的NewBuffer（如果容量翻倍之后还是不足以容纳新追加的字符串，则开辟足以容纳新字符串的容量），将已存放到Buffer中的字符串，拷贝至NewBuffer，然后将新字符串拷贝至NewBuffer。 比起每连接一个字符串就分配新的内存，这样做的好处就是，避免连接的元素过多时分配大量的内存。例如在JAVA中使用String类型的字符串进行连接操作，都会分配至少两个字符串长度的内存大小（实际上肯定不止，因为String类头部还会占用若干字节）：如果你连接100个字符串，每个字符串的大小都为1MByte，那么你在循环连接这100个字符串时，总共会分配<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>+</mo><mn>3</mn><mo>+</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo>+</mo><mn>100</mn></mrow><annotation encoding="application/x-tex">2+3+...+100</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord">.</span><span class="mord">.</span><span class="mord">.</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">0</span><span class="mord">0</span></span></span></span>MByte的内存，也就是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>5049</mn></mrow><annotation encoding="application/x-tex">5049</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">5</span><span class="mord">0</span><span class="mord">4</span><span class="mord">9</span></span></span></span>MByte（大概<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>5</mn></mrow><annotation encoding="application/x-tex">5</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">5</span></span></span></span>GByte）的内存。JAVA也考虑到了这个问题，所以其推出了StringBuffer类；StringBuffer在连接字符串时，就会采用<strong>缓存机制</strong>了。 最后来分析一下<strong>tconcat</strong>的时间复杂度和空间复杂度。</p>
+<h2 id="时间复杂度"><a class="markdownIt-Anchor" href="#时间复杂度"></a> 时间复杂度</h2>
+<p><strong>tconcat</strong>会将元素转换成字符串并将其追加到缓存Buffer中：</p>
 <ul>
-<li>如果元素不是字符串，比如元素是数字，还得将数字转换成字符串，转换函数的时间复杂度是$O(n)$；</li>
+<li>如果元素不是字符串，比如元素是数字，还得将数字转换成字符串，转换函数的时间复杂度是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>；</li>
 <li>如果元素是字符串，就无须转换；</li>
-<li>但是不论元素是不是字符串，最终将字符串追加到缓存Buffer时，都会调用C标准库函数memcpy，虽然说memcpy对其实现做了一定的优化（比如尽量按<strong>字</strong>拷贝、按操作系统的<strong>分页</strong>进行拷贝等），但是其时间复杂度仍认为是$O(n)$。</li>
+<li>但是不论元素是不是字符串，最终将字符串追加到缓存Buffer时，都会调用C标准库函数memcpy，虽然说memcpy对其实现做了一定的优化（比如尽量按<strong>字</strong>拷贝、按操作系统的<strong>分页</strong>进行拷贝等），但是其时间复杂度仍认为是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>。</li>
 </ul>
-<p>我们注意到<strong>tconcat</strong>是在一个for循环中追加元素和分隔符的；而<strong>tconcat</strong>的其他操作时间复杂度至多是$O(n)$；所以<strong>tconcat</strong>的时间复杂度就是： $$ O(n^{2}) $$</p>
-<h2 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h2><p>因为<strong>tconcat</strong>采用缓存机制处理被连接的字符串，缓存Buffer只会在新追加的字符串无法追加进Buffer时扩容；根据<strong>摊还分析</strong>思想，其空间复杂度应该是： $$ O(n) $$ 同样的，JAVA中对String类字符串进行连接，其空间复杂度就应该是： $$ O(n^{2}) $$</p>
-<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><p><a target="_blank" rel="noopener" href="https://www.lua.org/manual/5.3/manual.html#pdf-table.concat"><strong>lua5.3参考手册之table.concat</strong></a></p>
+<p>我们注意到<strong>tconcat</strong>是在一个for循环中追加元素和分隔符的；而<strong>tconcat</strong>的其他操作时间复杂度至多是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>；所以<strong>tconcat</strong>的时间复杂度就是： $$ O(n^{2}) $$</p>
+<h2 id="空间复杂度"><a class="markdownIt-Anchor" href="#空间复杂度"></a> 空间复杂度</h2>
+<p>因为<strong>tconcat</strong>采用缓存机制处理被连接的字符串，缓存Buffer只会在新追加的字符串无法追加进Buffer时扩容；根据<strong>摊还分析</strong>思想，其空间复杂度应该是： $$ O(n) $$ 同样的，JAVA中对String类字符串进行连接，其空间复杂度就应该是： $$ O(n^{2}) $$</p>
+<h1 id="引用"><a class="markdownIt-Anchor" href="#引用"></a> 引用</h1>
+<p><a target="_blank" rel="noopener" href="https://www.lua.org/manual/5.3/manual.html#pdf-table.concat"><strong>lua5.3参考手册之table.concat</strong></a></p>
 
     </div>
 

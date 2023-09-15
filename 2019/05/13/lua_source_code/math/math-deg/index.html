@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -96,20 +100,23 @@
 
     <div class="post-md">
         
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-deg%E7%AE%80%E4%BB%8B"><span class="post-toc-text">math_deg简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-deg%E5%AE%9E%E7%8E%B0"><span class="post-toc-text">math_deg实现</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%80%E4%BA%9B%E8%AF%B4%E6%98%8E"><span class="post-toc-text">一些说明</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math_deg%E7%AE%80%E4%BB%8B"><span class="post-toc-text"> math_deg简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math_deg%E5%AE%9E%E7%8E%B0"><span class="post-toc-text"> math_deg实现</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%80%E4%BA%9B%E8%AF%B4%E6%98%8E"><span class="post-toc-text"> 一些说明</span></a></li></ol>
         
-        <h1 id="math-deg简介"><a href="#math-deg简介" class="headerlink" title="math_deg简介"></a>math_deg简介</h1><p><strong>math_deg</strong>是lua库函数<strong>math.deg</strong>的具体实现。<strong>math_deg</strong>的目的是将以弧度为单位的参数转换成以角度为单位的值。<strong>math_deg</strong>的声明如下：</p>
-<pre><code class="c">static int math_deg (lua_State *L);
+        <h1 id="math_deg简介"><a class="markdownIt-Anchor" href="#math_deg简介"></a> math_deg简介</h1>
+<p><strong>math_deg</strong>是lua库函数<strong>math.deg</strong>的具体实现。<strong>math_deg</strong>的目的是将以弧度为单位的参数转换成以角度为单位的值。<strong>math_deg</strong>的声明如下：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_deg</span> <span class="hljs-params">(lua_State *L)</span>;
 </code></pre>
-<hr>
-<h1 id="math-deg实现"><a href="#math-deg实现" class="headerlink" title="math_deg实现"></a>math_deg实现</h1><p><strong>math_deg</strong>的源码：</p>
-<pre><code class="c">static int math_deg (lua_State *L) &#123;                                                  
-    lua_pushnumber(L, luaL_checknumber(L, 1) * (l_mathop(180.0) / PI));
-    return 1;
+<hr />
+<h1 id="math_deg实现"><a class="markdownIt-Anchor" href="#math_deg实现"></a> math_deg实现</h1>
+<p><strong>math_deg</strong>的源码：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_deg</span> <span class="hljs-params">(lua_State *L)</span> &#123;                                                  
+    lua_pushnumber(L, luaL_checknumber(L, <span class="hljs-number">1</span>) * (l_mathop(<span class="hljs-number">180.0</span>) / PI));
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 &#125;
 </code></pre>
-<p><strong>math_deg</strong>的实现代码是一目可以了然的。<strong>math_deg</strong>能正确求得角度依赖的数学公式： $$ 角度 &#x3D; 弧度 \times \frac{180^{\circ}}{\pi} $$ <strong>math_deg</strong>通过上述的数学公式求得角度值，然后将结果入栈。</p>
-<h1 id="一些说明"><a href="#一些说明" class="headerlink" title="一些说明"></a>一些说明</h1><p>1个单位的弧度大约等于$57.3^{\circ}$. 一个单位的角度等于$\frac{180^{\circ}}{\pi}$弧度. math_<strong>deg</strong>中的<strong>deg</strong>是<strong>degree</strong>（角度）的缩写。</p>
+<p><strong>math_deg</strong>的实现代码是一目可以了然的。<strong>math_deg</strong>能正确求得角度依赖的数学公式： $$ 角度 = 弧度 \times \frac{180^{\circ}}{\pi} $$ <strong>math_deg</strong>通过上述的数学公式求得角度值，然后将结果入栈。</p>
+<h1 id="一些说明"><a class="markdownIt-Anchor" href="#一些说明"></a> 一些说明</h1>
+<p>1个单位的弧度大约等于<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>57.</mn><msup><mn>3</mn><mrow><mspace linebreak="newline"></mspace><mi>c</mi><mi>i</mi><mi>r</mi><mi>c</mi></mrow></msup></mrow><annotation encoding="application/x-tex">57.3^{\\circ}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.824664em;vertical-align:0em;"></span><span class="mord">5</span><span class="mord">7</span><span class="mord">.</span><span class="mord"><span class="mord">3</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.824664em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mspace mtight newline"></span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">c</span></span></span></span></span></span></span></span></span></span></span></span>. 一个单位的角度等于<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mspace linebreak="newline"></mspace><mi>f</mi><mi>r</mi><mi>a</mi><mi>c</mi><mrow><mn>18</mn><msup><mn>0</mn><mrow><mspace linebreak="newline"></mspace><mi>c</mi><mi>i</mi><mi>r</mi><mi>c</mi></mrow></msup></mrow><mrow><mspace linebreak="newline"></mspace><mi>p</mi><mi>i</mi></mrow></mrow><annotation encoding="application/x-tex">\\frac{180^{\\circ}}{\\pi}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="mspace newline"></span><span class="base"><span class="strut" style="height:1.019104em;vertical-align:-0.19444em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span><span class="mord"><span class="mord">1</span><span class="mord">8</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.824664em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mspace mtight newline"></span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">c</span></span></span></span></span></span></span></span></span></span><span class="mord"><span class="mspace newline"></span><span class="mord mathnormal">p</span><span class="mord mathnormal">i</span></span></span></span></span>弧度. math_<strong>deg</strong>中的<strong>deg</strong>是<strong>degree</strong>（角度）的缩写。</p>
 
     </div>
 

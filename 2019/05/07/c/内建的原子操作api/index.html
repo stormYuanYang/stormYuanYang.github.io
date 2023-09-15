@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -96,10 +100,12 @@
 
     <div class="post-md">
         
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E9%9B%B6%E3%80%81%E5%89%8D%E8%A8%80"><span class="post-toc-text">零、前言</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%80%E3%80%81n-%E7%B1%BB%E6%93%8D%E4%BD%9C"><span class="post-toc-text">一、n++类操作</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%BA%8C%E3%80%81-n%E7%B1%BB%E6%93%8D%E4%BD%9C"><span class="post-toc-text">二、++n类操作</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%89%E3%80%81CAS"><span class="post-toc-text">三、CAS</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%9B%9B%E3%80%81lock-test-and-set"><span class="post-toc-text">四、lock_test_and_set</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%BA%94%E3%80%81lock-release"><span class="post-toc-text">五、lock_release</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%B3%A8%E6%84%8F"><span class="post-toc-text">注意</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%BC%95%E7%94%A8"><span class="post-toc-text">引用</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E9%9B%B6-%E5%89%8D%E8%A8%80"><span class="post-toc-text"> 零、前言</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%80-n%E7%B1%BB%E6%93%8D%E4%BD%9C"><span class="post-toc-text"> 一、n++类操作</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%BA%8C-n%E7%B1%BB%E6%93%8D%E4%BD%9C"><span class="post-toc-text"> 二、++n类操作</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%89-cas"><span class="post-toc-text"> 三、CAS</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%9B%9B-lock_test_and_set"><span class="post-toc-text"> 四、lock_test_and_set</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%BA%94-lock_release"><span class="post-toc-text"> 五、lock_release</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E6%B3%A8%E6%84%8F"><span class="post-toc-text"> 注意</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%BC%95%E7%94%A8"><span class="post-toc-text"> 引用</span></a></li></ol>
         
-        <h1 id="零、前言"><a href="#零、前言" class="headerlink" title="零、前言"></a>零、前言</h1><p>大名鼎鼎的<strong>GCC</strong>在glibc中，为原子操作提供了一系列<strong>built-in functions</strong>。这些函数以较底层的汇编代码编写，减轻了系统、应用级别的加锁带来的性能损耗。因为是内建的函数，在使用时不需要包含标准库的头文件；下面简单介绍这些函数。</p>
-<h1 id="一、n-类操作"><a href="#一、n-类操作" class="headerlink" title="一、n++类操作"></a>一、n++类操作</h1><pre><code class="c">type __sync_fetch_and_add (type *ptr, type value, ...)
+        <h1 id="零-前言"><a class="markdownIt-Anchor" href="#零-前言"></a> 零、前言</h1>
+<p>大名鼎鼎的<strong>GCC</strong>在glibc中，为原子操作提供了一系列<strong>built-in functions</strong>。这些函数以较底层的汇编代码编写，减轻了系统、应用级别的加锁带来的性能损耗。因为是内建的函数，在使用时不需要包含标准库的头文件；下面简单介绍这些函数。</p>
+<h1 id="一-n类操作"><a class="markdownIt-Anchor" href="#一-n类操作"></a> 一、n++类操作</h1>
+<pre class="highlight"><code class="c">type __sync_fetch_and_add (type *ptr, type value, ...)
 type __sync_fetch_and_sub (type *ptr, type value, ...)
 type __sync_fetch_and_or (type *ptr, type value, ...)
 type __sync_fetch_and_and (type *ptr, type value, ...)
@@ -107,15 +113,15 @@ type __sync_fetch_and_xor (type *ptr, type value, ...)
 type __sync_fetch_and_nand (type *ptr, type value, ...)
 </code></pre>
 <p>上述函数用伪代码可以表示为：</p>
-<pre><code class="c">&#123; // add sub or and xor
+<pre class="highlight"><code class="c">&#123; <span class="hljs-comment">// add sub or and xor</span>
     tmp = *ptr; 
-    *ptr op= value; //op表示操作，比如+、-、&amp;、、^等
-    return tmp; 
+    *ptr op= value; <span class="hljs-comment">//op表示操作，比如+、-、&amp;、、^等</span>
+    <span class="hljs-keyword">return</span> tmp; 
 &#125;
-&#123; // nand 即 not and，对and之后的值取反
+&#123; <span class="hljs-comment">// nand 即 not and，对and之后的值取反</span>
     tmp = *ptr; 
     *ptr = ~(tmp &amp; value); 
-    return tmp; 
+    <span class="hljs-keyword">return</span> tmp; 
 &#125;   
 </code></pre>
 <p>对其一一说明：</p>
@@ -128,39 +134,40 @@ type __sync_fetch_and_nand (type *ptr, type value, ...)
 <li><strong>__sync_fetch_and_nand</strong>：原子not and运算，先与运算再取反获得新值，但返回旧的*ptr。</li>
 </ul>
 <p>测试代码（非多线程环境，只是演示如何使用原子操作）：</p>
-<pre><code class="c">#include &lt;stdio.h&gt;
-int main() &#123;
-    int a = 0;
-    // __sync_fetch_and_add
-    printf(&quot;%d &quot;, __sync_fetch_and_add(&amp;a, 1));
-    printf(&quot;%d\n&quot;, a);
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-type">int</span> a = <span class="hljs-number">0</span>;
+    <span class="hljs-comment">// __sync_fetch_and_add</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, __sync_fetch_and_add(&amp;a, <span class="hljs-number">1</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
 
-    // __sync_fetch_and_sub
-    printf(&quot;%d &quot;, __sync_fetch_and_sub(&amp;a, 1));
-    printf(&quot;%d\n&quot;, a);
+    <span class="hljs-comment">// __sync_fetch_and_sub</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, __sync_fetch_and_sub(&amp;a, <span class="hljs-number">1</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
 
-    // __sync_fetch_and_or
-    printf(&quot;%d &quot;, __sync_fetch_and_or(&amp;a, 1));
-    printf(&quot;%d\n&quot;, a);
+    <span class="hljs-comment">// __sync_fetch_and_or</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, __sync_fetch_and_or(&amp;a, <span class="hljs-number">1</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
 
-    // __sync_fetch_and_and
-    printf(&quot;%d &quot;, __sync_fetch_and_and(&amp;a, 0));
-    printf(&quot;%d\n&quot;, a);
+    <span class="hljs-comment">// __sync_fetch_and_and</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, __sync_fetch_and_and(&amp;a, <span class="hljs-number">0</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
 
-    // __sync_fetch_and_xor
-    printf(&quot;%d &quot;, __sync_fetch_and_xor(&amp;a, 1));
-    printf(&quot;%d\n&quot;, a);
+    <span class="hljs-comment">// __sync_fetch_and_xor</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, __sync_fetch_and_xor(&amp;a, <span class="hljs-number">1</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
 
-    // __sync_fetch_and_nand
-    // 1 &amp; 1 --&gt; 1
-    // not 1 --&gt; 1111...1110
-    // 最终得到-2
-    printf(&quot;%d &quot;, __sync_fetch_and_nand(&amp;a, 1));
-    printf(&quot;%d\n&quot;, a);
-    return 0;
+    <span class="hljs-comment">// __sync_fetch_and_nand</span>
+    <span class="hljs-comment">// 1 &amp; 1 --&gt; 1</span>
+    <span class="hljs-comment">// not 1 --&gt; 1111...1110</span>
+    <span class="hljs-comment">// 最终得到-2</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, __sync_fetch_and_nand(&amp;a, <span class="hljs-number">1</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
-<h1 id="二、-n类操作"><a href="#二、-n类操作" class="headerlink" title="二、++n类操作"></a>二、++n类操作</h1><pre><code class="c">type __sync_add_and_fetch (type *ptr, type value, ...)
+<h1 id="二-n类操作"><a class="markdownIt-Anchor" href="#二-n类操作"></a> 二、++n类操作</h1>
+<pre class="highlight"><code class="c">type __sync_add_and_fetch (type *ptr, type value, ...)
 type __sync_sub_and_fetch (type *ptr, type value, ...)
 type __sync_or_and_fetch (type *ptr, type value, ...)
 type __sync_and_and_fetch (type *ptr, type value, ...)
@@ -168,13 +175,13 @@ type __sync_xor_and_fetch (type *ptr, type value, ...)
 type __sync_nand_and_fetch (type *ptr, type value, ...)
 </code></pre>
 <p>上述函数用伪代码表示：</p>
-<pre><code class="c">&#123;// add sub or and xor nand
+<pre class="highlight"><code class="c">&#123;<span class="hljs-comment">// add sub or and xor nand</span>
     *ptr op= value; 
-    return *ptr; 
+    <span class="hljs-keyword">return</span> *ptr; 
 &#125;
-&#123;// nand 即not and
+&#123;<span class="hljs-comment">// nand 即not and</span>
     *ptr = ~(*ptr &amp; value); 
-    return *ptr; 
+    <span class="hljs-keyword">return</span> *ptr; 
 &#125;
 </code></pre>
 <p>对其一一说明：</p>
@@ -187,40 +194,41 @@ type __sync_nand_and_fetch (type *ptr, type value, ...)
 <li><strong>__sync_nand_and_fetch</strong>：原子not and运算，先与运算再取反获得新值，并返回新值。</li>
 </ul>
 <p>测试代码：</p>
-<pre><code class="c">#include &lt;stdio.h&gt;
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span>
 
-int main() &#123;
-    int a = 0;
-    // __sync_add_and_fetch
-    printf(&quot;%d &quot;, __sync_add_and_fetch(&amp;a, 1));
-    printf(&quot;%d\n&quot;, a);
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-type">int</span> a = <span class="hljs-number">0</span>;
+    <span class="hljs-comment">// __sync_add_and_fetch</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, __sync_add_and_fetch(&amp;a, <span class="hljs-number">1</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
 
-    // __sync_sub_and_fetch
-    printf(&quot;%d &quot;, __sync_sub_and_fetch(&amp;a, 1));
-    printf(&quot;%d\n&quot;, a);
+    <span class="hljs-comment">// __sync_sub_and_fetch</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, __sync_sub_and_fetch(&amp;a, <span class="hljs-number">1</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
 
-    // __sync_or_and_fetch
-    printf(&quot;%d &quot;, __sync_or_and_fetch(&amp;a, 1));
-    printf(&quot;%d\n&quot;, a);
+    <span class="hljs-comment">// __sync_or_and_fetch</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, __sync_or_and_fetch(&amp;a, <span class="hljs-number">1</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
 
-    // __sync_and_and_fetch
-    printf(&quot;%d &quot;, __sync_and_and_fetch(&amp;a, 0));
-    printf(&quot;%d\n&quot;, a);
+    <span class="hljs-comment">// __sync_and_and_fetch</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, __sync_and_and_fetch(&amp;a, <span class="hljs-number">0</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
 
-    // __sync_xor_and_fetch
-    printf(&quot;%d &quot;, __sync_xor_and_fetch(&amp;a, 1));
-    printf(&quot;%d\n&quot;, a);
+    <span class="hljs-comment">// __sync_xor_and_fetch</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, __sync_xor_and_fetch(&amp;a, <span class="hljs-number">1</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
 
-    // __sync_nand_and_fetch
-    // 1 &amp; 1 --&gt; 1
-    // not 1 --&gt; 1111...1110
-    // 最终得到-2
-    printf(&quot;%d &quot;, __sync_nand_and_fetch(&amp;a, 1));
-    printf(&quot;%d\n&quot;, a);
-    return 0;
+    <span class="hljs-comment">// __sync_nand_and_fetch</span>
+    <span class="hljs-comment">// 1 &amp; 1 --&gt; 1</span>
+    <span class="hljs-comment">// not 1 --&gt; 1111...1110</span>
+    <span class="hljs-comment">// 最终得到-2</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, __sync_nand_and_fetch(&amp;a, <span class="hljs-number">1</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
-<h1 id="三、CAS"><a href="#三、CAS" class="headerlink" title="三、CAS"></a>三、CAS</h1><pre><code class="c">bool __sync_bool_compare_and_swap (type *ptr, type oldval type newval, ...)
+<h1 id="三-cas"><a class="markdownIt-Anchor" href="#三-cas"></a> 三、CAS</h1>
+<pre class="highlight"><code class="c"><span class="hljs-type">bool</span> __sync_bool_compare_and_swap (type *ptr, type oldval type newval, ...)
 type __sync_val_compare_and_swap (type *ptr, type oldval type newval, ...)
 </code></pre>
 <p>上述函数，执行原子的比较和交换（即<strong>CAS</strong>）：如果当前的*ptr等于oldval,则将newval写入到*ptr。 说明：</p>
@@ -229,69 +237,73 @@ type __sync_val_compare_and_swap (type *ptr, type oldval type newval, ...)
 <li><strong>__sync_val_compare_and_swap</strong>：返回进行CAS操作之前的*ptr。</li>
 </ul>
 <p>测试代码：</p>
-<pre><code class="c">#include &lt;stdio.h&gt;
-int main() &#123;
-    int a = 0;
-    // a: 0 --&gt; 9(can)
-    printf(&quot;%s &quot;, __sync_bool_compare_and_swap(&amp;a, 0, 9) ? &quot;yes&quot; : &quot;no&quot;);
-    printf(&quot;%d\n&quot;, a);
-    //a: 9 --&gt; 0 (can not, 因为a != 5)
-    printf(&quot;%s &quot;, __sync_bool_compare_and_swap(&amp;a, 5, 0) ? &quot;yes&quot; : &quot;no&quot;);
-    printf(&quot;%d\n&quot;, a);
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-type">int</span> a = <span class="hljs-number">0</span>;
+    <span class="hljs-comment">// a: 0 --&gt; 9(can)</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%s &quot;</span>, __sync_bool_compare_and_swap(&amp;a, <span class="hljs-number">0</span>, <span class="hljs-number">9</span>) ? <span class="hljs-string">&quot;yes&quot;</span> : <span class="hljs-string">&quot;no&quot;</span>);
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
+    <span class="hljs-comment">//a: 9 --&gt; 0 (can not, 因为a != 5)</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%s &quot;</span>, __sync_bool_compare_and_swap(&amp;a, <span class="hljs-number">5</span>, <span class="hljs-number">0</span>) ? <span class="hljs-string">&quot;yes&quot;</span> : <span class="hljs-string">&quot;no&quot;</span>);
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
 
-    a = 0;
-    // success
-    printf(&quot;old:%d &quot;, __sync_val_compare_and_swap(&amp;a, 0, 9)); 
-    printf(&quot;new:%d\n&quot;, a);
-    // fail,因为a != 5
-    printf(&quot;old:%d &quot;, __sync_val_compare_and_swap(&amp;a, 5, 0)); 
-    printf(&quot;new:%d\n&quot;, a);
+    a = <span class="hljs-number">0</span>;
+    <span class="hljs-comment">// success</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;old:%d &quot;</span>, __sync_val_compare_and_swap(&amp;a, <span class="hljs-number">0</span>, <span class="hljs-number">9</span>)); 
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;new:%d\n&quot;</span>, a);
+    <span class="hljs-comment">// fail,因为a != 5</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;old:%d &quot;</span>, __sync_val_compare_and_swap(&amp;a, <span class="hljs-number">5</span>, <span class="hljs-number">0</span>)); 
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;new:%d\n&quot;</span>, a);
 
-    return 0;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
-<h1 id="四、lock-test-and-set"><a href="#四、lock-test-and-set" class="headerlink" title="四、lock_test_and_set"></a>四、lock_test_and_set</h1><pre><code class="c">type __sync_lock_test_and_set (type *ptr, type value, ...)
+<h1 id="四-lock_test_and_set"><a class="markdownIt-Anchor" href="#四-lock_test_and_set"></a> 四、lock_test_and_set</h1>
+<pre class="highlight"><code class="c">type __sync_lock_test_and_set (type *ptr, type value, ...)
 </code></pre>
 <p><strong>__sync_lock_test_and_set</strong>将value写入*ptr，返回旧的*ptr。 测试代码：</p>
-<pre><code class="c">#include &lt;stdio.h&gt;
-int main() &#123;
-    int a = 0;
-    // a:0 --&gt; 6
-    printf(&quot;%d\n&quot;, __sync_lock_test_and_set(&amp;a, 6));
-    printf(&quot;%d\n&quot;, a);
-    return 0;
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-type">int</span> a = <span class="hljs-number">0</span>;
+    <span class="hljs-comment">// a:0 --&gt; 6</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, __sync_lock_test_and_set(&amp;a, <span class="hljs-number">6</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
-<h1 id="五、lock-release"><a href="#五、lock-release" class="headerlink" title="五、lock_release"></a>五、lock_release</h1><pre><code class="c">void __sync_lock_release (type *ptr, ...)
+<h1 id="五-lock_release"><a class="markdownIt-Anchor" href="#五-lock_release"></a> 五、lock_release</h1>
+<pre class="highlight"><code class="c"><span class="hljs-type">void</span> __sync_lock_release (type *ptr, ...)
 </code></pre>
-<p><strong>__sync_lock_release</strong>可以释放<strong>__sync_lock_test_and_set</strong>获得的锁。一般将0写入*ptr。 测试代码：</p>
-<pre><code class="c">#include &lt;stdio.h&gt;
+<p><strong>__sync_lock_release</strong>可以释放**__sync_lock_test_and_set**获得的锁。一般将0写入*ptr。 测试代码：</p>
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span>
 
-int main() &#123;
-    int a = 0;
-    // a:0 --&gt; 6
-    printf(&quot;%d\n&quot;, __sync_lock_test_and_set(&amp;a, 6));
-    printf(&quot;%d\n&quot;, a);
-    // release 
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;
+    <span class="hljs-type">int</span> a = <span class="hljs-number">0</span>;
+    <span class="hljs-comment">// a:0 --&gt; 6</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, __sync_lock_test_and_set(&amp;a, <span class="hljs-number">6</span>));
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
+    <span class="hljs-comment">// release </span>
     __sync_lock_release(&amp;a);
-    printf(&quot;%d\n&quot;, a);
-    return 0;
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
-<h1 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h1><p>上文提到的原子操作在新的标准库版本中支持C++11的内存模型。 上文提到的原子操作在较新的版本中，前缀由<strong>__sync</strong>变更为<strong>__atomic</strong>，并且去掉了中间的and，比如<strong>__sync_fetch_and_add</strong>变为<strong>__atomic_fetch_add</strong>；并且在使用上有细微差别。 上文提到的原子操作支持大小为1,2,4或者8字节的完整的变量和指针（如果__int128被支持，原子操作可以支持16字节的变量）。 上文提供的测试代码，请使用gcc进行编译。 在<strong>gcc4.4</strong>之前的版本，<strong>__sync_fetch_and_nand</strong>是先对*ptr的tmp值取反，再执行与运算（步骤是相反的）：</p>
-<pre><code class="c">&#123; // GCC4.4之前 nand 即 not and
+<h1 id="注意"><a class="markdownIt-Anchor" href="#注意"></a> 注意</h1>
+<p>上文提到的原子操作在新的标准库版本中支持C++11的内存模型。 上文提到的原子操作在较新的版本中，前缀由**__sync<strong>变更为</strong>__atomic**，并且去掉了中间的and，比如**__sync_fetch_and_add<strong>变为</strong>__atomic_fetch_add**；并且在使用上有细微差别。 上文提到的原子操作支持大小为1,2,4或者8字节的完整的变量和指针（如果__int128被支持，原子操作可以支持16字节的变量）。 上文提供的测试代码，请使用gcc进行编译。 在<strong>gcc4.4</strong>之前的版本，<strong>__sync_fetch_and_nand</strong>是先对*ptr的tmp值取反，再执行与运算（步骤是相反的）：</p>
+<pre class="highlight"><code class="c">&#123; <span class="hljs-comment">// GCC4.4之前 nand 即 not and</span>
     tmp = *ptr; 
-    *ptr = ~tmp &amp; value;// 先取反，再求与 
-    return tmp; 
+    *ptr = ~tmp &amp; value;<span class="hljs-comment">// 先取反，再求与 </span>
+    <span class="hljs-keyword">return</span> tmp; 
 &#125;   
 </code></pre>
 <p>在<strong>gcc4.4</strong>之前的版本，<strong>__sync_nand_and_fetch</strong>是先对*ptr的tmp值取反，再执行与运算（步骤是相反的）：</p>
-<pre><code class="c">&#123;// GCC4.4之前 nand 即 not and
-    *ptr = ~*ptr &amp; value;// 先取反，再求与 
-    return *ptr;
+<pre class="highlight"><code class="c">&#123;<span class="hljs-comment">// GCC4.4之前 nand 即 not and</span>
+    *ptr = ~*ptr &amp; value;<span class="hljs-comment">// 先取反，再求与 </span>
+    <span class="hljs-keyword">return</span> *ptr;
 &#125;
 </code></pre>
-<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><p><a target="_blank" rel="noopener" href="https://gcc.gnu.org/onlinedocs/gcc-9.1.0/gcc/_005f_005fatomic-Builtins.html#g_t_005f_005fatomic-Builtins"><strong>GCC原子操作说明文档</strong></a></p>
+<h1 id="引用"><a class="markdownIt-Anchor" href="#引用"></a> 引用</h1>
+<p><a target="_blank" rel="noopener" href="https://gcc.gnu.org/onlinedocs/gcc-9.1.0/gcc/_005f_005fatomic-Builtins.html#g_t_005f_005fatomic-Builtins"><strong>GCC原子操作说明文档</strong></a></p>
 
     </div>
 

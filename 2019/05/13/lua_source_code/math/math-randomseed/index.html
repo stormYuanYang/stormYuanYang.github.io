@@ -29,7 +29,11 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-<meta name="generator" content="Hexo 6.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
     
     <body>
         <div class="paper">
@@ -46,7 +50,7 @@
         height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
         <div class="header-content">
             <a class="logo" href="/">猫和天蝎</a> 
-            <span class="description"></span> 
+            <span class="description">当然我在思考</span> 
         </div>
         
     </div>
@@ -96,31 +100,34 @@
 
     <div class="post-md">
         
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-randomseed%E7%AE%80%E4%BB%8B"><span class="post-toc-text">math_randomseed简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math-randomseed%E5%AE%9E%E7%8E%B0"><span class="post-toc-text">math_randomseed实现</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%80%E4%BA%9B%E8%AF%B4%E6%98%8E"><span class="post-toc-text">一些说明</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math_randomseed%E7%AE%80%E4%BB%8B"><span class="post-toc-text"> math_randomseed简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#math_randomseed%E5%AE%9E%E7%8E%B0"><span class="post-toc-text"> math_randomseed实现</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E4%B8%80%E4%BA%9B%E8%AF%B4%E6%98%8E"><span class="post-toc-text"> 一些说明</span></a></li></ol>
         
-        <h1 id="math-randomseed简介"><a href="#math-randomseed简介" class="headerlink" title="math_randomseed简介"></a>math_randomseed简介</h1><p><strong>math_randomseed</strong>是lua库函数<strong>math.randomseed</strong>的具体实现。<strong>math_randomseed</strong>的目的是设定随机数生成器的“种子”，相同的“种子”会产生相同的伪随机数序列。<strong>math_randomseed</strong>的声明如下：</p>
-<pre><code class="c">static int math_randomseed (lua_State *L);
+        <h1 id="math_randomseed简介"><a class="markdownIt-Anchor" href="#math_randomseed简介"></a> math_randomseed简介</h1>
+<p><strong>math_randomseed</strong>是lua库函数<strong>math.randomseed</strong>的具体实现。<strong>math_randomseed</strong>的目的是设定随机数生成器的“种子”，相同的“种子”会产生相同的伪随机数序列。<strong>math_randomseed</strong>的声明如下：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_randomseed</span> <span class="hljs-params">(lua_State *L)</span>;
 </code></pre>
-<h1 id="math-randomseed实现"><a href="#math-randomseed实现" class="headerlink" title="math_randomseed实现"></a>math_randomseed实现</h1><p><strong>math_randomseed</strong>的实现源码：</p>
-<pre><code class="c">static int math_randomseed (lua_State *L) &#123;                                           
-    l_srand((unsigned int)(lua_Integer)luaL_checknumber(L, 1));
-    (void)l_rand(); /* discard first value to avoid undesirable correlations */
-    return 0;
+<h1 id="math_randomseed实现"><a class="markdownIt-Anchor" href="#math_randomseed实现"></a> math_randomseed实现</h1>
+<p><strong>math_randomseed</strong>的实现源码：</p>
+<pre class="highlight"><code class="c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">math_randomseed</span> <span class="hljs-params">(lua_State *L)</span> &#123;                                           
+    l_srand((<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span>)(lua_Integer)luaL_checknumber(L, <span class="hljs-number">1</span>));
+    (<span class="hljs-type">void</span>)l_rand(); <span class="hljs-comment">/* discard first value to avoid undesirable correlations */</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 &#125;
 </code></pre>
 <p><strong>math_randomseed</strong>通过调用<strong>l_srand</strong>将传入的参数设为随机数生成器的“种子”。注意接下来的<code>(void)l_rand();</code>，执行一次随机数函数的调用的目的是丢弃当前“种子”产生的第一个随机数，避免产生不好的随机数关联，以便提高伪随机性。</p>
-<h1 id="一些说明"><a href="#一些说明" class="headerlink" title="一些说明"></a>一些说明</h1><p><strong>l_srand</strong>和<strong>l_rand</strong>均是宏定义(都定义在<strong>lmathlib.c</strong>中)：</p>
-<pre><code class="c">#if !defined(l_rand)        /* &#123; */                                                   
-    #if defined(LUA_USE_POSIX)
-        #define l_rand()    random()
-        #define l_srand(x)  srandom(x)
-        #define L_RANDMAX   2147483647  /* (2^31 - 1), following POSIX */
-    #else
-        #define l_rand()    rand()
-        #define l_srand(x)  srand(x)
-        #define L_RANDMAX   RAND_MAX
-    #endif
-#endif                      /* &#125; */
+<h1 id="一些说明"><a class="markdownIt-Anchor" href="#一些说明"></a> 一些说明</h1>
+<p><strong>l_srand</strong>和<strong>l_rand</strong>均是宏定义(都定义在<strong>lmathlib.c</strong>中)：</p>
+<pre class="highlight"><code class="c"><span class="hljs-meta">#<span class="hljs-keyword">if</span> !defined(l_rand)        <span class="hljs-comment">/* &#123; */</span>                                                   </span>
+    <span class="hljs-meta">#<span class="hljs-keyword">if</span> defined(LUA_USE_POSIX)</span>
+        <span class="hljs-meta">#<span class="hljs-keyword">define</span> l_rand()    random()</span>
+        <span class="hljs-meta">#<span class="hljs-keyword">define</span> l_srand(x)  srandom(x)</span>
+        <span class="hljs-meta">#<span class="hljs-keyword">define</span> L_RANDMAX   2147483647  <span class="hljs-comment">/* (2^31 - 1), following POSIX */</span></span>
+    <span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+        <span class="hljs-meta">#<span class="hljs-keyword">define</span> l_rand()    rand()</span>
+        <span class="hljs-meta">#<span class="hljs-keyword">define</span> l_srand(x)  srand(x)</span>
+        <span class="hljs-meta">#<span class="hljs-keyword">define</span> L_RANDMAX   RAND_MAX</span>
+    <span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span>                      <span class="hljs-comment">/* &#125; */</span></span>
 </code></pre>
 
     </div>
