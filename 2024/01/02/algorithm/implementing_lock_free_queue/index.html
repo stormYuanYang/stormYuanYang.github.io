@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0,  viewport-fit=cover" name="viewport" />
+    <meta name="description" content="实现无锁队列" />
+    <meta name="hexo-theme-A4" content="v1.6.9" />
+    <link rel="alternate icon" type="image/webp" href="/img/favicon.webp">
+    <title>猫和天蝎 | 太阳岛</title>
+
+    
+        
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/reset.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/markdown.css">
+
+            
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/fonts.css">
+ 
+            <!--注意：首页既不是post也不是page-->
+            
+        
+    
+    
+<link rel="stylesheet" href="/css/ui.css">
+ 
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+    
+    <body>
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+<div class="header">
+    <div class="header-container">
+        <img style="
+        width: 56px;
+        height: auto;" alt="^-^" cache-control="max-age=86400" class="header-img" src="/img/favicon.webp" width="10%"></img>
+        <div class="header-content">
+            <a class="logo" href="/">猫和天蝎</a> 
+            <span class="description">当然我在思考</span> 
+        </div>
+        
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="/">首页</a></li>
+            
+        
+            
+                <li><a href="/list/">文章</a></li>
+            
+        
+            
+                <li><a href="/categories/">分类</a></li>
+            
+        
+            
+                <li><a href="/tags/">标签</a></li>
+            
+        
+            
+                <li><a href="/about/">关于</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+
+    
+        <div class="post-main-title">
+            实现无锁队列
+        </div>
+      
+    
+
+    <div class="post-md">
+        
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%91%98%E8%A6%81"><span class="post-toc-text"> 摘要</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-%E5%BA%8F%E8%A8%80"><span class="post-toc-text"> 1 序言</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-%E8%83%8C%E6%99%AF"><span class="post-toc-text"> 2 背景</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-%E9%93%BE%E8%A1%A8%E5%AE%9E%E7%8E%B0"><span class="post-toc-text"> 3 链表实现</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#31-%E9%9D%9E%E7%BA%BF%E6%80%A7%E5%8C%96%E6%96%B9%E6%B3%95"><span class="post-toc-text"> 3.1 非线性化方法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#32-%E9%98%BB%E5%A1%9E%E6%96%B9%E6%B3%95"><span class="post-toc-text"> 3.2 阻塞方法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#33-%E9%9D%9E%E9%98%BB%E5%A1%9E%E6%96%B9%E6%B3%95"><span class="post-toc-text"> 3.3 非阻塞方法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#34-%E4%B8%80%E7%A7%8D%E6%96%B0%E7%9A%84%E6%97%A0%E9%94%81%E9%98%9F%E5%88%97"><span class="post-toc-text"> 3.4 一种新的无锁队列</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-aba%E9%97%AE%E9%A2%98"><span class="post-toc-text"> 4 ABA问题</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#41%E5%AE%89%E5%85%A8%E7%9A%84%E8%AF%BB%E5%8F%96%E5%8D%8F%E8%AE%AE"><span class="post-toc-text"> 4.1安全的读取协议</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#5-%E6%95%B0%E7%BB%84%E5%AE%9E%E7%8E%B0"><span class="post-toc-text"> 5 数组实现</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#51-%E6%96%B0%E7%AE%97%E6%B3%95"><span class="post-toc-text"> 5.1 新算法</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#6-%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="post-toc-text"> 6 实验结果</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#61-%E7%AB%9E%E4%BA%89%E4%B8%8B%E7%9A%84%E5%BB%B6%E8%BF%9F"><span class="post-toc-text"> 6.1 竞争下的延迟</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#62-%E9%A1%BA%E5%BA%8F%E5%BB%B6%E8%BF%9F"><span class="post-toc-text"> 6.2 顺序延迟</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#7-%E6%80%BB%E7%BB%93"><span class="post-toc-text"> 7 总结</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#71-%E6%9C%AA%E6%9D%A5%E7%A0%94%E7%A9%B6"><span class="post-toc-text"> 7.1 未来研究</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%BC%95%E7%94%A8"><span class="post-toc-text"> 引用</span></a></li></ol>
+        
+        <p>作者：<br />
+John D. Valois<br />
+伦斯勒理工学院<br />
+计算机科学系<br />
+位于纽约州，特洛伊市 (邮政编码：12180)<br />
+1994年10月于内华达州的拉斯维加斯,发表在第七届国际并行和分布式计算系统会议论文集。</p>
+<p>译者：<br />
+小旋风</p>
+<h2 id="摘要"><a class="markdownIt-Anchor" href="#摘要"></a> 摘要</h2>
+<p>我们研究了使用无锁数据结构实现FIFO队列抽象数据类型的实用技术，该结构可以在不使用互斥的情况下同步并发进程的操作。提出了新的两个基于链表和数组的算法。我们还提出了一个新的解决方案来解决和Compare&amp;Swap指令相关的ABA问题。我们的链表算法的性能比较了其他几种无锁队列的实现，以及更传统的锁技术。</p>
+<h2 id="1-序言"><a class="markdownIt-Anchor" href="#1-序言"></a> 1 序言</h2>
+<p>为了避免有冲突的更新，对多个进程共享的数据结构的并发访问必须进行同步。按管理，这是使用互斥完成的；进程只在代码临界区内修改数据结构，并保证在这个临界区内对数据结构的互斥访问。通常而言，在多处理器上，临界区由自旋锁保护。我们将参考所有使用互斥的方法，它们称为加锁或者基于锁的方法。</p>
+<p>近期，研究者们研究了不利用互斥实现并发数据结构的方法。在异步环境中，这种无锁数据结构有几个优点。特别地，缓慢或者停止的进程不会阻止其他进程访问该数据结构(应该是指多进程共享的数据结构)。</p>
+<p>FIFO队列是一种位于操作系统实现核心的重要的抽象数据类型。队列在实现许多算法的并行版本时也很有用，例如快速排序和分支限界算法，并且通常在将工作分配给多个进程时很有用[14]。许多作者已经在文献中提出了无锁队列的算法[6,8,11,12,16,18,19,20]。</p>
+<p>接下来，我们将研究无锁FIFO队列的实际实现。第二节介绍和无锁数据结构相关的一些基本概念。第三节调差前人的工作并提出一种新的无锁队列算法，接着第四节讨论如何处理这一类算法可能出现的ABA问题。第五节调查基于数组的算法，并提出了我们的第二种新算法。第六节报告了一些初步的实验性结果，并将我们的算法与其他技术进行比较。</p>
+<h2 id="2-背景"><a class="markdownIt-Anchor" href="#2-背景"></a> 2 背景</h2>
+<p>我们的目标是设计一个支持正常入队和出队操作的并发队列。在并发数据结构中，各个进程顺序地执行单个操作;但是，不同进程的操作可能同时进行。进程间相互协作同时执行一个或多个操作的并行数据结构，与之不同的顺序数据结构只能由单个进程访问。</p>
+<p>无锁数据结构可能具有两个有用的属性。非阻塞属性保证至少有一个执行操作的进程将在少量步骤内完成，而无等待属性保证每个进程将在少量步骤内完成其操作。非阻塞数据结构具有前言中提到的特性，即尽管进程可能在操作期间变慢或中断，但该数据结构始终是可访问的。无等待的数据结构进一步确保没有进程会饥饿。注意，基于锁的数据结构不能具有这两个任意一个属性，因为处于临界区的进程可能无限期地延迟所有操作(译者：持有锁的进程如何执行，其他进程是完全无法预料的，所以完全有可能无限期延迟所有操作)。</p>
+<p>其他作者将无锁(lock-free)和非阻塞(non-blocking)作为同义词，但我们发现区分不需要互斥的算法和实际提供非阻塞特性的算法是有用的。我们将讨论的几个算法属于前一类(译者：即指不需要互斥的算法)。</p>
+<p>我们用线性一致性(linearizability)[7]作为数据结构的正确性条件。线性一致性意味着每个操作似乎在某个时间点上立即发生，并且非并发操作的相对顺序保持不变。换句话说，对于非并发操作，该数据结构的行为与其顺序版本完全相同。而并发操作可以以任何相对顺序进行。</p>
+<p>存在通用的构造方法，可以通过顺序功能算法[4,15]或者并发基于锁的算法[17,21]构建无锁数据结构。一般而言，(通用构造方法)对于像队列这样的简单数据结构，这些方法比我们将要考虑的算法具有更多的开销。</p>
+<p>我们假设目标架构支持常见的原子“读-修改-写”原语，例如Fetch&amp;Add (FAA)和Compare&amp;Swap (CSW)。FAA原子地读取内存位置中的值，将另一个值添加到该值上，并将结果写回内存位置，返回原始值。CSW接受三个值：一个内存位置、一个旧值和一个新值。如果内存位置的当前值等于旧值，则将新值写入该内存位置。因此，只有在我们了解内存位置的当前内容时，CSW才会原子地将新值写入内存位置。CSW返回一个条件码，指示是否成功。</p>
+<p>在我们的伪代码中，我们使用以下符号表示：如果 p 是一个指针，则 p^ 表示指向的对象，p^.field 表示对象中的字段。我们假设已提供了内存分配和回收功能；内存管理将在第4节进一步讨论。</p>
+<h2 id="3-链表实现"><a class="markdownIt-Anchor" href="#3-链表实现"></a> 3 链表实现</h2>
+<p>在本节中，我们回顾了几种基于链表数据结构的无锁队列的提议算法，并提出了一种新的算法。所有这些算法中的数据结构由记录组成，每个记录包含两个字段：next(指向列表中下一个记录的指针)和value(存储在记录中的数据值)。两个全局指针head和tail分别指向列表上的记录；这些指针分别用于在出队和入队时快速找到正确的记录。</p>
+<p>除了3.3节中描述的Massalin算法和Pu算法外，所有这些算法都可以使用CSW原子语义实现。</p>
+<h3 id="31-非线性化方法"><a class="markdownIt-Anchor" href="#31-非线性化方法"></a> 3.1 非线性化方法</h3>
+<p>在[18]中提到了使用CSW来实现由多个处理器共享的队列，原始用途可追溯到20世纪70年代初。[8]中也简要提到了这种方法。</p>
+<p>该方法的工作原理如下：对于出队操作，在链表中使用CSW将头指针向前移动一个节点；原本指向的节点现在被出队。对于入队操作，使用CSW将尾指针指向要入队的新节点；然后将新节点链接到列表的末尾。</p>
+<p>作者没有讨论如何处理空队列；而这并不是一个简单的任务，因为在空队列的情况下，并发的入队和出队操作可能会发生冲突。这些算法还可能导致非线性化行为。</p>
+<p>特别是，当一个进程执行出队操作的时候，如果入队进程在将新节点链接到列表末尾时速度较慢，可能会导致执行出队操作的进程错误地认为队列为空，而实际上队列并不是空的。此外，如果进程完全停止，链表结构就会损坏，无法修复，因为只有被停止的进程知道需要进行哪种连接。</p>
+<h3 id="32-阻塞方法"><a class="markdownIt-Anchor" href="#32-阻塞方法"></a> 3.2 阻塞方法</h3>
+<p>Mellor-Crummey[12]和Stone[19]提出的基本算法解决了上述缺陷。然而，为了确保队列是可线性化的，这两个算法可以检测到一个缓慢的排队过程何时还没有将其节点链接到链表，并只是简单地等待。因此，虽然它们没有使用任何互斥，但这两种算法都不具有非阻塞特性。</p>
+<h3 id="33-非阻塞方法"><a class="markdownIt-Anchor" href="#33-非阻塞方法"></a> 3.3 非阻塞方法</h3>
+<p>Prakash等人[16]提供了一个既可线性化又非阻塞的队列。他们的方法是对队列的当前状态进行快照;通过使用此信息，进程能够完成任何可能阻塞它的停滞进程的操作。</p>
+<p>为了实现这一点，在入队操作期间，该算法首先使用CSW将新节点链接到列表中，然后使用第二个CSW更新tail。(如果第二个CSW失败，则不会重试。)这使得另一个进程完成入队操作(通过更新tail)所需的所有信息都是全局可访问的。</p>
+<p>这种算法的一个缺点是由于需要对队列进行快照，通常不会相互干扰的入队和出队进程可能会发生竞争。</p>
+<p>Massalin和Pu开发了无锁队列算法，作为无锁多处理器操作系统[11]的一部分。他们的算法依赖于一个强大的Compare&amp;Swap变体，它允许原子性地修改两个任意的字，可以在摩托罗拉65030处理器上找到；本文不考虑他们的算法。</p>
+<h3 id="34-一种新的无锁队列"><a class="markdownIt-Anchor" href="#34-一种新的无锁队列"></a> 3.4 一种新的无锁队列</h3>
+<p>我们现在描述一种新的无锁队列算法。该算法的伪代码(伪代码1)如下：</p>
+<pre class="highlight"><code class="pseudocode">ENQUEUE(x)
+	q &lt;-- new record
+	q^.value &lt;-- x
+	q^.next &lt;-- NULL
+	repeat
+		p &lt;-- tail
+    	succ &lt;-- Compare&amp;Swap(p^.next, NULL, q)
+    	if succ != TRUE
+    		Compare&amp;Swap(tail, p, p^.next)
+    until succ == TRUE
+  	Compare&amp;Swap(tail, p, q)
+end
+
+DEQUEUE()
+	repeat
+		p &lt;-- head
+		if p^.next == NULL
+			error queue empty
+	until Compare&amp;Swap(head, p, p^.next)
+	return p^.next^.value
+end
+</code></pre>
+<p>与Prakash等人的算法类似，在入队操作中，我们的算法首先将新节点连接到链表的末尾，然后更新尾指针。然而，我们的出队操作略有不同。head指向最后一个离开队列的节点，而不是当前排在队列最前面的节点。(因此，队列头的节点就是head所指向的节点的后面一个节点。)</p>
+<p>译者：上面这段话中关于出队的操作可能不太好理解，其实意思是说这个队列的头节点不是指向的队列中的首个节点(一般队列头节点指向首个节点)，而是最后一个出队的元素！也就是说最后一个出队的元素仍然被保留在队列中并未从队列中移除，紧接着head的下一个节点才是真正的首节点。</p>
+<p>这个位于链表前端的哑节点确保了头和尾始终指向链表中的一个节点，从而避免了队列为空或只包含一个元素时发生的问题。这种技术还消除了入队和出队进程之间的竞争，即使队列中只有一个项目。</p>
+<p>我们不再需要Prakash等人算法的快照，因为队列唯一可能处于的中间状态是尾指针没有被更新。执行入队操作的进程将在其第一个CSW返回不成功时发现这一点，然后它可以尝试更新tail本身。</p>
+<p>图2显示了按照本节描述实现的队列。请注意，进程正在将项目C入队，尾指针尚未更新。</p>
+<p>![image-20231219174753628](/Users/yangyuan/Library/Application Support/typora-user-images/image-20231219174753628.png)</p>
+<p>在重试操作时，我们可以使用几种策略。在上面的代码中，我们对尾部指针的位置采用了一个严格的策略;它总是指向链表的最后一个节点或在紧接它之前的节点。这是通过第二条CSW指令完成的，如果进程未能将其自己的节点加入队列，该指令将尝试更新尾指针。</p>
+<p>另一种策略是将尾部仅作为链表中最后一个节点位置的“提示”，指向一个非常接近但可能不完全位于链表末尾的节点。接下来给出了实现此策略的伪代码(伪代码2)：</p>
+<pre class="highlight"><code class="pseudocode">ENQUEUE(x)
+	q &lt;-- new record
+	q^.value &lt;-- x
+	q^.next &lt;-- NULL
+	p &lt;-- tail
+	oldp &lt;-- p
+	repeat
+		while p^.next != NULL
+			p &lt;-- p^.next
+	until Compare&amp;Swap(p^.next, NULL, q)
+	Compare&amp;Swap(tail, oldp, q)
+end
+</code></pre>
+<p>接下来的定理表明，尾指针能够偏离链表末端的最大距离受并发入队操作次数的限制。</p>
+<blockquote>
+<p>定理1 如果p个并发进程正在执行队列操作，那么tail指向链表末尾最多2p-1个节点。</p>
+</blockquote>
+<p>证明：我们只需要考虑执行入队操作的进程。考虑最后一个成功设置尾指针的操作。最多p-1个其他操作已经完成入队操作，将节点添加到链表末尾，但由于与第一个进程冲突，未能更新tail。还有最多p个并发入队操作，它们已经向链表插入了节点，但还没有尝试改变尾指针。</p>
+<p>译者：上述证明说到情况也挺好理解的。一共p个进程同时入队，那么在极端情况下，可能有p-1个进程已经执行到上述伪代码的第11行，只不过这p-1个进程执行CSW都失败了，没有成功更新尾指针；只有一个进程正在执行第11行代码（当然这个进程执行CSW会成功）;那执行CSW失败了的p-1个进程，意味着每个进程自己的入队操作结束，又在进行下一次入队操作，并且已经成功插入节点到链表中，也就是说代码刚好执行完第10行，但尚未执行第11行，此时不就又有p-1个新的节点插入到链表中吗？综上：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mn>2</mn><mi>p</mi><mo>−</mo><mn>1</mn><mo>=</mo><mo stretchy="false">(</mo><mi>p</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>+</mo><mn>1</mn><mo>+</mo><mo stretchy="false">(</mo><mi>p</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">2p-1 = (p-1) + 1 + (p-1)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord">2</span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span></span></p>
+<p>2p-1由三部分组成：</p>
+<ul>
+<li>p-1个成功插入的节点,但其对应进程并未成功更新tail;</li>
+<li>第一批p个进程中最幸运的那一个，成功插入节点，但正在更新tail;</li>
+<li>第一批未成功更新tail的p-1进程又进行下一次的入队操作，最多也有p-1个新结点插入到链表，而这p-1个进程尚未去更新tail;</li>
+</ul>
+<p>根据上述分析，我们就明白了证明的过程。</p>
+<p>然而，还有第三种选择。对上述两种策略的实现进行的实验表明，第二种策略导致入队进程将大部分时间花费在遍历链表上，而使用第一种策略则导致来自执行第二条CSW指令的过度竞争。（直观地说，第二条CSW指令是多余的，因为在大多数情况下，当一个进程未能将一个元素链接到列表末尾时，成功的进程将已经更新了tail。）</p>
+<p>这些观察结果引出了第三种策略，即进程永远不会更新尾指针，除非它们刚刚成功地将新元素链到列表中。(很简单，删除伪代码1中的代码：<code>if succ != TRUE Compare&amp;Swap(tail, p, p^.next)</code>)。我们的实验表明，在进程不暂停或停止的情况下，这种策略可以生成最快的代码。</p>
+<p>但不幸的是，这种改变有非阻塞属性被破坏的副作用，因为如果一个停止入队的进程无法更新尾指针，那么后续的入队就无法成功(译者：这里的意思是说，如果一个入队的进程将新节点插入到链表中了，但是还没来得及更新tail指针就中止。此时tail指向的不是队列中最后一个节点，而是倒数第二个节点；而其他的入队进程想要插入新节点必须拿到最后一个节点的指针;但此时tail指向的是倒数第二个节点，所以其他入队进程就永远无法插入新结点，就会被阻塞)。不过，非阻塞属性可以通过实现第二个和第三个策略的混合来恢复；如果tail指针没有更新，入队进程在尝试几次后就可以简单地搜索链表末尾并更新tail指针。</p>
+<h2 id="4-aba问题"><a class="markdownIt-Anchor" href="#4-aba问题"></a> 4 ABA问题</h2>
+<p>在上一节讨论的算法中，CSW的使用方式如下：读取数据结构中的一个指针，进行一些计算以确定如何更改数据结构，然后使用CSW将在此期间没有更改的新值写入指针。由于CSW指令并不能真正确保指针没有更改过，而只是确保它具有某个值，这可能会出现一个微妙的问题。如果指针已经改变，但碰巧具有与我们最初读取它时相同的值，那么CSW指令将成功，但实际它应该失败。</p>
+<p>为了了解无锁队列算法是如何发生这种问题的，考虑一个试图将一个项目从队列中取出的进程。这个过程将读取head的值，确定链表上第二个节点的地址(通过跟踪第一个节点的下一个节点)，然后使用CSW使head指向第二个节点。如果head已经改变(由于其他进程完成出队操作)，那么CSW指令应该失败。然而，假设组成列表上第一个节点的内存块被“回收”并作为加入队列的新节点重用(在我们的进程已经读取头指针之后，但在它尝试CSW之前)。如果这个节点碰巧排到队列的前面(译者：即排到链表的尾部，因为新节点都是连接到链表尾部)，那么当我们的进程执行CSW时，它将成功，很可能破坏链表结构。</p>
+<p>这个问题被称为ABA问题[9]。这个问题的传统解决方案是使用CSW的一个变体，它一次操作两个相邻的内存字;一个单词用于保存指针，另一个单词用于保存标签，每当指针改变时，标签的值都会加1。这样，即使指针改变了，然后又变回原来的值，标签也已经改变，CSW操作不会成功。</p>
+<h3 id="41安全的读取协议"><a class="markdownIt-Anchor" href="#41安全的读取协议"></a> 4.1安全的读取协议</h3>
+<p>上述解决方案除了需要一个更强大的CSW版本之外，只会使ABA问题不太可能发生。在本节中，我们提出了一个替代解决方案，它不需要双字版本的CSW，并保证不会发生ABA问题。</p>
+<p>我们观察到，当我们使用CSW操作指针时，ABA问题的根本原因可以归结为节点被回收和重用的时候，一些进程仍在查看它们。因此，我们将ABA问题视为内存管理问题之一。为了解决这个问题，我们为每个节点分配一个引用计数，以跟踪(或者说监测)何时可以安全回收节点，直到它的引用计数为0时才重新使用节点。</p>
+<p>在跟踪数据结构中的指针时，必须确保进程以原子方式读取该指针，并将所指向结点的引用计数加1。我们把这个操作称为安全读取(safe read)。伪代码3给出了该操作的伪代码。在进程处理完该指针时，对应的释放操作将引用计数减1。如果计数为零，则可以回收该内存块。</p>
+<p>伪代码3（安全读取操作）如下：</p>
+<pre class="highlight"><code class="pseudocode">SAFEREAD(q)
+	loop:
+		p &lt;-- q^.next
+		if p == NULL then
+			return p
+		Fetch&amp;Add(p^.refct, 1)
+		if p == q^.next then
+			return p
+		else
+			Release(p)
+	goto loop
+end
+</code></pre>
+<p>假定底层内存管理库支持SafeRead和Release操作，其还提供常见的Alloc和Free操作。关于如何实现提供这四个操作的无锁版本的库的进一步细节可以在作者的博士论文[22]中找到。</p>
+<h2 id="5-数组实现"><a class="markdownIt-Anchor" href="#5-数组实现"></a> 5 数组实现</h2>
+<p>通常使用“循环数组”数据结构来实现顺序队列。与链表结构相比，这种数据结构的优点是开销更低，因为不需要next指针，也没有必要在每次操作时都分配和释放内存。</p>
+<p>Herlihy和Wing[7]提出了一种基于数组的队列，它是非阻塞的、可线性化的，但需要无限长的数组。Wing和Gong[23]对该算法进行了改进，去掉了对无限长数组的需求；然而，对于这两种算法，出队操作的运行时间随着入队操作的增加而降低。另外，Treiber[20]算法的性能也较差。</p>
+<p>Gottlieb等人[3]提出了一种高效的算法，但在一定条件下会产生阻塞。虽然可以通过增加数组的大小来降低阻塞发生的概率，但它并不是真正的非阻塞算法。</p>
+<h3 id="51-新算法"><a class="markdownIt-Anchor" href="#51-新算法"></a> 5.1 新算法</h3>
+<p>我们提出一种新的基于数组的无锁队列算法。该算法具有非阻塞性和线性化性。该方法与之前算法的不同之处在于，它使用的是CSW指令，而不是FAA指令。上一节中的算法在入队时都使用FAA在数组中分配一个位置。</p>
+<p>该数组被设置为一个标准的循环数组。除了用户希望存储在队列中的数据，还有3个特殊值：HEAD、TAIL和EMPTY。最初，数组中的每个位置都被设置为EMPTY，除了两个相邻的位置被设置为HEAD和TAIL。这表示空队列。</p>
+<p>算法的工作原理如下。为了将值x入队，进程查找包含特殊TAIL值的(唯一)位置。然后使用“double-world Compare&amp;Swap”(也可以使用CSW的标准版本，只要存储的数据值是半字)操作将相邻的两个位置从&lt;TAIL, EMPTY&gt;更改为&lt;x, TAIL&gt;。注意，如果包含TAIL的位置的相邻位置不为EMPTY，则队列已满，操作将终止。</p>
+<p>出队操作的工作方式类似，使用CSW操作将相邻的两个位置从&lt;HEAD, x&gt;更改为&lt;EMPTY, HEAD&gt;，返回值x(当然前提是x不是TAIL，在这种情况下队列是空的)。</p>
+<p>为了快速找到包含HEAD和TAIL值的数组中的位置，我们记录了两个计数值。入队次数和出队次数，并对数组大小取模。每当进程完成一个操作时，计数都会递增(使用FAA)，可用于在p次内确定头值或尾值的位置，其中p是并发进程的数量。请注意，由于ABA问题，使用CSW将队列末端的索引保存在变量中不起作用，而且由于我们无法防止索引被重用，因此无法应用安全读取协议(safe read protocol)。</p>
+<p>图5显示了与图2相同的队列，只是按照本节中描述的方式实现。请再次注意，进程正在对元素C进行入队，而Tail count变量尚未加1。</p>
+<p>![image-20231221152443034](/Users/yangyuan/Library/Application Support/typora-user-images/image-20231221152443034.png)</p>
+<p>这种技术也可以用于提供无锁的stack和deque (双端队列)抽象数据类型。但这种技术确实有一个微妙的问题：在真实的机器上，内存操作必须是对齐的。而我们的算法需要对每一个其他操作进行非对齐的CSW，因此在真实的机器上是不可行的。</p>
+<h2 id="6-实验结果"><a class="markdownIt-Anchor" href="#6-实验结果"></a> 6 实验结果</h2>
+<p>由于这类并发算法的运行时间依赖于并发进程的数量，因此很难描述它们的性能。对于本文提出的算法，一系列操作所需的时间与操作数和并发进程数的乘积成正比。</p>
+<blockquote>
+<p>定理2 一个由n个队列操作组成的序列需要<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mi>p</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(np)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mord mathnormal">p</span><span class="mclose">)</span></span></span></span>时间。</p>
+</blockquote>
+<p>证明:以下证明可以推广到本文的任何算法。注意，在没有其他进程竞争的情况下，一个操作将在常量时间内完成。竞争导致进程做更多了的工作，原因有二:</p>
+<ol>
+<li>在数据结构中寻找执行操作的适当位置(例如：遍历节点以找到链表的末尾)，</li>
+<li>以及重试失败的CSW操作。</li>
+</ol>
+<p>注意，根据定理1，从尾指针找到链表末尾的时间最多为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>p</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(p)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mclose">)</span></span></span></span>。对于数组实现，入队和出队操作计数器也将在<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>p</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(p)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mclose">)</span></span></span></span>的“正确”值范围内，因为最多有p个进程执行了操作，但没有增加计数器。</p>
+<p>在操作进行中，可能向链表(或数组)添加若干新元素。遍历这些项的总工作量为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mi>p</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(np)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mord mathnormal">p</span><span class="mclose">)</span></span></span></span>，因为每个操作最多可能导致p-1个并发操作遍历其(队列)项目。</p>
+<p>最后，通过类似的参数，重试失败的CSW操作的总工作量也是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mi>p</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(np)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mord mathnormal">p</span><span class="mclose">)</span></span></span></span>。接下来是边界。</p>
+<p>边界反映了最坏情况下的行为。为了更好地比较本文讨论的不同无锁算法以及等价的基于锁的算法的性能，我们在Proteus并行架构模拟器[2]上实现了其中的几个算法。所有数值结果在“cycles”中引用，由Proteus模拟。</p>
+<p>为了评估这些算法的性能，我们测量了两个量:每个操作的顺序延迟(即，一个操作在没有其他进程竞争的情况下执行的时间)，以及每个操作在不同数量的并发操作竞争下的延迟。假设有无限个处理器执行队列操作，执行间隔服从指数分布，对竞争进行建模。</p>
+<p>除了在第3节中描述的无锁数据结构之外，我们还使用互斥实现了一个并发队列。我们对以下锁定机制进行了测试：简单的“test-and-set”锁、测试和“test-and-set”锁，以及Mellor-Crummey和Scott [13]的ticket锁(译者：即序号锁，是一种同步机制，用于实现互斥访问共享资源。它基于排队的概念，类似于人们在售票窗口等待时获取号码牌的方式。每个进程或线程在访问共享资源之前获取一个唯一的票号，并按照顺序使用这些票号。只有持有当前票号的进程才能进入临界区并执行操作。当进程完成操作后，它会释放票号，使其他等待进程可以获得新的票号。这样可以确保公平性和避免饥饿情况的发生。)和队列锁。</p>
+<p>为了仅测量算法性能，我们在测试中没有实现安全读取协议;我们通过不重用链表上的节点来避免ABA问题。此外，为了从我们的结果中删除内存分配的开销，我们为测试使用预分配的节点缓冲区。</p>
+<p>在进程之间管理竞争的方法通常是通过在失败的CSW或锁获取后进行“backing off”(退避)来实现。这种类型的退避对调整参数非常敏感；不过，在这些初始实验中，除了ticket锁和队列锁之外，我们对所有算法使用了相同的退避算法（简单的指数退避）。ticket锁使用比例退避过程，而队列锁不需要任何退避。</p>
+<h3 id="61-竞争下的延迟"><a class="markdownIt-Anchor" href="#61-竞争下的延迟"></a> 6.1 竞争下的延迟</h3>
+<p>图6显示了Enqueue操作的平均延迟。这些结果代表了1000多个操作在不同竞争程度下的平均值(通过对操作的平均间隔时间的测量)。图7显示了出队操作的相同结果。</p>
+<p>![image-20231221164336697](/Users/yangyuan/Library/Application Support/typora-user-images/image-20231221164336697.png)</p>
+<p>初步结果表明，无锁队列与使用互斥的数据结构相比具有竞争力。该算法不仅运算速度快，而且具有非阻塞性和可线性化的特点，具有很好的应用前景。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">算法</th>
+<th style="text-align:center">入队</th>
+<th style="text-align:center">出队</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Stone</td>
+<td style="text-align:center">77</td>
+<td style="text-align:center">85</td>
+</tr>
+<tr>
+<td style="text-align:center">Valois(本文作者)</td>
+<td style="text-align:center">81</td>
+<td style="text-align:center">73</td>
+</tr>
+<tr>
+<td style="text-align:center">test &amp; test-and-set</td>
+<td style="text-align:center">129</td>
+<td style="text-align:center">94</td>
+</tr>
+<tr>
+<td style="text-align:center">test-and-set</td>
+<td style="text-align:center">136</td>
+<td style="text-align:center">100</td>
+</tr>
+<tr>
+<td style="text-align:center">Prakash等人</td>
+<td style="text-align:center">145</td>
+<td style="text-align:center">146</td>
+</tr>
+<tr>
+<td style="text-align:center">ticket锁</td>
+<td style="text-align:center">158</td>
+<td style="text-align:center">122</td>
+</tr>
+<tr>
+<td style="text-align:center">队列锁</td>
+<td style="text-align:center">228</td>
+<td style="text-align:center">197</td>
+</tr>
+</tbody>
+</table>
+<p>表格1：队列操作的顺序延迟。</p>
+<h3 id="62-顺序延迟"><a class="markdownIt-Anchor" href="#62-顺序延迟"></a> 6.2 顺序延迟</h3>
+<p>表1包含了顺序延迟测试的结果。Stone算法和本文算法是速度最快的两种算法。这可以归因于它们的简单性;在串行情况下，当没有竞争时，算法只执行少量指令。</p>
+<h2 id="7-总结"><a class="markdownIt-Anchor" href="#7-总结"></a> 7 总结</h2>
+<p>本文提出了两种新的数据结构和算法，用于实现非阻塞的、可线性化的并发队列。我们还提出了ABA问题的新解决方案。初步实验表明，与其他算法(包括使用互斥的数据结构)相比，该算法是实用的。</p>
+<h3 id="71-未来研究"><a class="markdownIt-Anchor" href="#71-未来研究"></a> 7.1 未来研究</h3>
+<p>这些算法在不同条件下的性能有待进一步的实验验证。例如，如果进程在其临界区内部可能会变慢，那么无锁方法就很有吸引力。需要通过实验来确定无锁数据结构在什么条件下能够超越基于锁的对应版本。</p>
+<p>本文主要关注队列的抽象数据类型；其他数据类型也可以从无锁方法中受益。其他研究人员针对各种问题提出了无锁算法，包括不相交集[1]、垃圾收集[5]、优先队列[10]和多处理器操作系统内核[11]。我们目前正在研究其他无锁数据结构的实现，如链表和二叉搜索树[22]。</p>
+<p>第2节提到的通用结构可以提供具有wait free属性的无锁数据结构。虽然这是一个理想的属性，但它通常需要在进程之间提供更高级别的协调，并会引入很大的开销。我们认为更好的方法是通过调度和退避策略来确保公平性。需要做更多的工作来确定如何最好地做到这一点。</p>
+<p>由于对齐问题，第5节中给出的基于数组的实现在实际机器上是不可行的。不过，该算法比使用数组的其他解决方案要高效得多。有没有一种算法既现实又高效?</p>
+<p>无锁数据结构提供了另一种同步方法，它比自旋锁具有优势。需要进行研究，以确定这些优势的范围(或者说程度)，以及如何在应用中利用它们。</p>
+<h2 id="引用"><a class="markdownIt-Anchor" href="#引用"></a> 引用</h2>
+<p>[1] R. Anderson and H. Woll. Wait-free parallel algorithms for the union-nd problem. In Proceedings of the 23rd ACM Symposium on Theory of Computation, pages 370-380, 1991.</p>
+<p>[2] E. Brewer, C. Dellarocas, A. Colbrook, and W. Weihl. Proteus: A high-performance parallel-architecture simulator. In Proceedings of the 1992 ACM SIGMETRICS and PERFOR MANCE '92 Conference, June 1992.</p>
+<p>[3] A. Gottlieb, B. Lubachevsky, and L. Rudolph. Basic techniques for the ecient coordination of very large numbers of cooperating sequential processors. ACM Transactions on Programming Languages and Systems, 5(2):164-189, April 1983.</p>
+<p>[4] M. Herlihy. A methodology for implementing highly concurrent data structures. In Second ACM SIGPLAN Symposium on Principles and Practice of Paral lel Programming, pages 197-206,1990.</p>
+<p>[5] M. Herlihy and J. Moss. Lock-free garbage collection for multiprocessors. In Proceedings of the 3rd Annual ACM Symposium on Paral lel Algorithms and Architectures, pages 229-236, July 1991.</p>
+<p>[6] M. Herlihy and J. Wing. Axioms for concurrentobjects. In 14th ACM Symposium on Principles of Programming Languages, pages 13-26, 1987.</p>
+<p>[7] M. Herlihy and J. Wing. Linearizability: A correctness condition for concurrent objects. ACM Transactions on Programming Languages and Systems, 12(3):463-492, July 1990.</p>
+<p>[8] K. Hwang and F. Briggs. Computer Architecture and Paral lel Processing, pages 559-562. McGraw Hill, 1985.</p>
+<p>[9] IBM T.J. Watson Research Center. System/370 Principles of Operation, 1983.</p>
+<p>[10] A. Israeli and L. Rappoport. Ecient wait-free implementation of a concurrent priority queue. In Proceedings of the 1993 Workshop on Distributed Algorithms, pages 1-16, 1993.</p>
+<p>[11] H. Massalin and C. Pu. A lock-free multiprocessor OS kernel. Technical Report CUCS-005-91, Columbia University, New York, NY, 1991.</p>
+<p>[12] J. Mellor-Crummey. Concurrent queues: Practical fetch-and- algorithms. Technical Report 229, University of Rochester, November 1987.</p>
+<p>[13] J. Mellor-Crummey and M. Scott. Algorithms for scalable synchronization on shared-memory multiprocessors. ACM Transactions On Computer Systems, 9:21-65, February 1991.</p>
+<p>[14] Peter Moller-Nielsen and Jorgen Staunstrup. Problem-heap: A paradigm for multiprocessor algorithms. Paral lel Computing, 4:63-74, 1987.</p>
+<p>[15] S. Plotkin. Sticky bits and universality of consensus. In Proceedings 8th ACM Symposium on Principles of Distributed Computing, pages 159-175, August 1989.</p>
+<p>[16] S. Prakash, Y. Lee, and T. Johnson. A non-blocking algorithm for shared queues using compare-and-swap. In Proccedings 1991 Inter national Conference on Paral lel Processing, volume 2, pages 68-75, 1991.</p>
+<p>[17] S. Prakash, Y. Lee, and T. Johnson. Non-blocking algorithms for concurrent data structures. Tech nical Report TR91-002, University of Florida, 1991.</p>
+<p>[18] R. Sites. Operating systems and computer architecture. In H. Stone, editor, Introduction to Computer Architecture, chapter 12, pages 594-604. Science Research Associates, 2nd edition, 1980.</p>
+<p>[19] J. Stone. A simple and correct shared-queue algorithm using Compare-and-Swap. In Proceedings of Supercomputing '90, pages 495-504, 1990.</p>
+<p>[20] R. K. Treiber. Systems programming: Copingwith parallelism. Technical Report RJ 5118, IBM Almaden Research Center, April 1986.</p>
+<p>[21] J. Turek. Resilient Computation in the Presence of Slowdowns. PhD thesis, New York University, 1991.</p>
+<p>[22] J. Valois. PhD thesis, Rensselaer Polytechnic In stitute, Troy, NY, in preparation.</p>
+<p>[23] J. Wing and C. Gong. A library of concurrent objects and their proofs of correctness. Technical Report CMU-CS-90-151, Carnegie Mellon University, 1990.</p>
+
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2024-01-02</span>
+            
+                <span>该篇文章被 小旋风</span>
+            
+            
+                <span>打上标签:
+                    
+                    
+                        <a href='/tags/%E7%BF%BB%E8%AF%91%E7%B3%BB%E5%88%97/'>
+                            翻译系列
+                        </a>
+                    
+                        <a href='/tags/%E6%97%A0%E9%94%81%E9%98%9F%E5%88%97/'>
+                            无锁队列
+                        </a>
+                    
+                </span>
+             
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='/categories/%E7%BF%BB%E8%AF%91%E7%B3%BB%E5%88%97/'>
+                            翻译系列
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    
+        
+
+     
+</div>
+
+
+
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 2019-2023  蜀ICP备19006467号 
+
+            
+                
+
+            
+        </span>
+    
+</div>
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>人生如逆旅，我亦是行人。</span>
+            
+    
+</div>
+
+
+    
+        
+<link rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/css/a11y-dark.min.css">
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlight.min.js"></script>
+
+        
+<script src="https://jsd.onmicrosoft.cn/npm/hexo-theme-a4@latest/source/js/highlightjs-line-numbers.js"></script>
+
+    
+
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+                </div>
+            
+    </body>
+</html>
